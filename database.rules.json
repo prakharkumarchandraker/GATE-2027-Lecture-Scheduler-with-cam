@@ -1,0 +1,13 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "desks": {
+      "$code": {
+        ".read": "$code.length >= 16",
+        ".write": "$code.length >= 16",
+        ".validate": "newData.hasChildren(['json', 'updated']) && newData.child('json').isString() && newData.child('json').val().length < 5000000"
+      }
+    }
+  }
+}

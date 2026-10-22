@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2343A6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>[hidden]{display:none!important}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px)}</style>
+</head>
+<body>
+<title>Pragati Study Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: ledger-book study desk. Three tabs. Sections are boxed cards with a tinted header; tappable things have a blue border or a › arrow. */
+:root{
+  --bg:#EEF0F5; --surface:#FFFFFF; --sunk:#E4E8F1; --ink:#1A1F2E; --muted:#5B6377; --line:#D3D9E5;
+  --accent:#2343A6; --accent-ink:#FFFFFF; --accent-soft:#E2E8FA; --margin:#C8452E;
+  --good:#1D7748; --good-soft:#DDF1E5; --warn:#9A5B00; --warn-soft:#FBEED6; --bad:#B3261E; --bad-soft:#FBE2DF;
+  --f-display:'Young Serif',Georgia,'Times New Roman',serif;
+  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C111C; --surface:#161C2A; --sunk:#1F2738; --ink:#E5E8F1; --muted:#9AA3B8; --line:#2C3549;
+  --accent:#8FA8F5; --accent-ink:#0E1320; --accent-soft:#222F57; --margin:#E07A62;
+  --good:#5CC08D; --good-soft:#163427; --warn:#E3A74A; --warn-soft:#3A2B11; --bad:#F08A80; --bad-soft:#3D1D1B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C111C; --surface:#161C2A; --sunk:#1F2738; --ink:#E5E8F1; --muted:#9AA3B8; --line:#2C3549;
+  --accent:#8FA8F5; --accent-ink:#0E1320; --accent-soft:#222F57; --margin:#E07A62;
+  --good:#5CC08D; --good-soft:#163427; --warn:#E3A74A; --warn-soft:#3A2B11; --bad:#F08A80; --bad-soft:#3D1D1B; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent);font-weight:600}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:1fr;min-height:100%}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -2px 10px rgb(0 0 0 / .05)}
+nav.tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:600;color:var(--muted);padding:6px 0;border-radius:10px;cursor:pointer}
+nav.tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button.on{color:var(--accent);background:var(--accent-soft)}
+nav.tabs .brand{display:none}
+main{padding:16px 16px 100px;max-width:760px;width:100%;margin:0 auto;min-width:0}
+@media (min-width:900px){
+  .app{grid-template-columns:220px 1fr}
+  nav.tabs{position:sticky;top:0;height:100vh;grid-template-columns:1fr;grid-auto-rows:min-content;gap:4px;border-top:0;border-right:1px solid var(--line);padding:20px 12px;box-shadow:none}
+  nav.tabs .brand{display:block;font-family:var(--f-display);font-size:20px;padding:4px 10px 18px;border-bottom:1px solid var(--line);margin-bottom:10px}
+  nav.tabs .brand small{display:block;font-family:var(--f-body);font-size:12px;color:var(--muted)}
+  nav.tabs button{flex-direction:row;justify-content:flex-start;gap:12px;font-size:15px;padding:10px 12px}
+  main{padding:28px 32px 48px}
+}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--margin)}
+.top h1{font-family:var(--f-display);font-weight:400;font-size:27px;line-height:1.15;margin:0;text-wrap:balance}
+.top .eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.round{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;width:38px;height:38px;display:inline-grid;place-items:center;cursor:pointer;color:var(--ink);flex:none;font-weight:700}
+.round svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--accent);font-weight:700;padding:6px 0;margin-bottom:4px;cursor:pointer;font-size:15px}
+.section{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:16px;overflow:hidden;box-shadow:0 1px 2px rgb(0 0 0 / .04)}
+.sh{display:flex;align-items:center;gap:8px;padding:9px 12px 9px 14px;background:var(--sunk);border-bottom:1px solid var(--line);min-height:46px}
+.sh h2{flex:1;margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:0}
+.sb{padding:14px}
+.sb.flush{padding:0}
+.info-btn{flex:none;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);background:var(--surface);font:italic 700 15px Georgia,serif;cursor:pointer;display:grid;place-items:center;padding:0}
+.info-btn[aria-expanded="true"]{background:var(--accent);color:var(--accent-ink)}
+.info{background:var(--accent-soft);padding:10px 14px;font-size:14px;border-bottom:1px solid var(--line);line-height:1.55}
+.info ul{margin:4px 0 0;padding-left:18px}
+.big{font-family:var(--f-display);font-size:36px;line-height:1.05}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.btn{border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px;min-height:42px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn.sm{padding:5px 12px;font-size:13px;min-height:34px}
+.btn.on{background:var(--accent);color:var(--accent-ink)}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.tag.good{background:var(--good-soft);color:var(--good)} .tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.bad{background:var(--bad-soft);color:var(--bad)} .tag.acc{background:var(--accent-soft);color:var(--accent)}
+.bar{height:10px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);border-radius:99px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{border:1.5px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:700;font-size:14px;cursor:pointer;min-width:52px}
+.chip.on{background:var(--accent);color:var(--accent-ink)}
+.chips input{width:84px;min-height:38px;padding:6px 10px;border-radius:999px;text-align:center}
+/* topic rows */
+.trow{display:flex;align-items:flex-start;gap:12px;width:100%;padding:12px 14px 12px 22px;border:0;border-bottom:1px solid var(--line);background:var(--surface);text-align:left;cursor:pointer;position:relative;color:var(--ink)}
+.trow:last-child{border-bottom:0}
+.trow::before{content:"";position:absolute;left:11px;top:0;bottom:0;width:1.5px;background:var(--margin);opacity:.5}
+.trow:hover{background:var(--accent-soft)}
+.box{flex:none;width:24px;height:24px;border:2px solid var(--accent);border-radius:7px;display:grid;place-items:center;font-size:14px;font-weight:700;color:var(--surface);margin-top:1px}
+.trow .t{flex:1;min-width:0}
+.trow .nm{font-weight:600;overflow-wrap:anywhere}
+.trow .meta{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.trow.done .box{background:var(--good);border-color:var(--good)}
+.trow.done .nm{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--good);color:var(--muted)}
+.vrow{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}.vrow:last-child{border-bottom:0}.vrow .trow{border-bottom:0;flex:1;min-width:0}.vrow .watch{flex:none;display:flex;align-items:center;padding:0 12px 0 4px;background:var(--surface)}
+.unit-h{padding:8px 14px;font-size:13px;font-weight:700;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}
+.subj-h{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;background:var(--surface);border:0;text-align:left;cursor:pointer;color:var(--ink)}
+.subj-h:hover{background:var(--accent-soft)}
+.subj-h .t{flex:1;min-width:0}
+.subj-h .nm{font-weight:700;font-size:16px;overflow-wrap:anywhere}
+.caret{flex:none;color:var(--accent);font-weight:700;border:1.5px solid var(--accent);border-radius:7px;padding:1px 8px;font-size:12px}
+.segs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:11px;margin:0 0 14px;border:1px solid var(--line)}
+.segs button{flex:1;border:0;background:transparent;padding:9px 12px;border-radius:8px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer}
+.segs button.on{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgb(0 0 0 / .12)}
+.empty{padding:18px 14px;text-align:center;color:var(--muted);font-size:14px}
+.empty b{display:block;color:var(--ink);margin-bottom:2px}
+.note{border-radius:10px;padding:10px 12px;font-size:14px;margin-top:10px}
+.note.warn{background:var(--warn-soft);color:var(--warn)} .note.good{background:var(--good-soft);color:var(--good)} .note.acc{background:var(--accent-soft);color:var(--accent)}
+.plain{padding:12px 14px;border-bottom:1px solid var(--line)} .plain:last-child{border-bottom:0}
+.kv{display:grid;grid-template-columns:1fr auto;gap:6px 14px;font-size:14px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:700;color:var(--muted)}
+.hint{font-size:12px;font-weight:500;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],input[type=url],input[type=password],select,textarea{width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:9px;padding:10px 11px;font-size:15px;font-weight:400;color:var(--ink);min-height:44px}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:none}
+textarea{min-height:90px;resize:vertical;line-height:1.55}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px}
+.pill-opts{display:flex;gap:6px;flex-wrap:wrap}
+.pill-opts label{border:1.5px solid var(--accent);color:var(--accent);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:14px;font-weight:600}
+.pill-opts input{position:absolute;opacity:0;pointer-events:none}
+.pill-opts label:has(input:checked){background:var(--accent);color:var(--accent-ink)}
+.scrim{position:fixed;inset:0;background:rgb(10 14 25 / .5);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){.scrim{align-items:center}.sheet{border-radius:18px}}
+.sheet h3{font-family:var(--f-display);font-weight:400;font-size:22px;margin:0 0 12px}
+.sheet form{display:flex;flex-direction:column;gap:12px}
+.sheet .acts{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:6px;padding-top:12px;border-top:1px solid var(--line)}
+.toast{position:fixed;left:16px;right:16px;margin:0 auto;width:fit-content;bottom:calc(88px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 8px 8px 16px;border-radius:12px;font-size:14px;z-index:60;max-width:92vw;display:flex;align-items:center;gap:12px;min-height:44px}
+.toast button{background:var(--bg);color:var(--ink);border:0;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer}
+@media (min-width:900px){.toast{bottom:28px}}
+.walk{position:fixed;inset:0;z-index:50;background:rgb(10 14 25 / .6);display:grid;place-items:center;padding:16px}
+.walk .wbox{background:var(--surface);border-radius:16px;max-width:440px;width:100%;padding:22px;border:1px solid var(--line)}
+.walk .step{font-family:var(--f-mono);font-size:12px;color:var(--margin)}
+.walk h3{font-family:var(--f-display);font-weight:400;font-size:24px;margin:6px 0 8px}
+.dots{display:flex;gap:5px;margin:14px 0}
+.dots i{width:7px;height:7px;border-radius:9px;background:var(--line)} .dots i.on{background:var(--accent);width:18px}
+.help-card h3{font-family:var(--f-display);font-weight:400;font-size:19px;margin:0 0 4px}
+.help-card ul{padding-left:20px;margin:6px 0 0}
+.help-card li{margin-bottom:4px;max-width:65ch}
+code{font-family:var(--f-mono);font-size:13px;background:var(--sunk);padding:1px 5px;border-radius:4px}
+[hidden]{display:none!important}
+/* clock, focus mode, break reminder */
+.clock-card{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.clock-big{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:40px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.clock-big small{font-size:18px;color:var(--muted);margin-left:2px}
+.focus,.brk{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.focus{background:var(--bg);color:var(--ink);gap:12px;justify-content:flex-start;overflow-y:auto;padding-top:calc(64px + env(safe-area-inset-top,0px))}
+.flist{width:min(100%,560px);text-align:left;margin-top:8px}
+.focus .fc{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600;font-size:clamp(56px,18vw,160px);line-height:1;letter-spacing:-.03em}
+.focus .fc small{font-size:.32em;color:var(--muted)}
+.focus .fd{font-family:var(--f-display);font-size:clamp(20px,5vw,32px)}
+.focus .fx{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px}
+.brk{background:var(--accent);color:var(--accent-ink);gap:16px;z-index:80}
+.brk h2{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,9vw,64px);margin:0;line-height:1.1;text-wrap:balance}
+.brk p{font-size:18px;margin:0;max-width:30ch;opacity:.9}
+.brk .bt{font-family:var(--f-mono);font-size:clamp(40px,12vw,90px);font-weight:600;font-variant-numeric:tabular-nums}
+.brk .bb{background:var(--accent-ink);color:var(--accent);border:0;border-radius:14px;padding:16px 34px;font-size:20px;font-weight:700;cursor:pointer;min-width:220px}
+.brk .bs{background:transparent;color:var(--accent-ink);border:2px solid var(--accent-ink);border-radius:14px;padding:12px 24px;font-size:16px;font-weight:700;cursor:pointer;min-width:220px}
+.brk .bpane{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%}
+.brk .wopts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:min(100%,380px)}
+.brk .wopt{background:var(--accent-ink);color:var(--accent);border:0;border-radius:12px;padding:16px 0;font-weight:700;font-size:18px;cursor:pointer}
+.brk .row .bs{min-width:0;flex:1}
+.walker{width:84px;height:84px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+@media (prefers-reduced-motion:no-preference){.brk .walker{animation:bob 1s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-6px)}}}
+.switch{display:flex;align-items:center;gap:10px;font-weight:600;cursor:pointer}
+.switch input{width:22px;height:22px;accent-color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){.sheet,.walk .wbox{animation:rise .18s ease-out}@keyframes rise{from{transform:translateY(8px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+<div class="app">
+  <nav class="tabs" id="tabs" aria-label="Main">
+    <div class="brand">Study Desk<small>B.Com · Pragati</small></div>
+    <button data-nav="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Today</button>
+    <button data-nav="syllabus"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg>Syllabus</button>
+    <button data-nav="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+  </nav>
+  <main id="view"></main>
+</div>
+<div id="sheet-root"></div>
+<div id="walk-root"></div>
+<div class="focus" id="focus" hidden role="dialog" aria-label="Focus clock"><button class="btn fx" data-act="focusOff">✕ Exit</button><div class="fd" id="f-date"></div><div class="fc" id="f-clock"></div><div class="tag acc" style="font-size:15px;padding:6px 12px" id="f-next"></div><div class="small muted" id="f-prog"></div><div class="flist" id="f-list"></div></div>
+<div class="brk" id="brk" hidden role="alertdialog" aria-labelledby="brk-h">
+<div class="bpane" id="brk-ask"><div class="bt" id="brk-time"></div><svg class="walker" viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="4" r="2"/><path d="M9 21l2.5-6.5L14 17v4M11.5 14.5L12 9l-3 2-1.5 3M12 9l3 3 3 1"/></svg><h2 id="brk-h">Stand up and walk</h2><p>Pick how long you will walk. The app rings when time is up.</p>
+<div class="wopts"><button class="wopt" data-act="brkWalk" data-m="1">1 min</button><button class="wopt" data-act="brkWalk" data-m="3">3 min</button><button class="wopt" data-act="brkWalk" data-m="5">5 min</button><button class="wopt" data-act="brkWalk" data-m="10">10 min</button></div>
+<div class="row" style="justify-content:center;width:min(100%,380px)"><button class="bs" data-act="brkDone">Skip</button><button class="bs" data-act="brkSnooze">Snooze 5 min</button></div></div>
+<div class="bpane" id="brk-run" hidden><h2>Walking…</h2><div class="bt" id="brk-cd">0:00</div><p>Keep moving. The app will ring when time is up.</p><button class="bs" data-act="brkStop">Stop early</button></div>
+<div class="bpane" id="brk-end" hidden><h2>Walk done</h2><p>Sit down, drink some water and get back to study.</p><button class="bb" data-act="brkBack">Back to study ✓</button></div>
+</div>
+<div class="toast" id="toast" hidden role="status"><span id="toast-msg"></span><button id="toast-undo" hidden>Undo</button></div>
+
+<script>
+(function(){
+'use strict';
+/* ================= utils ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-4);
+const z=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());
+const today=()=>ymd(new Date());
+const addDays=(s,n)=>{const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ymd(d)};
+const diff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5);
+const fmt=s=>s?new Date(s+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:(s.slice(0,4)!==today().slice(0,4))?'numeric':undefined}):'';
+const hrs=h=>{h=+h||0;const H=Math.floor(h),M=Math.round((h-H)*60);return (H?H+' hr':'')+(M?(H?' ':'')+M+' min':'')||'0 min'};
+const KEY='pragati-desk-v2',OLDKEY='pragati-desk-v1',SKEY='pragati-desk-sync';
+const KINDS=['DSC (Core)','GE (Elective)','AEC','VAC','SEC','Other'];
+
+/* ================= built-in syllabus: DU B.Com (Programme) Sem 1, NEP 2022 ================= */
+const PACK={ver:3,subjects:[
+ {key:'bom',name:'Business Organisation and Management',code:'BC: DSC-1.1',kind:'Core',written:true,cr:'4',units:[
+  ['Unit 1 · Introduction',[['b1a','Role of organisations and management in our lives'],['b1b','Nature and functions of management (overview), coordination'],['b1c','Managerial competencies'],['b1d','Ownership forms (sole proprietorship, partnership, LLP, company, OPC)'],['b1e','Business formats: brick & mortar, click, brick & click, e-commerce'],['b1f','Franchising'],['b1g','Outsourcing']]],
+  ['Unit 2 · Business Environment and Entrepreneurship',[['b2a','Meaning and layers of business environment (micro, meso, macro, international)'],['b2b','Business ethics and social responsibility'],['b2c','Entrepreneurship and its relevance'],['b2d','Business and social entrepreneurship as a process of opportunity/problem'],['b2e','Micro, small and medium enterprises (MSMEs)'],['b2f','Government policy regarding MSMEs']]],
+  ['Unit 3 · Planning and Organizing',[['b3a','Strategic planning: business and corporate level strategies'],['b3b','Decision-making: process and techniques'],['b3c','Organizing; formal and informal organisations'],['b3d','Centralisation and decentralisation; delegation; span of management'],['b3e','Organisational structures: divisional, product, matrix, project, virtual']]],
+  ['Unit 4 · Directing and Controlling',[['b4a','Motivation: needs, Maslow\'s theory, incentives'],['b4b','Equity theory and Herzberg\'s two-factor theory'],['b4c','McGregor\'s Theory X and Theory Y'],['b4d','Leadership styles; transactional vs transformational leadership'],['b4e','Followership: meaning, importance, Kelley\'s model'],['b4f','Communication: new trends, role of IT and social media'],['b4g','Controlling: techniques; relationship between planning and controlling']]],
+  ['Unit 5 · Indian Ethos and Contemporary Issues in Management',[['b5a','Indian ethos: value-oriented holistic management'],['b5b','Lessons from Bhagavad Gita and Ramayana'],['b5c','Business Process Reengineering (BPR)'],['b5d','Learning organisation'],['b5e','Six Sigma'],['b5f','Supply chain management'],['b5g','Subaltern management ideas from India'],['b5h','Diversity and inclusion'],['b5i','Work-life balance'],['b5j','Freelancing, flexi-time and work from home'],['b5k','Co-sharing / co-working']]]]},
+ {key:'bl',name:'Business Laws',code:'BC: DSC-1.2',kind:'Core',written:true,cr:'4',units:[
+  ['Unit 1 · The Indian Contract Act, 1872',[['l1a','Contract: meaning, characteristics and kinds'],['l1b','Offer and acceptance'],['l1c','Consideration'],['l1d','Contractual capacity'],['l1e','Free consent'],['l1f','Legality of object'],['l1g','Void agreements'],['l1h','Quasi-contracts']]],
+  ['Unit 2 · Discharge of Contract and Remedies for Breach',[['l2a','Modes of discharge: performance, mutual agreement, supervening impossibility, lapse of time, operation of law, breach'],['l2b','Remedies for breach: rescission, damages, quantum meruit, specific performance, injunction']]],
+  ['Unit 3 · Introduction to Special Contracts',[['l3a','Indemnity and guarantee'],['l3b','Bailment and pledge'],['l3c','Agency']]],
+  ['Unit 4 · The Sale of Goods Act, 1930',[['l4a','Contract of sale; sale vs agreement to sell'],['l4b','Conditions and warranties'],['l4c','Transfer of ownership, including sale by non-owners'],['l4d','Performance of the contract of sale'],['l4e','Unpaid seller: meaning and rights against the goods']]],
+  ['Unit 5 · The Limited Liability Partnership Act, 2008',[['l5a','Salient features and nature of LLP; small LLP'],['l5b','LLP vs partnership; LLP vs company'],['l5c','LLP agreement; incorporation document; incorporation by registration'],['l5d','Registered office and its change; change and rectification of name'],['l5e','Partners and designated partners; their relations'],['l5f','Extent and limitation of liability; whistleblowing'],['l5g','Conversion into LLP']]]]},
+ {key:'fa',name:'Financial Accounting',code:'BC: DSC-1.3',kind:'Core',written:true,cr:'4',ext:'55',intM:'25',units:[
+  ['Unit 1 · Theoretical Framework and Accounting Process',[['f1a','Accounting as an information system; users and their needs; AI and data analytics in accounting'],['f1b','Qualitative characteristics; functions, advantages, limitations; branches of accounting'],['f1c','Cash vs accrual basis; capital vs revenue expenditure and receipts'],['f1d','Events after balance sheet date; extraordinary and prior period items; accounting estimates'],['f1e','Accounting policies; fair value; provisions, contingent liabilities and assets'],['f1f','GAAP: accounting concepts and conventions; fundamental assumptions (AS 1)'],['f1g','Accounting standards: AS, Ind AS, IFRS; convergence vs adoption'],['f1h','Accounting process: journal to trial balance; adjusting, transfer and closing entries'],['f1i','Accounting treatment of GST']]],
+  ['Unit 2 · Business Income, PPE and Inventory',[['f2a','Business income: concept, measurement, accounting period, continuity, matching'],['f2b','Revenue recognition (AS 9)'],['f2c','Property, plant and equipment (AS 10); depreciation and its effect on income'],['f2d','Intangible assets (AS 26)'],['f2e','Inventory valuation (AS 2): FIFO, LIFO, weighted average']]],
+  ['Unit 3 · Financial Statements',[['f3a','Final accounts of a sole proprietor (Trading, P&L, Balance Sheet with adjustments)'],['f3b','Not-for-profit organisations: Receipts & Payments, Income & Expenditure, Balance Sheet']]],
+  ['Unit 4 · Inland Branches, Departments and Leases',[['f4a','Dependent branches: debtors system'],['f4b','Branches: stock and debtors system'],['f4c','Departmental accounts (excluding mark-up account)'],['f4d','Leases (AS 19)']]],
+  ['Unit 5 · Computerised Accounting (practical)',[['f5a','Create a company; configure features; ledgers and groups'],['f5b','Stock items and groups; voucher entry including GST'],['f5c','Reports: cash book, ledger, trial balance, P&L, balance sheet, cash flow'],['f5d','Select and shut a company; backup and restore']]]]},
+ {key:'eng',name:'Developing English Language Skills-I',code:'GE Language 4',kind:'Elective',written:true,cr:'4',units:[
+  ['Unit 1 · Reading & Vocabulary–I',[['e1a','Strategies for language learning'],['e1b','Various ways of reading'],['e1c','Understanding text types: newspaper articles, poems, stories (reading aloud, sentence completion, true/false, jumbled sentences, titles, comprehension)']]],
+  ['Unit 2 · Writing & Grammar–I',[['e2a','Structure of written texts: topic sentences and supporting details'],['e2b','Summarising passages'],['e2c','Expanding ideas, subjects and topics'],['e2d','Steps in the process of good writing'],['e2e','Grammar: subject–verb agreement'],['e2f','Grammar: tenses'],['e2g','Grammar: articles'],['e2h','Grammar: prepositions']]],
+  ['Unit 3 · Speaking & Listening–I',[['e3a','Formal vs informal language'],['e3b','Socialising and showing politeness'],['e3c','Greetings, asking after, introducing oneself and others'],['e3d','Thanking, wishing well, apologising and excusing'],['e3e','Asking for and giving information'],['e3f','Making offers and requests, giving orders']]]]},
+ {key:'hin',name:'Hindi Aupcharik Lekhan (Hindi B)',code:'AEC 2',kind:'Skill / AEC',written:true,cr:'2',ext:'38',intM:'12',units:[
+  ['इकाई 1 · लेखन दक्षता का विकास',[['h1a','कार्यालयी हिंदी (Official Hindi)'],['h1b','व्यावसायिक हिंदी (Business Hindi)'],['h1c','टिप्पण और प्रारूपण: सामान्य परिचय (Noting and drafting)'],['h1d','प्रतिवेदन और विज्ञप्ति का महत्व (Report and press release)']]],
+  ['इकाई 2 · औपचारिक लेखन के प्रकार',[['h2a','स्ववृत्त लेखन (Resume / CV)'],['h2b','सूचना के अधिकार के लिए लेखन (RTI application)'],['h2c','कार्यालयी और व्यावसायिक पत्र लेखन (Official and business letters)'],['h2d','व्यावसायिक कार्यक्रम के लिए प्रेस विज्ञप्ति (Press release)']]]]},
+ {key:'sb',name:'Swachh Bharat',code:'VAC 1',kind:'Skill / AEC',written:true,cr:'2',units:[
+  ['Unit 1 · Introduction to Swachh Bharat Abhiyan',[['s1a','Gandhian philosophy of cleanliness'],['s1b','Swachh Bharat Abhiyan (SBA)'],['s1c','Hygiene, sanitation and sustainable waste management'],['s1d','Agencies and nodal ministries for SBA'],['s1e','Phases of SBA and its evaluation'],['s1f','Citizens\' responsibilities: role of Swachhagrahi']]],
+  ['Unit 2 · Rural and Urban Facets',[['s2a','Indicators for Swachh Bharat'],['s2b','Rural: sanitation coverage across households (2014 vs 2022)'],['s2c','Rural: ODF village parameters; ODF plus model indicators'],['s2d','Urban: sustainable sanitation'],['s2e','Urban: wastewater and solid waste management; garbage-free cities']]],
+  ['Unit 3 · Prospects and Challenges',[['s3a','Attitudes and perceptions'],['s3b','Operational and financial issues'],['s3c','Monitoring and supervision'],['s3d','Community mobilization']]]]},
+ {key:'yoga',name:'Yoga: Philosophy and Practice',code:'VAC 1',kind:'Skill / AEC',written:true,cr:'2',units:[
+  ['Unit 1 · Asana, Pranayama and Dhyana',[['y1a','History of Yoga'],['y1b','Significance of asana'],['y1c','Effect of pranayama'],['y1d','Importance of dhyana']]],
+  ['Unit 2 · Patanjali\'s Yogasutra and Chakra',[['y2a','Patanjali\'s Yogasutra: a summary'],['y2b','First sutra'],['y2c','Second sutra'],['y2d','Chakras (psychic centres)']]],
+  ['Unit 3 · Understanding Asana and Pranayama',[['y3a','Asana: the basics'],['y3b','Surya Namaskara'],['y3c','Nadishodhana pranayama']]]]}
+],kinds:{bom:'DSC (Core)',bl:'DSC (Core)',fa:'DSC (Core)',eng:'GE (Elective)',hin:'AEC',sb:'VAC',yoga:'SEC'}};
+
+/* ================= info texts ================= */
+const INFO={
+ hours:'Pick how long you will study today and, if you like, which subjects. Tap a subject to add or remove it; tap All subjects to go back to the automatic mix. The app fills that time with revisions that are due and new topics. Change it any time; topics you already crossed stay crossed.',
+ revise:'Topics you already studied come back for revision automatically:<ul><li><b>Revision 1</b>: 3 days after you study a topic.</li><li><b>Revision 2</b>: 7 days after Revision 1.</li><li><b>Final revision</b>: every studied topic once more in the last revision days before the exam.</li></ul>Tap a topic when revised; it gets crossed out. Revisions take up to half your study time; the rest goes to new topics.',
+ plan:'Topics not finished yesterday come back today first (marked Left from earlier). Want a specific topic? Tap + Choose a topic, or tap + Today next to it in the Syllabus tab. Tap ✕ to remove a topic from today; it comes back on another day. These topics are picked for you from every subject. Subjects whose exam is closer, or that have more left, get more topics.<ul><li>Tap a topic when you finish it. It gets crossed out and stays in the list.</li><li>Tapped by mistake? Tap it again, or press Undo.</li><li>Finished early? Tap <b>+ One more topic</b>.</li><li>Topics you skip today come back tomorrow.</li></ul>',
+ exams:'Set the date your exams start. The app spreads the remaining topics over the days left, keeping the last few days free for revision. If a subject has its own exam date, set it in Syllabus → that subject → Edit.',
+ progress:'How much of this semester is done. Tap Syllabus at the bottom to see every topic.',
+ syllabus:'Every topic of the semester. Tap a topic to cross it out when done, tap again to undo. Use the buttons at the top to see only what is left or only what is done.',
+ subject:'Tap the subject name to open or close its topics. Edit lets you change its name, exam date or topic list.',
+ lect:'Lecture videos picked for today. Lectures linked to today\'s new topics come first, then the next lectures in order from each subject. Tap a lecture when watched to cross it out. Watch ↗ opens the video.',
+ lectures:'Add lecture videos for any subject by pasting JSON. Tap <b>Get the Claude prompt</b>, copy it, paste it into Claude with your lecture names, lengths and links, and paste the JSON Claude gives back into <b>+ Add lectures</b>. Daily study time is then split between topics and lectures by the share below.',
+ study:'Minutes per topic: about how long a new topic takes you. Minutes per revision: how long revising one topic takes. Today’s list uses it to decide how many topics fit in your study time. Revision days: the last days before the exam kept free for revision.',
+ breaks:'At the interval you set, counted from the From time (with 30 min from 7:00 that is 9:30, 10:00, 10:30…), the app shows a full-screen reminder with a sound and a phone notification. It works while the app is open. With the phone locked or the app closed, Android may delay or skip it, so use Focus clock while studying: it keeps the screen on and the reminders on time.',
+ look:'Match phone follows your phone’s dark mode setting.',
+ sync:'Your data always saves on this device first and works without internet. Cloud sync keeps a copy in Firebase so the same data shows on phone and laptop, and nothing is lost if the phone changes. No login: the sync code is the key. Keep it private, and write it down somewhere safe.',
+ backup:'Download a backup file once a week and keep it in Google Drive or email it to yourself. Import replaces everything on this device with the backup.',
+ sems:'Each semester has its own subjects and exam date. Old semesters stay saved. The current semester is what Today and Syllabus show.',
+ reset:'Erase all progress removes every crossed topic and setting on this device, then loads the Sem 1 syllabus fresh. Download a backup first.'
+};
+
+/* ================= state ================= */
+function mkTopic(name){return {id:uid(),name,done:'',r1:'',r2:'',rf:''}}
+function fresh(){const sem={id:uid(),name:'Semester 1',exam:''};return {v:3,meta:{updated:0},sems:[sem],activeSem:sem.id,subjects:[],plan:{date:'',hours:0,ids:[],mode:''},hoursLog:{},
+  set:{theme:'system',mpt:45,rmin:15,buffer:5,hours:2,vshare:50,speed:1,brkOn:true,brkEvery:30,brkFrom:'07:00',brkTo:'23:00',brkSound:true,tutDone:false},open:{}}}
+function loadPack(){for(const ps of PACK.subjects){if(S.subjects.some(s=>s.pk===ps.key))continue;
+  S.subjects.push({id:uid(),pk:ps.key,semId:S.activeSem,name:ps.name,kind:PACK.kinds[ps.key]||'Other',exam:'',units:ps.units.map(([un,ts])=>({id:uid(),name:un,topics:ts.map(([k,n])=>mkTopic(n))}))})}
+  S.packVer=PACK.ver}
+/* convert data from the earlier, bigger version of the app */
+function fromOld(o){const n=fresh();n.sems=(o.sems||n.sems).map(s=>({id:s.id,name:s.name,exam:s.exam||''}));n.activeSem=o.activeSem||n.sems[0].id;
+  n.subjects=(o.subjects||[]).filter(s=>!s.ex).map(s=>({id:s.id,pk:s.pk||'',semId:s.semId,name:s.name,kind:({'Core':'DSC (Core)','Elective':'GE (Elective)'})[s.kind]||(s.pk&&PACK.kinds[s.pk])||'Other',exam:s.exam||'',
+    units:(s.units||[]).map(u=>({id:u.id,name:u.name,topics:(u.topics||[]).map(x=>({id:x.id,name:x.name,done:x.st>0?(x.d&&x.d.s)||today():'',r1:(x.d&&x.d.r1)||'',r2:(x.d&&x.d.r2)||'',rf:''}))}))}));
+  if(o.set){n.set.theme=o.set.theme||'system';n.set.tutDone=!!o.set.tutDone}return n}
+function migrate(){const f=fresh();for(const k of Object.keys(f))if(S[k]===undefined)S[k]=f[k];S.set=Object.assign({},f.set,S.set);S.meta=S.meta||{updated:0};S.open=S.open||{};S.hoursLog=S.hoursLog||{};
+  for(const s of S.subjects){s.units=s.units||[];s.videos=s.videos||[];for(const u of s.units)for(const x of u.topics){if(x.done==null)x.done='';if(x.rev&&!x.r1)x.r1=x.rev;delete x.rev;for(const k of ['r1','r2','rf'])if(x[k]==null)x[k]=''}}}
+let S;
+function load(){try{const r=localStorage.getItem(KEY);if(r){S=JSON.parse(r);migrate();return}}catch(e){}
+  try{const o=localStorage.getItem(OLDKEY);if(o){S=fromOld(JSON.parse(o));if(!S.subjects.length)loadPack();save(true);return}}catch(e){}
+  S=fresh();loadPack()}
+function save(noSync){S.meta.updated=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Could not save on this device. Download a backup from Settings.')}if(!noSync)schedulePush()}
+load();
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+
+/* ================= lookups ================= */
+const sem=()=>S.sems.find(s=>s.id===S.activeSem)||S.sems[0];
+const semSubs=()=>S.subjects.filter(s=>s.semId===S.activeSem);
+const sub=id=>S.subjects.find(s=>s.id===id);
+function topicsOf(s){const a=[];for(const u of s.units)for(const x of u.topics)a.push(x);return a}
+function findTopic(id){for(const s of S.subjects)for(const u of s.units){const x=u.topics.find(t=>t.id===id);if(x)return {s,u,x}}return null}
+const examOf=s=>s.exam||sem().exam||'';
+function count(list){let n=0,d=0;for(const s of list)for(const x of topicsOf(s)){n++;if(x.done)d++}return {n,d,left:n-d}}
+function streak(){const set=new Set();for(const s of S.subjects)for(const x of topicsOf(s)){for(const k of ['done','r1','r2','rf'])if(x[k])set.add(x[k])}let d=today();if(!set.has(d))d=addDays(d,-1);let n=0;while(set.has(d)){n++;d=addDays(d,-1)}return n}
+
+/* ================= daily plan ================= */
+/* Revision schedule: Rev 1 is due 3 days after studying, Rev 2 is due 7 days after Rev 1,
+   and in the last revision days before the exam every studied topic gets one final revision. */
+const RK={r1:'Revision 1',r2:'Revision 2',rf:'Final revision'};
+function winStart(s){const e=examOf(s);return e?addDays(e,-(+S.set.buffer||0)):''}
+function revDue(x,s,t){if(!x.done)return null;
+  const ws=winStart(s),e=examOf(s);
+  if(e&&ws&&t>=ws&&t<=e){const last=[x.rf,x.r2,x.r1].filter(Boolean).sort().pop()||'';if(!x.rf&&last<ws&&x.done<ws)return {k:'rf',on:ws}}
+  if(!x.r1)return {k:'r1',on:addDays(x.done,3)};
+  if(!x.r2)return {k:'r2',on:addDays(x.r1,7)};
+  return null}
+function daysFor(s){const t=today(),e=examOf(s);if(!e||e<t)return null;const L=diff(t,e),B=+S.set.buffer||0;return Math.max(1,L-B>0?L-B:L)}
+function pace(){let need=0,undated=0;for(const s of semSubs()){const left=topicsOf(s).filter(x=>!x.done).length;if(!left)continue;const d=daysFor(s);if(d==null){undated+=left;continue}need+=left/d}return {need:Math.ceil(need-1e-9),undated}}
+const MPT=()=>Math.max(10,+S.set.mpt||45), RMIN=()=>Math.max(5,+S.set.rmin||15);
+function fits(h){return Math.max(1,Math.floor((+h||0)*60/MPT()))}
+function todaySel(){return S.subjToday&&S.subjToday.date===today()?S.subjToday.ids.filter(id=>sub(id)&&sub(id).semId===S.activeSem):[]}
+function planSubs(){const sel=todaySel();return sel.length?semSubs().filter(s=>sel.includes(s.id)):semSubs()}
+function pickTopics(n,exclude){
+  const out=[];for(const id of S.pending||[]){if(out.length>=n)break;const f=findTopic(id);if(f&&!f.x.done&&planSubs().includes(f.s)&&!exclude.has(id)){out.push(id);exclude=new Set([...exclude,id])}}
+  const pool=[];
+  for(const s of planSubs()){const left=topicsOf(s).filter(x=>!x.done&&!exclude.has(x.id));if(!left.length)continue;const d=daysFor(s);pool.push({s,left,d:d==null?90:d,e:examOf(s)||'9999',k:0})}
+  const even=todaySel().length>0;const sc=p=>even?1/(1+p.k):p.left.length/p.d/(1+p.k);
+  while(out.length<n&&pool.length){pool.sort((a,b)=>sc(b)-sc(a)||(a.e<b.e?-1:1));const p=pool[0];out.push(p.left.shift().id);p.k++;if(!p.left.length)pool.shift()}
+  return out;
+}
+function dueRevisions(exclude){const t=today(),out=[];
+  for(const s of semSubs())for(const x of topicsOf(s)){if(exclude.has(x.id))continue;const d=revDue(x,s,t);if(d&&d.on<=t)out.push({id:x.id,k:d.k,on:d.on,e:examOf(s)||'9999'})}
+  out.sort((a,b)=>(a.on<b.on?-1:a.on>b.on?1:0)||(a.e<b.e?-1:1));return out}
+function extraRevisions(n,exclude){const all=[];for(const s of semSubs())for(const x of topicsOf(s))if(x.done&&!exclude.has(x.id))all.push({id:x.id,e:examOf(s)||'9999',last:[x.rf,x.r2,x.r1,x.done].filter(Boolean).sort().pop()});
+  all.sort((a,b)=>(a.last<b.last?-1:1)||(a.e<b.e?-1:1));return all.slice(0,n).map(a=>({id:a.id,k:'rx'}))}
+/* ---- lectures ---- */
+const vMin=v=>Math.max(1,Math.round((+v.min||0)/(+S.set.speed||1)));
+function findVideo(id){for(const s of S.subjects){const v=(s.videos||[]).find(x=>x.id===id);if(v)return {s,v}}return null}
+function vcount(list){let n=0,w=0,left=0;for(const s of list)for(const v of s.videos||[]){n++;if(v.w)w++;else left+=vMin(v)}return {n,w,left}}
+function pickVideos(budget,topicIds,exclude){
+  const out=[];let used=0;const tset=new Set(topicIds);
+  const fitsIn=v=>!out.length&&budget>0||used+vMin(v)<=budget;
+  for(const s of semSubs())for(const v of s.videos||[]){if(v.w||exclude.has(v.id)||!v.topicId||!tset.has(v.topicId))continue;if(!fitsIn(v))continue;out.push(v.id);used+=vMin(v)}
+  const pool=[];for(const s of planSubs()){const left=(s.videos||[]).filter(v=>!v.w&&!exclude.has(v.id)&&!out.includes(v.id));if(!left.length)continue;const d=daysFor(s);pool.push({left,d:d==null?90:d,e:examOf(s)||'9999',k:0})}
+  const sc=p=>p.left.reduce((a,v)=>a+vMin(v),0)/p.d/(1+p.k);
+  while(pool.length){pool.sort((a,b)=>sc(b)-sc(a)||(a.e<b.e?-1:1));const p=pool[0],v=p.left[0];if(!fitsIn(v))break;out.push(v.id);used+=vMin(v);p.left.shift();p.k++;if(!p.left.length)pool.shift()}
+  return out}
+function buildPlan(hours){
+  const t=today(),old=S.plan&&S.plan.date===t?S.plan:null;
+  const dt=doneToday();const keepNew=dt.ids,keepRev=dt.rev,keepVid=dt.vids;
+  const skip=old&&old.skip?old.skip.slice():[];
+  let mins=(+hours||0)*60-keepNew.length*MPT()-keepRev.length*RMIN()-keepVid.reduce((a,id)=>a+vMin(findVideo(id).v),0);
+  const ex=new Set(keepNew.concat(keepRev.map(r=>r.id),skip));
+  const leftNew=planSubs().reduce((a,s)=>a+topicsOf(s).filter(x=>!x.done).length,0);
+  const due=dueRevisions(ex);
+  const revCap=leftNew?Math.max(1,Math.floor(Math.max(0,mins)*0.5/RMIN())):Math.floor(Math.max(0,mins)/RMIN());
+  const rev=keepRev.concat(due.slice(0,revCap).map(r=>({id:r.id,k:r.k})));
+  mins-=Math.min(due.length,revCap)*RMIN();
+  rev.forEach(r=>ex.add(r.id));
+  const vLeft=vcount(planSubs()).left;
+  let vBudget=vLeft?(leftNew?Math.max(0,mins)*(Math.min(100,Math.max(0,+S.set.vshare||0))/100):Math.max(0,mins)):0;
+  let tMins=Math.max(0,mins)-vBudget;
+  let nNew=Math.floor(tMins/MPT());if(!keepNew.length&&!nNew&&leftNew&&(+hours||0)>0&&mins>0&&(!vLeft||mins>=MPT())){nNew=1;vBudget=Math.max(0,mins-MPT());tMins=MPT()}
+  const ids=keepNew.concat(pickTopics(nNew,ex));
+  tMins-=(ids.length-keepNew.length)*MPT();
+  if(vLeft)vBudget+=Math.max(0,tMins),tMins=0;
+  const vids=keepVid.concat(pickVideos(vBudget,ids,new Set(keepVid.concat(skip))));
+  mins-=(ids.length-keepNew.length)*MPT()+vids.slice(keepVid.length).reduce((a,id)=>a+vMin(findVideo(id).v),0);
+  if(!leftNew&&!vLeft&&mins>=RMIN()){const more=extraRevisions(Math.floor(mins/RMIN()),new Set([...ex,...ids]));rev.push(...more)}
+  S.plan={date:t,hours:+hours,ids,rev,vids,skip,overdue:Math.max(0,due.length-revCap)};
+}
+function doneToday(){const t=today(),ids=[],rev=[],vids=[];
+  for(const s of semSubs()){for(const x of topicsOf(s)){if(x.done===t)ids.push(x.id);for(const k of ['r1','r2','rf','rx'])if(x[k]===t)rev.push({id:x.id,k})}for(const v of s.videos||[])if(v.w===t)vids.push(v.id)}
+  return {ids,rev,vids}}
+function mergeDoneToday(){const d=doneToday(),P=S.plan;for(const id of d.ids)if(!P.ids.includes(id))P.ids.push(id);for(const r of d.rev)if(!P.rev.some(q=>q.id===r.id&&q.k===r.k))P.rev.push(r);for(const id of d.vids)if(!P.vids.includes(id))P.vids.push(id)}
+function rollPending(){const P=S.plan;S.pending=(S.pending||[]).concat((P&&P.ids)||[]).filter((id,i,a)=>a.indexOf(id)===i).filter(id=>{const f=findTopic(id);return f&&!f.x.done})}
+function ensurePlan(){const t=today();if(S.plan&&S.plan.date&&S.plan.date!==t)rollPending();if(!S.plan||S.plan.date!==t||!S.plan.rev||!S.plan.vids){buildPlan(S.hoursLog[t]||S.set.hours);save(true)}else{S.plan.ids=S.plan.ids.filter(id=>findTopic(id));S.plan.rev=S.plan.rev.filter(r=>findTopic(r.id));S.plan.vids=S.plan.vids.filter(id=>findVideo(id));S.plan.skip=S.plan.skip||[]}mergeDoneToday()}
+const revDone=(x,k)=>k==='rx'?x.rx===today():x[k]===today();
+
+/* ================= sync (Firebase Realtime Database, no login) =================
+   Data lives at /desks/<sync code>. Rules only allow reading/writing a path whose code you know. */
+const DBURL='https://pragati-study-desk-default-rtdb.asia-southeast1.firebasedatabase.app';
+let SY={code:'',status:'',dirty:false};
+try{const o=JSON.parse(localStorage.getItem(SKEY)||'{}');SY.code=o.code&&!o.url?o.code:'';SY.status=o.status||'';SY.dirty=!!o.dirty&&!!SY.code}catch(e){}
+const saveSY=()=>{try{localStorage.setItem(SKEY,JSON.stringify(SY))}catch(e){}};
+const syncOn=()=>!!SY.code;
+const deskUrl=c=>DBURL+'/desks/'+encodeURIComponent(c||SY.code)+'.json';
+const nowT=()=>new Date().toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'});
+function setSync(m){SY.status=m;saveSY();const el=$('#syncst');if(el)el.textContent=m}
+function syncErr(e){const m=String(e&&e.message||e);setSync(/401|403|denied/i.test(m)?'Sync blocked by Firebase rules. Update the database rules (see README). Data is safe on this device.':'Sync failed ('+m.slice(0,80)+'). Data is safe on this device.')}
+function newCode(){const a=new Uint8Array(12);(window.crypto||{}).getRandomValues?crypto.getRandomValues(a):a.forEach((_,i)=>a[i]=Math.random()*256|0);return 'pragati-'+Array.from(a,b=>'abcdefghjkmnpqrstuvwxyz23456789'[b%31]).join('')}
+async function getRemote(code){const r=await fetch(deskUrl(code),{cache:'no-store'});if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,80));const v=await r.json();if(!v||!v.json)return null;let d=JSON.parse(v.json);if(d&&!d.plan)d=fromOld(d);return d}
+let pushT;function schedulePush(){if(!syncOn())return;SY.dirty=true;saveSY();clearTimeout(pushT);pushT=setTimeout(push,2500)}
+async function push(){if(!syncOn())return;if(!navigator.onLine){setSync('Offline. Will sync when the internet is back.');return}
+  try{const r=await fetch(deskUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({json:JSON.stringify(S),updated:S.meta.updated||Date.now()})});
+    if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,80));SY.dirty=false;setSync('Synced at '+nowT())}catch(e){syncErr(e)}}
+async function pull(manual){if(!syncOn())return;if(!navigator.onLine){setSync('Offline. Using data on this device.');return}
+  try{const remote=await getRemote();const ru=remote&&remote.meta?remote.meta.updated||0:0;
+    if(remote&&ru>(S.meta.updated||0)&&!SY.dirty){S=remote;migrate();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}render();if(manual)toast('Loaded latest data from cloud');setSync('Synced at '+nowT())}
+    else if(!remote||(S.meta.updated||0)>ru||SY.dirty){await push()}else setSync('Synced at '+nowT())}catch(e){syncErr(e)}}
+async function joinCode(code){code=code.trim();if(code.length<16){toast('That code is too short. Copy the full code from the other device.');return}
+  if(!navigator.onLine){toast('Connect to the internet first');return}
+  setSync('Checking code…');
+  try{const remote=await getRemote(code);if(!remote){setSync('No data found for that code. Check it and try again.');return}
+    SY.code=code;SY.dirty=false;S=remote;migrate();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}setSync('Synced at '+nowT());render();toast('Data loaded from the other device')}catch(e){syncErr(e)}}
+window.addEventListener('online',()=>{SY.dirty?push():pull()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){pull();if(S.plan&&S.plan.date!==today())render()}});
+
+/* ================= ui helpers ================= */
+const UI={info:new Set(),filter:'all'};
+let toastT,undoFn=null;
+function toast(m,undo){$('#toast-msg').textContent=m;const ub=$('#toast-undo');undoFn=undo||null;ub.hidden=!undo;$('#toast').hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{$('#toast').hidden=true;undoFn=null},undo?5000:2600)}
+function applyTheme(){const th=S.set.theme;if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th);else document.documentElement.removeAttribute('data-theme')}
+const MOON='<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+const head=(title,eyebrow)=>`<div class="top"><div style="min-width:0"><div class="eyebrow">${esc(eyebrow||'')}</div><h1>${esc(title)}</h1></div><div class="row" style="flex-wrap:nowrap"><button class="round" data-act="fs" aria-label="Full screen" title="Full screen">⛶</button><button class="round" data-act="nav" data-v="help" aria-label="How to use">?</button><button class="round" data-act="theme" aria-label="Switch light or dark">${MOON}</button></div></div>`;
+const sec=(k,title,body,o)=>{o=o||{};const on=UI.info.has(k);return `<section class="section"><div class="sh"><h2>${title}</h2>${o.right||''}<button class="info-btn" data-act="info" data-k="${k}" aria-label="What is this?" aria-expanded="${on}">i</button></div><div class="info" ${on?'':'hidden'}>${INFO[k]||''}</div><div class="sb${o.flush?' flush':''}">${body}</div></section>`};
+const bar=(d,n)=>`<div class="bar"><i style="width:${n?(d*100/n).toFixed(1):0}%"></i></div>`;
+function daysTag(d){if(!d)return '<span class="tag warn">No exam date</span>';const n=diff(today(),d);if(n<0)return `<span class="tag">Exam was ${fmt(d)}</span>`;return `<span class="tag ${n<=7?'bad':n<=21?'warn':'acc'}">${n===0?'Exam today':n===1?'Exam tomorrow':n+' days'} · ${fmt(d)}</span>`}
+function addTodayWrap(x,html){if(x.done)return html;const inPlan=S.plan&&S.plan.date===today()&&S.plan.ids.includes(x.id);return `<div class="vrow">${html}<span class="watch">${inPlan?'<span class="tag acc">Today</span>':`<button type="button" class="btn sm" data-act="addToday" data-id="${x.id}">+ Today</button>`}</span></div>`}
+function addToPlan(id){ensurePlan();const P=S.plan;if(!P.ids.includes(id))P.ids.push(id);P.skip=(P.skip||[]).filter(x=>x!==id);save();render();const f=findTopic(id);toast('Added to today: '+(f?f.x.name.slice(0,40):''))}
+function pickOpts(sid){const s=sub(sid);if(!s)return '';const inPlan=new Set((S.plan&&S.plan.ids)||[]);return s.units.map(u=>{const ts=u.topics.filter(x=>!x.done&&!inPlan.has(x.id));return ts.length?`<optgroup label="${esc(u.name)}">${ts.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</optgroup>`:''}).join('')}
+function dropBtn(type,id,k){return `<span class="watch"><button type="button" class="btn sm" data-act="dropItem" data-type="${type}" data-id="${id}" ${k?`data-k="${k}"`:''} aria-label="Remove from today" title="Remove from today">✕</button></span>`}
+function withDrop(html,type,id,k,done){return done?html:`<div class="vrow">${html}${dropBtn(type,id,k)}</div>`}
+function vrow(v,s,drop){const done=!!v.w,t=v.topicId&&findTopic(v.topicId);return `<div class="vrow"><button type="button" class="trow${done?' done':''}" data-act="vidTap" data-id="${v.id}" aria-pressed="${done}"><span class="box" aria-hidden="true">${done?'✓':''}</span><span class="t"><span class="nm">${esc(v.title)}</span><span class="meta"><span class="tag acc num">▶ ${vMin(v)} min</span><span class="tag">${esc(s.name)}</span>${t?`<span class="tag">${esc(t.x.name.slice(0,40))}</span>`:''}${done&&v.w!==today()?`<span class="tag good">Watched ${fmt(v.w)}</span>`:''}</span></span></button>${v.url?`<span class="watch"><a class="btn sm" href="${esc(v.url)}" target="_blank" rel="noopener">Watch ↗</a></span>`:''}${drop&&!done?dropBtn('v',v.id):''}</div>`}
+function trow(x,s,o){o=o||{};const done=o.rk?revDone(x,o.rk):!!x.done;
+  return `<button type="button" class="trow${done?' done':''}" data-act="${o.rk?'revTopic':'tapTopic'}" data-id="${x.id}" ${o.rk?`data-k="${o.rk}"`:''} aria-pressed="${done}"><span class="box" aria-hidden="true">${done?'✓':''}</span><span class="t"><span class="nm">${esc(x.name)}</span>${o.meta?`<span class="meta">${o.meta}</span>`:''}</span></button>`}
+
+let SH=null;
+function sheet(o){SH=o;$('#sheet-root').innerHTML=`<div class="scrim" data-act="sclose"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(o.title)}"><h3>${esc(o.title)}</h3><form id="sform" autocomplete="off">${o.body}<div class="acts"><div class="row">${o.del?`<button type="button" class="btn danger" data-act="sdel">Delete</button>`:''}</div><div class="row"><button type="button" class="btn" data-act="sclose2">Cancel</button>${o.submit===false?'':`<button class="btn primary" type="submit">${esc(o.submit||'Save')}</button>`}</div></div></form></div></div>`;
+  const f=$('#sform');f.addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f).entries());f.querySelectorAll('input[type=checkbox]').forEach(c=>d[c.name]=c.checked);const r=o.onSubmit&&o.onSubmit(d);if(r!==false){closeSheet();save();render()}})}
+function closeSheet(){SH=null;$('#sheet-root').innerHTML=''}
+function armed(el,fn,label){if(el.dataset.armed){fn();return}el.dataset.armed='1';const o=el.textContent;el.textContent=label||'Tap again to confirm';setTimeout(()=>{if(el.isConnected){delete el.dataset.armed;el.textContent=o}},3000)}
+
+/* ================= clock, focus mode, break reminders ================= */
+const tFmt=d=>d.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'});
+function clockHTML(d,secs){const h=d.getHours()%12||12,ap=d.getHours()<12?'am':'pm';return `${h}:${z(d.getMinutes())}${secs?`<small>:${z(d.getSeconds())}</small>`:''}<small> ${ap}</small>`}
+const toMin=t=>{const p=String(t||'0:0').split(':');return (+p[0]||0)*60+(+p[1]||0)};
+function inHours(m){const a=toMin(S.set.brkFrom),b=toMin(S.set.brkTo);return a<=b?(m>=a&&m<b):(m>=a||m<b)}
+const EV=()=>Math.min(240,Math.max(5,Math.round(+S.set.brkEvery||30)));
+function relOf(m){const a=toMin(S.set.brkFrom);return ((m-a)%1440+1440)%1440}
+function nextBreak(){const ev=EV(),now=new Date(),m=now.getHours()*60+now.getMinutes();let t=m+(ev-relOf(m)%ev);for(let k=0;k<=1440/ev+2;k++,t+=ev){if(inHours(t%1440)&&relOf(t%1440)%ev===0){const d=new Date(now);d.setHours(0,0,0,0);d.setMinutes(t);return d}}return null}
+function nextBreakText(){if(!S.set.brkOn)return 'Break reminders are off';if(BRK.snooze)return 'Snoozed until '+tFmt(new Date(BRK.snooze));const d=nextBreak();if(!d)return '';const mins=Math.max(0,Math.ceil((d-new Date())/60000));return `Next break at ${tFmt(d)} · in ${mins} min`}
+function notifStatus(){if(!('Notification' in window))return 'This browser does not support notifications. The full-screen reminder and sound still work.';const p=Notification.permission;return p==='granted'?'Notifications are allowed.':p==='denied'?'Notifications are blocked. Allow them in the browser’s site settings to get them.':'Tap “Allow notifications” so the reminder also shows in the phone’s notification bar.'}
+const BRK={open:false,snooze:0,rep:null,reps:0,walkEnd:0};
+function walkTick(){if(!BRK.walkEnd)return;const left=BRK.walkEnd-Date.now();if(left<=0){BRK.walkEnd=0;brkPane('end');chime();try{navigator.vibrate&&navigator.vibrate([500,200,500,200,500])}catch(e){}sysNotify('Walk done','Back to study.');clearInterval(BRK.rep);BRK.reps=0;BRK.rep=setInterval(()=>{if(!BRK.open||++BRK.reps>2){clearInterval(BRK.rep);return}chime()},30000);return}const sec=Math.ceil(left/1000);$('#brk-cd').textContent=Math.floor(sec/60)+':'+z(sec%60)}
+const BKEY='pragati-desk-brk';
+let AC=null;function unlockAudio(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
+document.addEventListener('pointerdown',unlockAudio,{passive:true});
+function chime(){if(!S.set.brkSound)return;try{unlockAudio();if(!AC)return;const t0=AC.currentTime;[784,988,1175,988,1175].forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;const st=t0+i*0.22;g.gain.setValueAtTime(0.0001,st);g.gain.exponentialRampToValueAtTime(0.35,st+0.03);g.gain.exponentialRampToValueAtTime(0.0001,st+0.5);o.connect(g).connect(AC.destination);o.start(st);o.stop(st+0.55)})}catch(e){}}
+function sysNotify(title,body){title=title||'Stand up and walk';try{if(!('Notification' in window)||Notification.permission!=='granted')return;const opt={body:body||'Pick a walk time in the app: 1, 3, 5 or 10 min.',tag:'break',renotify:true,requireInteraction:true,vibrate:[300,150,300,150,300],icon:'icon-192.png',badge:'icon-192.png'};
+  if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)navigator.serviceWorker.getRegistration().then(r=>{if(r)r.showNotification(title,opt);else new Notification(title,opt)}).catch(()=>{});else new Notification(title,opt)}catch(e){}}
+function brkPane(p){for(const k of ['ask','run','end'])$('#brk-'+k).hidden=k!==p}
+function showBreak(){BRK.open=true;const el=$('#brk');el.hidden=false;brkPane('ask');$('#brk-time').textContent=tFmt(new Date());chime();try{navigator.vibrate&&navigator.vibrate([400,200,400,200,400])}catch(e){}sysNotify();
+  clearInterval(BRK.rep);BRK.reps=0;BRK.rep=setInterval(()=>{if(!BRK.open||++BRK.reps>2){clearInterval(BRK.rep);return}chime();try{navigator.vibrate&&navigator.vibrate([400,200,400])}catch(e){}},40000);
+  setTimeout(()=>{const b=el.querySelector('.wopt');b&&b.focus()},50)}
+function hideBreak(){BRK.open=false;BRK.walkEnd=0;$('#brk').hidden=true;clearInterval(BRK.rep);try{navigator.serviceWorker&&navigator.serviceWorker.getRegistration&&navigator.serviceWorker.getRegistration().then(r=>r&&r.getNotifications&&r.getNotifications({tag:'break'}).then(ns=>ns.forEach(n=>n.close()))).catch(()=>{})}catch(e){}}
+function checkBreak(){if(!S.set.brkOn||BRK.open||BRK.walkEnd)return;const now=new Date();
+  if(BRK.snooze){if(+now>=BRK.snooze){BRK.snooze=0;showBreak()}return}
+  const ev=EV(),m=now.getHours()*60+now.getMinutes(),off=relOf(m)%ev,slot=(m-off+1440)%1440;if(off>2||!inHours(slot))return;
+  const key=today()+'@'+slot;let last='';try{last=localStorage.getItem(BKEY)||''}catch(e){}if(last===key)return;try{localStorage.setItem(BKEY,key)}catch(e){}showBreak()}
+let WL=null;async function wake(on){try{if(on&&'wakeLock' in navigator){WL=await navigator.wakeLock.request('screen')}else if(!on&&WL){await WL.release();WL=null}}catch(e){}}
+function goFull(el){try{const r=(el||document.documentElement).requestFullscreen;if(r)return r.call(el||document.documentElement).catch(()=>{})}catch(e){}}
+function exitFull(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}}
+function focusProg(){const c=count(semSubs());const P=S.plan||{ids:[]};const done=(P.ids||[]).filter(id=>{const f=findTopic(id);return f&&f.x.done}).length;return `Today: ${done} of ${(P.ids||[]).length} new topics done · Semester: ${c.d}/${c.n}`}
+function clockTick(){const d=new Date();const a=$('#t-clock');if(a)a.innerHTML=clockHTML(d,false);const nb=$('#t-next');if(nb)nb.textContent=nextBreakText();
+  if(!$('#focus').hidden){$('#f-clock').innerHTML=clockHTML(d,true);$('#f-date').textContent=d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});$('#f-next').textContent=nextBreakText();$('#f-prog').textContent=focusProg()}
+  walkTick();checkBreak()}
+setInterval(clockTick,1000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){checkBreak();if(!$('#focus').hidden)wake(true)}});
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&!$('#focus').hidden){/* leaving fullscreen keeps focus view; user exits with ✕ */}});
+
+/* ================= router ================= */
+let R={v:'today',p:{}};
+function go(v,p){R={v,p:p||{}};render();window.scrollTo(0,0)}
+function renderFocus(){const box=$('#f-list');if(!box||$('#focus').hidden)return;ensurePlan();const P=S.plan;
+  const items=P.ids.map(id=>findTopic(id)).filter(Boolean),revs=P.rev.map(r=>Object.assign({k:r.k},findTopic(r.id))).filter(r=>r.x),vids=P.vids.map(id=>findVideo(id)).filter(Boolean);
+  const m=f=>`<span class="tag">${esc(f.s.name.split(' (')[0])}</span>`;
+  const part=(title,html)=>html?`<section class="section"><div class="sh"><h2>${title}</h2></div><div class="sb flush">${html}</div></section>`:'';
+  box.innerHTML=part('Revise today',revs.map(r=>trow(r.x,r.s,{rk:r.k,meta:m(r)+`<span class="tag good">${r.k==='rx'?'Extra revision':RK[r.k]}</span>`})).join(''))+
+    part('New topics today',items.map(f=>trow(f.x,f.s,{meta:m(f)})).join(''))+
+    part('Lectures today',vids.map(o=>vrow(o.v,o.s)).join(''))||'<div class="empty">Nothing planned for today.</div>'}
+function render(){applyTheme();const V=VIEWS[R.v]||VIEWS.today;$('#view').innerHTML=V(R.p);renderFocus();
+  const n={today:'today',syllabus:'syllabus'}[R.v]||'settings';document.querySelectorAll('#tabs [data-nav]').forEach(b=>b.classList.toggle('on',b.dataset.nav===n))}
+
+/* ================= views ================= */
+const VIEWS={};
+VIEWS.today=()=>{
+  ensurePlan();
+  const t=today(),subs=semSubs(),P=S.plan,h=P.hours,c=count(subs),pc=pace();
+  const items=P.ids.map(id=>findTopic(id)).filter(Boolean);
+  const revs=P.rev.map(r=>Object.assign({k:r.k},findTopic(r.id))).filter(r=>r.x);
+  const doneN=items.filter(f=>!!f.x.done).length, revN=revs.filter(r=>revDone(r.x,r.k)).length;
+  const vids=P.vids.map(id=>findVideo(id)).filter(Boolean),vc=vcount(subs),vMinsToday=vids.reduce((a,o)=>a+vMin(o.v),0),vW=vids.filter(o=>o.v.w).length;
+  const hour=new Date().getHours(),hello=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+  const exams=subs.map(s=>({s,e:examOf(s)})).filter(o=>o.e&&o.e>=t).sort((a,b)=>a.e<b.e?-1:1);
+  const first=exams[0];
+  const presets=[1,2,3,4,5,6];
+  const hoursBody=`<div class="chips" role="group" aria-label="Study hours today">${presets.map(v=>`<button class="chip${+h===v?' on':''}" data-act="setHours" data-h="${v}" aria-pressed="${+h===v}">${v} hr</button>`).join('')}<input type="number" id="hrs-custom" min="0.5" max="16" step="0.5" value="${presets.includes(+h)?'':esc(h)}" placeholder="Other" aria-label="Other hours"></div>
+    <div class="small" style="font-weight:700;color:var(--muted);margin:14px 0 6px">Which subjects today?</div>
+    <div class="chips" role="group" aria-label="Subjects today"><button class="chip${todaySel().length?'':' on'}" data-act="subjToggle" data-id="all" aria-pressed="${!todaySel().length}">All subjects</button>${subs.filter(s=>topicsOf(s).length).map(s=>{const on=todaySel().includes(s.id);return `<button class="chip${on?' on':''}" data-act="subjToggle" data-id="${s.id}" aria-pressed="${on}">${esc(s.name.split(' (')[0])}</button>`}).join('')}</div>
+    <div class="small muted" style="margin-top:6px">New topics and lectures come only from the subjects you pick. Revisions that are due still show from every subject.</div>
+    <div class="small muted" style="margin-top:8px">New topic ≈ ${S.set.mpt} min, revision ≈ ${S.set.rmin} min${vcount(semSubs()).n?`, lectures get ${S.set.vshare}% of the time left after revision`:''}. Change these in Settings.</div>`;
+  const meta=(f,extra)=>`<span class="tag">${esc(f.s.name)}</span><span class="tag">${esc(f.u.name.split(' · ')[0])}</span>${extra||''}`;
+  const revBody=revs.length?revs.map(r=>withDrop(trow(r.x,r.s,{rk:r.k,meta:meta(r,`<span class="tag good">${r.k==='rx'?'Extra revision':RK[r.k]}</span>`)}),'r',r.x.id,r.k,revDone(r.x,r.k))).join('')+
+      `<div class="plain small muted"><b class="num">${revN}</b> of ${revs.length} revised${P.overdue?` · ${P.overdue} more revision${P.overdue>1?'s':''} pending (they come first tomorrow)`:''}</div>`
+    :`<div class="empty">${c.d?'No revision due today.':'Revisions appear here 3 days after you finish a topic.'}</div>`;
+  let newBody;
+  if(!c.n)newBody=`<div class="empty"><b>No subjects in ${esc(sem().name)}</b>Add subjects and their syllabus in the Syllabus tab.</div>`;
+  else if(!c.left)newBody=`<div class="empty"><b>All topics studied</b>Only revision from now on.</div>`;
+  else if(!items.length)newBody=`<div class="empty">Today's time is full with revision. Tap + One more topic if you have extra time.</div><div class="plain row"><button class="btn sm" data-act="pickTopic">+ Choose a topic</button><button class="btn sm" data-act="oneMore">+ One more topic</button></div>`;
+  else newBody=items.map(f=>withDrop(trow(f.x,f.s,{meta:meta(f,f.x.done?'<span class="tag good">✓ Done today</span>':(S.pending||[]).includes(f.x.id)?'<span class="tag warn">Left from earlier</span>':'')}),'t',f.x.id,'',!!f.x.done)).join('')+
+    `<div class="plain row between"><span class="small muted"><b class="num">${doneN}</b> of ${items.length} done</span><span class="row"><button class="btn sm" data-act="pickTopic">+ Choose a topic</button><button class="btn sm" data-act="oneMore">+ One more topic</button></span></div>`;
+  let paceNote='';
+  if(c.left&&pc.need){paceNote=items.length<pc.need?`<div class="note warn">To finish every topic before the exam with ${S.set.buffer} revision days, you need about <b>${pc.need} new topics a day</b>. Study a bit longer, or lower minutes per topic in Settings.</div>`:`<div class="note good">At ${hrs(h)} a day you are on track to finish before the exam.</div>`}
+  if(pc.undated)paceNote+=`<div class="note acc">Set the exam start date below so the app can pace your topics.</div>`;
+  const inWin=subs.some(s=>{const ws=winStart(s),e=examOf(s);return ws&&t>=ws&&t<=e});
+  return head(hello+', Pragati',sem().name+' · '+new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'}))+
+  `<section class="section"><div class="sb clock-card"><div><div class="clock-big" id="t-clock">${clockHTML(new Date(),false)}</div><div class="small muted" style="margin-top:6px" id="t-next">${esc(nextBreakText())}</div></div><div class="row"><a class="btn" href="stream.html" style="text-decoration:none">🎥 Stream</a><button class="btn primary" data-act="focusOn">⛶ Focus clock</button></div></div></section>`+
+  sec('hours','How long will you study today?',hoursBody)+
+  `<div class="row" style="margin:-4px 0 12px;gap:6px"><span class="tag acc" style="font-size:13px;padding:5px 10px">Today: ${hrs(h)}</span><span class="tag" style="font-size:13px;padding:5px 10px">${items.length} new topic${items.length===1?'':'s'}</span><span class="tag good" style="font-size:13px;padding:5px 10px">${revs.length} revision${revs.length===1?'':'s'}</span>${vc.n?`<span class="tag acc" style="font-size:13px;padding:5px 10px">▶ ${vids.length} lecture${vids.length===1?'':'s'} · ${vMinsToday} min</span>`:''}</div>`+
+  sec('revise',inWin?'Revise today · final revision days':'Revise today',revBody,{flush:true})+
+  sec('plan','New topics today',newBody+(paceNote?`<div class="plain" style="padding-top:2px">${paceNote}</div>`:''),{flush:true})+
+  (vc.n?sec('lect','Lectures to watch today',(vids.length?vids.map(o=>vrow(o.v,o.s,true)).join('')+`<div class="plain row between"><span class="small muted"><b class="num">${vW}</b> of ${vids.length} watched · ${hrs(vc.left/60)} of lectures left</span><button class="btn sm" data-act="oneMoreVid">+ One more lecture</button></div>`:`<div class="empty">${vc.left?'No lecture fits in today\'s time.':'All lectures watched.'}</div>${vc.left?'<div class="plain"><button class="btn sm" data-act="oneMoreVid">+ One more lecture</button></div>':''}`),{flush:true}):'')+
+  sec('exams','Exams',`<label class="f" for="sem-exam">Exams start on</label><input type="date" id="sem-exam" value="${esc(sem().exam||'')}" style="margin-top:4px">
+    ${first?`<div class="row" style="align-items:baseline;gap:8px;margin-top:12px"><span class="big num">${diff(t,first.e)}</span><span class="muted">days to first exam${first.s.exam?' ('+esc(first.s.name)+')':''}</span></div>`:''}
+    ${exams.some(o=>o.s.exam)?`<div class="row" style="margin-top:8px">${exams.filter(o=>o.s.exam).map(o=>`<span class="tag">${esc(o.s.name.split(' (')[0])} · ${fmt(o.e)}</span>`).join('')}</div>`:''}`)+
+  sec('progress','Semester progress',`<div class="row" style="align-items:baseline;gap:6px"><span class="big num">${c.d}</span><span class="muted">of ${c.n} topics studied · ${c.left} left</span></div><div style="margin:8px 0 6px">${bar(c.d,c.n)}</div>
+    <div class="small muted" style="margin-bottom:12px">${vc.n?`Lectures watched: <b class="num">${vc.w}/${vc.n}</b> · `:''}Revised once: <b class="num">${subs.reduce((a,s)=>a+topicsOf(s).filter(x=>x.r1).length,0)}</b> · twice: <b class="num">${subs.reduce((a,s)=>a+topicsOf(s).filter(x=>x.r2).length,0)}</b></div>
+    <div class="kv">${subs.map(s=>{const k=count([s]);return `<span style="min-width:0;overflow-wrap:anywhere">${esc(s.name)}</span><span class="num small">${k.d}/${k.n}</span>`}).join('')}</div>
+    <div class="row between" style="margin-top:12px"><span class="tag acc">🔥 ${streak()}-day streak</span><button class="btn sm" data-act="nav" data-v="syllabus">Full syllabus ›</button></div>`);
+};
+function pickable(x){return !x.done||x.done===today()}
+
+VIEWS.syllabus=()=>{
+  const subs=semSubs(),c=count(subs),F=UI.filter;
+  const subjBlock=s=>{const k=count([s]),open=S.open[s.id]===true;
+    let body='';
+    if(open){body=s.units.map(u=>{const ts=u.topics.filter(x=>F==='all'||(F==='left'?!x.done:!!x.done));if(!ts.length)return '';const ud=u.topics.filter(x=>x.done).length;
+      return `<div class="unit-h"><span>${esc(u.name)}</span><span class="num">${ud}/${u.topics.length}</span></div>`+ts.map(x=>addTodayWrap(x,trow(x,s,{meta:x.done?`<span class="tag good">Studied ${fmt(x.done)}</span>${x.r1?'<span class="tag good">Rev 1 ✓</span>':''}${x.r2?'<span class="tag good">Rev 2 ✓</span>':''}${x.rf?'<span class="tag good">Final ✓</span>':''}${(()=>{const d=revDue(x,s,today());return d?`<span class="tag ${d.on<=today()?'warn':''}">${RK[d.k]} ${d.on<=today()?'due':'on '+fmt(d.on)}</span>`:''})()}`:''}))).join('')}).join('')||`<div class="empty">${F==='left'?'Nothing left in this subject.':F==='done'?'Nothing done yet.':'No topics yet. Tap Edit to add the syllabus.'}</div>`;
+      const vl=(s.videos||[]).filter(v=>F==='all'||(F==='left'?!v.w:!!v.w));if((s.videos||[]).length){const k2=vcount([s]);body+=`<div class="unit-h"><span>▶ Lectures</span><span class="num">${k2.w}/${k2.n} · ${hrs(k2.left/60)} left</span></div>`+(vl.map(v=>vrow(v,s)).join('')||'<div class="empty">Nothing here.</div>')}
+      body+=`<div class="plain row between">${daysTag(examOf(s))}<button class="btn sm" data-act="subForm" data-id="${s.id}">Edit subject</button></div>`}
+    return `<section class="section"><button type="button" class="subj-h" data-act="toggleSub" data-id="${s.id}" aria-expanded="${open}"><span class="t"><span class="nm">${esc(s.name)}</span><span class="row small muted" style="margin-top:2px;gap:6px"><span class="tag">${esc(s.kind)}</span><span class="num">${k.d}/${k.n} done</span></span><span style="display:block;margin-top:6px">${bar(k.d,k.n)}</span></span><span class="caret">${open?'Close ▴':'Open ▾'}</span></button>${open?`<div style="border-top:1px solid var(--line)">${body}</div>`:''}</section>`};
+  return head('Syllabus',sem().name)+
+  `<div class="row" style="margin-bottom:12px"><label class="small muted" for="semsel" style="font-weight:700">Semester</label><select id="semsel" style="width:auto;flex:1;max-width:260px">${S.sems.map(s=>`<option value="${s.id}" ${s.id===S.activeSem?'selected':''}>${esc(s.name)}</option>`).join('')}</select><button class="btn sm" data-act="semForm">+ Semester</button></div>`+
+  sec('syllabus',`${esc(sem().name)} · ${c.d}/${c.n} done`,`<div class="row" style="align-items:baseline;gap:6px"><span class="big num">${c.n?Math.round(c.d*100/c.n):0}%</span><span class="muted">${c.d} done · ${c.left} left</span></div><div style="margin-top:8px">${bar(c.d,c.n)}</div>`)+
+  `<div class="segs" role="tablist">${[['all','All topics'],['left','Left'],['done','Done']].map(([k,l])=>`<button role="tab" aria-selected="${F===k}" class="${F===k?'on':''}" data-act="filter" data-f="${k}">${l}</button>`).join('')}</div>`+
+  (subs.map(subjBlock).join('')||`<section class="section"><div class="empty"><b>No subjects yet</b>Add each subject with its syllabus.</div></section>`)+
+  `<div class="row" style="margin-bottom:16px"><button class="btn primary" data-act="subForm">+ Add subject</button>${subs.length?`<button class="btn" data-act="openAll" data-o="1">Open all</button><button class="btn" data-act="openAll" data-o="0">Close all</button>`:''}</div>`;
+};
+
+VIEWS.settings=()=>head('Settings','Study, sync & backup')+
+  sec('study','Study',`<div class="fgrid"><label class="f">Minutes per topic<input type="number" min="10" max="240" step="5" id="set-mpt" data-set="mpt" value="${esc(S.set.mpt)}"></label><label class="f">Minutes per revision<input type="number" min="5" max="120" step="5" id="set-rmin" data-set="rmin" value="${esc(S.set.rmin)}"></label><label class="f">Revision days before exam<input type="number" min="0" max="30" id="set-buffer" data-set="buffer" value="${esc(S.set.buffer)}"></label><label class="f">Usual study hours a day<input type="number" min="0.5" max="16" step="0.5" id="set-hours" data-set="hours" value="${esc(S.set.hours)}"><span class="hint">Used when you don't pick hours on Today</span></label></div>`)+
+  sec('lectures','Lecture videos',`${semSubs().filter(s=>(s.videos||[]).length).map(s=>{const k=vcount([s]);return `<div class="row between small" style="padding:4px 0"><span style="min-width:0;overflow-wrap:anywhere">${esc(s.name)}</span><span class="row" style="flex-wrap:nowrap"><span class="num">${k.w}/${k.n} · ${hrs(k.left/60)} left</span><button class="btn sm danger" data-act="clearVids" data-id="${s.id}">Remove</button></span></div>`}).join('')||'<div class="small muted">No lectures added yet.</div>'}
+    <div class="row" style="margin-top:12px"><button class="btn primary" data-act="vidImport">+ Add lectures (paste JSON)</button><button class="btn" data-act="vidPrompt">Get the Claude prompt</button></div>
+    <div class="fgrid" style="margin-top:12px"><label class="f">Share of time for lectures (%)<input type="number" min="0" max="100" step="10" id="set-vshare" data-set="vshare" value="${esc(S.set.vshare)}"><span class="hint">Of the time left after revision</span></label><label class="f">Watch speed<select id="set-speed" data-set="speed">${[1,1.25,1.5,1.75,2].map(v=>`<option value="${v}" ${+S.set.speed===v?'selected':''}>${v}×</option>`).join('')}</select><span class="hint">Lecture minutes are divided by this</span></label></div>`)+
+  sec('sems','Semesters',S.sems.map(s=>{const k=count(S.subjects.filter(x=>x.semId===s.id));return `<div class="plain row"><div style="flex:1;min-width:0"><b>${esc(s.name)}</b><div class="small muted">${k.d}/${k.n} topics done${s.exam?' · exams '+fmt(s.exam):''}</div></div>${s.id===S.activeSem?'<span class="tag good">✓ Current</span>':`<button class="btn sm primary" data-act="semSet" data-id="${s.id}">Make current</button>`}<button class="btn sm" data-act="semForm" data-id="${s.id}">Edit</button></div>`}).join('')+`<div class="plain"><button class="btn sm" data-act="semForm">+ Add semester</button></div>`,{flush:true})+
+  sec('breaks','Break reminders',`<label class="switch"><input type="checkbox" id="brk-on" ${S.set.brkOn?'checked':''}> Remind me to stand up and walk</label>
+    <div class="fgrid" style="margin-top:12px"><label class="f">Every (minutes)<input type="number" min="5" max="240" step="1" inputmode="numeric" id="set-brkEvery" data-set="brkEvery" value="${esc(S.set.brkEvery)}"><span class="hint">Any number, e.g. 11, 15, 30. Counted from the From time.</span></label><label class="f">From<input type="time" id="brk-from" value="${esc(S.set.brkFrom)}"></label><label class="f">Until<input type="time" id="brk-to" value="${esc(S.set.brkTo)}"></label></div>
+    <label class="switch" style="margin-top:12px"><input type="checkbox" id="brk-sound" ${S.set.brkSound?'checked':''}> Play a sound</label>
+    <div class="small" style="margin-top:10px" id="notif-st">${esc(notifStatus())}</div>
+    <div class="row" style="margin-top:12px"><button class="btn" data-act="brkTest">Test reminder now</button>${'Notification' in window&&Notification.permission==='default'?'<button class="btn" data-act="notifAsk">Allow notifications</button>':''}</div>`)+
+  sec('look','Look',`<div class="pill-opts">${['system','light','dark'].map(t=>`<label><input type="radio" name="theme" value="${t}" data-act="setTheme" ${S.set.theme===t?'checked':''}>${t==='system'?'Match phone':t[0].toUpperCase()+t.slice(1)}</label>`).join('')}</div>`)+
+  sec('sync','Cloud sync',syncOn()?`<div class="small muted">Sync code for this desk</div><div class="row" style="margin:4px 0 10px;flex-wrap:nowrap"><code id="sy-show" style="font-size:15px;padding:8px 10px;user-select:all;overflow-wrap:anywhere;flex:1;min-width:0">${esc(SY.code)}</code><button class="btn sm" data-act="copyCode">Copy</button></div>
+    <div class="small">On another phone or laptop, open the app → Settings → Cloud sync → <b>Use a code</b> and enter this code.</div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" data-act="syncNow">Sync now</button><button class="btn danger" data-act="syncOff">Turn off on this device</button></div>
+    <div class="small" id="syncst" style="margin-top:8px">${esc(SY.status||'Not synced yet')}</div>`
+   :`<div class="small" style="margin-bottom:12px">Sync is off. Data is only on this device.</div>
+    <div class="stack" style="display:flex;flex-direction:column;gap:12px"><div><b>First device</b><div class="small muted">Creates a code and uploads this device's data.</div><button class="btn primary" style="margin-top:6px" data-act="syncCreate">Turn on sync</button></div>
+    <div><b>Second device</b><div class="small muted">Enter the code from the first device. This device's data is replaced by the cloud copy.</div><div class="row" style="margin-top:6px;flex-wrap:nowrap"><input type="text" id="sy-join" placeholder="pragati-…" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn" data-act="syncJoin">Use a code</button></div></div></div>
+    <div class="small" id="syncst" style="margin-top:8px">${esc(SY.status||'')}</div>`)+
+  sec('backup','Backup',`<div class="row"><button class="btn primary" data-act="export">Download backup</button><button class="btn" data-act="copyBk">Copy backup text</button><label class="btn" for="imp" tabindex="0">Import file</label><input type="file" id="imp" accept=".json,application/json" hidden><button class="btn" data-act="pasteImp">Paste backup</button></div>`)+
+  sec('reset','Start over',`<div class="row"><button class="btn" data-act="addPack">Add back Sem 1 subjects</button><button class="btn danger" data-act="reset">Erase all progress</button></div>`);
+
+const HELP=[
+ ['Today',['Pick how many hours you will study. The app shows that many topics, mixed from your subjects.','Tap a topic when done: it gets crossed out and stays in the list. Tap again to undo.','Skipped topics come back tomorrow. Finished early? Tap <b>+ One more topic</b>.','Set the date your exams start. The app tells you if your daily hours are enough to finish in time.','Every topic you finish comes back under <b>Revise today</b>: after 3 days, then 7 days later, and once more just before the exam.']],
+ ['Syllabus',['The whole semester, subject by subject and unit by unit. Tap any topic to cross it out.','Use <b>All / Left / Done</b> to see what is pending.','<b>Edit subject</b>: change the name, give it its own exam date, or edit the topic list. One unit per line starting with "Unit", one topic per line under it.']],
+ ['Lectures',['Settings → Lecture videos → <b>Get the Claude prompt</b>. Copy it, paste it in Claude with your lecture names, lengths and links. Claude replies with JSON.','Copy that JSON, then Settings → <b>+ Add lectures</b> → paste → Add lectures.','Today then shows lectures next to topics, splitting your study time between them. Tap a lecture when watched.']],
+ ['New semester',['Settings → Semesters → Add semester, then make it current. Add each subject with + Add subject and paste its syllabus. Old semesters stay saved.']],
+ ['Keeping data safe',['Everything saves on the phone instantly and works offline.','Turn on cloud sync in Settings to use the same data on laptop and phone.','Download a backup every week.']],
+ ['Buttons',['Anything with a blue border or a › arrow can be tapped. Grey labels are only information.','The <b>i</b> button on each section explains it.']]
+];
+VIEWS.help=()=>`<button class="back" data-act="nav" data-v="today">‹ Today</button>`+head('How to use','Guide')+`<button class="btn primary" data-act="walk" style="margin-bottom:16px">▶ Play the quick tour</button>`+HELP.map(([t,pts])=>`<section class="section help-card"><div class="sb"><h3>${t}</h3><ul>${pts.map(x=>`<li>${x}</li>`).join('')}</ul></div></section>`).join('');
+
+const WALK=[
+ ['Welcome, Pragati','This app plans your study day by day. Your Sem 1 syllabus is already inside.','today'],
+ ['1. Set your hours','On Today, pick how long you will study. The app shows that many topics from your subjects.','today'],
+ ['2. Tap to cross','Finish a topic, tap it. It gets crossed out. It comes back for revision after 3 days, then after 7 more, and once before the exam.','today'],
+ ['3. Add the exam date','Set when exams start, so the app can tell you if you are on track.','today'],
+ ['4. See everything','The Syllabus tab shows every topic, done and left, semester by semester.','syllabus']
+];
+function walk(i){const w=WALK[i];go(w[2]);$('#walk-root').innerHTML=`<div class="walk"><div class="wbox" role="dialog" aria-modal="true"><div class="step">${i+1} / ${WALK.length}</div><h3>${esc(w[0])}</h3><p style="margin:0">${esc(w[1])}</p><div class="dots">${WALK.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div><div class="row between"><button class="btn" data-act="walkEnd">Skip</button><div class="row">${i?`<button class="btn" data-act="walkGo" data-i="${i-1}">Back</button>`:''}<button class="btn primary" data-act="${i<WALK.length-1?'walkGo':'walkEnd'}" data-i="${i+1}">${i<WALK.length-1?'Next':'Start'}</button></div></div></div></div>`}
+
+/* ================= forms ================= */
+function sylText(s){return s.units.map(u=>u.name+'\n'+u.topics.map(x=>'- '+x.name).join('\n')).join('\n\n')}
+function parseSyl(text,old){const byName={};if(old)for(const u of old.units)for(const x of u.topics)byName[x.name.trim().toLowerCase()]=x;
+  const units=[];let cur=null;
+  text.split('\n').forEach(raw=>{const l=raw.trim();if(!l)return;
+    if(/^(unit|module|chapter|block|इकाई)\b/i.test(l)||/:\s*$/.test(l)){cur={id:uid(),name:l.replace(/:\s*$/,'').replace(/^(unit\s*\w+)\s*[:\-–]\s*/i,'$1 · '),topics:[]};units.push(cur);return}
+    if(!cur){cur={id:uid(),name:'Unit '+(units.length+1),topics:[]};units.push(cur)}
+    l.replace(/^([-*•·]|\d+[.)])\s*/,'').split(/\s*;\s*/).filter(Boolean).forEach(n=>{const prev=byName[n.toLowerCase()];cur.topics.push(prev?prev:mkTopic(n))})});
+  return units}
+function subForm(id){const s=id?sub(id):null;
+  sheet({title:s?'Edit subject':'Add subject',body:`<label class="f">Subject name<input type="text" name="name" required value="${esc(s?s.name:'')}" placeholder="Financial Accounting"></label>
+  <div class="fgrid"><label class="f">Type<select name="kind">${KINDS.map(k=>`<option ${s&&s.kind===k?'selected':''}>${k}</option>`).join('')}</select></label><label class="f">Exam date (optional)<input type="date" name="exam" value="${esc(s?s.exam:'')}"><span class="hint">Leave empty to use the semester date</span></label></div>
+  <label class="f">Syllabus<textarea name="syl" style="min-height:260px" placeholder="Unit 1: Introduction&#10;- Meaning and scope&#10;- Concepts&#10;Unit 2: Final accounts&#10;- Trading account">${esc(s?sylText(s):'')}</textarea><span class="hint">A line starting with "Unit" starts a new unit. Every other line is a topic. Topics you already crossed stay crossed if you keep their name.</span></label>`,
+  onSubmit:d=>{const units=parseSyl(d.syl||'',s);if(s){s.name=d.name;s.kind=d.kind;s.exam=d.exam;s.units=units}else S.subjects.push({id:uid(),semId:S.activeSem,name:d.name,kind:d.kind,exam:d.exam,units});S.plan.date=''},
+  del:s?()=>{S.subjects=S.subjects.filter(x=>x!==s);S.plan.date='';closeSheet();save();render();toast('Subject deleted')}:null})}
+function semForm(id){const x=id?S.sems.find(s=>s.id===id):null;
+  sheet({title:x?'Edit semester':'Add semester',body:`<label class="f">Name<input type="text" name="name" required value="${esc(x?x.name:'Semester '+(S.sems.length+1))}"></label><label class="f">Exams start on<input type="date" name="exam" value="${esc(x?x.exam:'')}"></label>${x?'':'<label class="row" style="font-weight:600"><input type="checkbox" name="cur" checked style="width:20px;height:20px;accent-color:var(--accent)"> Make it the current semester</label>'}`,
+  onSubmit:d=>{if(x){x.name=d.name;x.exam=d.exam}else{const n={id:uid(),name:d.name,exam:d.exam};S.sems.push(n);if(d.cur)S.activeSem=n.id}S.plan.date=''},
+  del:x&&S.sems.length>1?()=>{S.subjects=S.subjects.filter(s=>s.semId!==x.id);S.sems=S.sems.filter(s=>s!==x);if(S.activeSem===x.id)S.activeSem=S.sems[0].id;S.plan.date='';closeSheet();save();render();toast('Semester deleted')}:null})}
+
+function claudePrompt(){
+  const subs=semSubs();
+  return `Convert my lecture list into JSON for my study app. Reply with only the JSON, nothing else.
+
+Format:
+[
+  {"subject": "<subject name exactly as listed below>",
+   "videos": [
+     {"title": "<lecture title>", "minutes": <length in whole minutes>, "url": "<link, or empty>", "topic": "<the syllabus topic it covers, copied exactly from the list below, or empty>"}
+   ]}
+]
+
+Rules:
+- Keep the lectures in the same order I give them.
+- Convert lengths to whole minutes: 1:05:30 becomes 66, 45:20 becomes 45, "1 hr 10 min" becomes 70.
+- If a link is missing, use "".
+- Pick a topic only if you are sure; otherwise use "".
+- One object per subject.
+
+My subjects and their topics:
+${subs.map(s=>`\n${s.name}\n`+topicsOf(s).map(x=>'  - '+x.name).join('\n')).join('\n')}
+
+My lecture list:
+<paste your lecture names, lengths, links and subject here>`}
+function vidPromptSheet(){sheet({title:'Prompt for Claude',submit:false,body:`<div class="small">1. Tap <b>Copy prompt</b>. 2. Paste it in Claude and replace the last line with your lecture list. 3. Copy the JSON Claude gives you. 4. Come back and tap <b>+ Add lectures</b>.</div><textarea id="prompt-text" readonly style="min-height:260px;font-size:13px">${esc(claudePrompt())}</textarea><button type="button" class="btn primary" data-act="copyPrompt">Copy prompt</button>`})}
+function parseLen(m){if(typeof m==='number')return m;m=String(m||'').trim();if(/^\d+(\.\d+)?$/.test(m))return +m;const p=m.split(':').map(Number);if(p.length===3)return p[0]*60+p[1]+p[2]/60;if(p.length===2)return p[0]+p[1]/60;const h=m.match(/(\d+)\s*h/i),mi=m.match(/(\d+)\s*m/i);return (h?+h[1]*60:0)+(mi?+mi[1]:0)}
+const norm=x=>String(x||'').toLowerCase().replace(/[^a-z0-9ऀ-ॿ]+/g,' ').trim();
+function importVideos(text){
+  let data;try{data=JSON.parse(text.trim().replace(/^```(json)?/,'').replace(/```$/,''))}catch(e){return {err:'This is not valid JSON. Copy the whole reply from Claude, from [ to ].'}}
+  if(!Array.isArray(data))data=[data];
+  if(data.length&&!data[0].videos&&data[0].subject){const g={};data.forEach(v=>{(g[v.subject]=g[v.subject]||[]).push(v)});data=Object.keys(g).map(k=>({subject:k,videos:g[k]}))}
+  const subs=semSubs(),res=[],miss=[];
+  for(const grp of data){const key=norm(grp.subject);const s=subs.find(x=>norm(x.name)===key)||subs.find(x=>key&&(norm(x.name).includes(key)||key.includes(norm(x.name))));
+    if(!s){miss.push(grp.subject||'(no subject)');continue}
+    s.videos=s.videos||[];let n=0,skip=0;
+    for(const v of grp.videos||[]){const title=String(v.title||v.name||'').trim();if(!title)continue;
+      if(s.videos.some(o=>(v.url&&o.url===v.url)||o.title===title)){skip++;continue}
+      let topicId='';if(v.topic){const tk=norm(v.topic);const x=topicsOf(s).find(t=>norm(t.name)===tk)||topicsOf(s).find(t=>tk&&(norm(t.name).includes(tk)||tk.includes(norm(t.name))));if(x)topicId=x.id}
+      s.videos.push({id:uid(),title,min:Math.round(parseLen(v.minutes!=null?v.minutes:(v.length||v.duration))),url:String(v.url||v.link||''),topicId,w:''});n++}
+    res.push(`${s.name}: ${n} added${skip?`, ${skip} already there`:''}`)}
+  return {res,miss}}
+function vidImportForm(){sheet({title:'Add lectures',submit:'Add lectures',body:`<div class="small">Paste the JSON from Claude. Don't have it yet? <button type="button" class="btn sm" data-act="vidPrompt">Get the Claude prompt</button></div>
+  <label class="f">JSON<textarea name="t" required style="min-height:220px;font-family:var(--f-mono);font-size:13px" placeholder='[{"subject":"Financial Accounting","videos":[{"title":"Depreciation one-shot","minutes":95,"url":"https://youtu.be/...","topic":""}]}]'></textarea></label><div id="imp-msg" class="small" style="color:var(--bad)"></div>`,
+  onSubmit:d=>{const r=importVideos(d.t);if(r.err){$('#imp-msg').textContent=r.err;return false}if(!r.res.length){$('#imp-msg').textContent='No subject matched. Subject names must match your subjects: '+semSubs().map(s=>s.name).join(', ');return false}
+    S.plan.date='';setTimeout(()=>toast(r.res.join(' · ')+(r.miss.length?` · Not matched: ${r.miss.join(', ')}`:'')),50)}})}
+
+/* ================= actions ================= */
+function tapTopic(id){const f=findTopic(id);if(!f)return;const snap={done:f.x.done,r1:f.x.r1,r2:f.x.r2,rf:f.x.rf};if(snap.done){f.x.done='';f.x.r1='';f.x.r2='';f.x.rf=''}else f.x.done=today();save();render();
+  toast(snap.done?'Marked not done':'✓ Done. Revision in 3 days: '+f.x.name.slice(0,30),()=>{Object.assign(f.x,snap);save();render()})}
+const A={
+  nav:el=>go(el.dataset.v),
+  fs:()=>{if(document.fullscreenElement)exitFull();else{const p=goFull();if(!p&&!document.fullscreenEnabled)toast('Full screen is not available here. Install the app for a full-screen view.')}},
+  focusOn:()=>{unlockAudio();$('#focus').hidden=false;renderFocus();clockTick();goFull();wake(true)},
+  focusOff:()=>{$('#focus').hidden=true;exitFull();wake(false)},
+  brkDone:()=>{hideBreak();toast('Skipped. Next break '+(nextBreak()?'at '+tFmt(nextBreak()):'later'))},
+  brkWalk:el=>{unlockAudio();clearInterval(BRK.rep);BRK.walkEnd=Date.now()+(+el.dataset.m)*60000;brkPane('run');walkTick();try{navigator.serviceWorker&&navigator.serviceWorker.getRegistration&&navigator.serviceWorker.getRegistration().then(r=>r&&r.getNotifications&&r.getNotifications({tag:'break'}).then(ns=>ns.forEach(n=>n.close()))).catch(()=>{})}catch(e){}},
+  brkStop:()=>{BRK.walkEnd=0;brkPane('end')},
+  brkBack:()=>{hideBreak();toast('Back to study. Next break '+(nextBreak()?'at '+tFmt(nextBreak()):'later'))},
+  brkSnooze:()=>{hideBreak();BRK.snooze=Date.now()+5*60000;toast('Snoozed for 5 minutes')},
+  brkTest:()=>{unlockAudio();showBreak()},
+  notifAsk:()=>{try{Notification.requestPermission().then(()=>render())}catch(e){toast('Notifications are not supported here')}},
+  info:el=>{const k=el.dataset.k,on=!UI.info.has(k);on?UI.info.add(k):UI.info.delete(k);const box=el.closest('.section').querySelector(':scope > .info');if(box)box.hidden=!on;el.setAttribute('aria-expanded',on)},
+  theme:()=>{const dark=matchMedia('(prefers-color-scheme: dark)').matches;const cur=S.set.theme==='system'?(dark?'dark':'light'):S.set.theme;S.set.theme=cur==='dark'?'light':'dark';save();render()},
+  setTheme:el=>{S.set.theme=el.value;save();render()},
+  subjToggle:el=>{const id=el.dataset.id;let ids=todaySel().slice();if(id==='all')ids=[];else ids=ids.includes(id)?ids.filter(x=>x!==id):ids.concat(id);if(ids.length&&ids.length===semSubs().filter(s=>topicsOf(s).length).length)ids=[];
+    S.subjToday={date:today(),ids};ensurePlan();buildPlan(S.plan.hours);save();render()},
+  setHours:el=>{const h=+el.dataset.h;S.hoursLog[today()]=h;buildPlan(h);save();render()},
+  tapTopic:el=>tapTopic(el.dataset.id),
+  revTopic:el=>{const f=findTopic(el.dataset.id),k=el.dataset.k;if(!f)return;const prev=f.x[k]||'';f.x[k]=prev===today()?'':today();save();render();toast(f.x[k]?'✓ Revised':'Marked not revised',()=>{f.x[k]=prev;save();render()})},
+  vidTap:el=>{const f=findVideo(el.dataset.id);if(!f)return;const prev=f.v.w;f.v.w=prev?'':today();save();render();toast(prev?'Marked not watched':'✓ Watched',()=>{f.v.w=prev;save();render()})},
+  oneMoreVid:()=>{const ex=new Set(S.plan.vids.concat(S.plan.skip||[]));const more=pickVideos(1e9,S.plan.ids,ex).filter(id=>!ex.has(id));if(!more.length){toast('No lectures left');return}S.plan.vids.push(more[0]);save();render()},
+  vidImport:()=>vidImportForm(),vidPrompt:()=>vidPromptSheet(),
+  clearVids:el=>armed(el,()=>{const s=sub(el.dataset.id);s.videos=[];S.plan.date='';save();render();toast('Lectures removed')},'Tap again'),
+  copyPrompt:()=>{const t=$('#prompt-text').value;try{navigator.clipboard.writeText(t).then(()=>toast('Prompt copied. Paste it in Claude.'),()=>{$('#prompt-text').select();toast('Select all and copy')})}catch(e){$('#prompt-text').select();toast('Select all and copy')}},
+  dropItem:el=>{const P=S.plan,id=el.dataset.id,ty=el.dataset.type,k=el.dataset.k;const snap=JSON.stringify(P);
+    if(ty==='t')P.ids=P.ids.filter(x=>x!==id);else if(ty==='r')P.rev=P.rev.filter(r=>!(r.id===id&&r.k===k));else P.vids=P.vids.filter(x=>x!==id);
+    P.skip=P.skip||[];if(!P.skip.includes(id))P.skip.push(id);save();render();toast('Removed from today. It will come back another day.',()=>{S.plan=JSON.parse(snap);save();render()})},
+  addToday:el=>addToPlan(el.dataset.id),
+  pickTopic:()=>{const subs=semSubs().filter(s=>topicsOf(s).some(x=>!x.done));if(!subs.length){toast('No topics left');return}
+    sheet({title:'Choose a topic for today',submit:'Add to today',body:`<label class="f">Subject<select id="pick-sub" name="sub">${subs.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></label><label class="f">Topic<select id="pick-top" name="top">${pickOpts(subs[0].id)}</select></label>`,
+      onSubmit:d=>{if(!d.top)return false;closeSheet();addToPlan(d.top);return false}})},
+  oneMore:()=>{const ex=new Set(S.plan.ids.concat(S.plan.rev.map(r=>r.id),S.plan.skip||[]));const more=pickTopics(1,ex);if(more.length){S.plan.ids.push(more[0])}else{const r=extraRevisions(1,ex);if(!r.length){toast('Nothing more to add');return}S.plan.rev.push(r[0])}save();render()},
+  toggleSub:el=>{const id=el.dataset.id;S.open[id]=S.open[id]!==true;save(true);render()},
+  openAll:el=>{for(const s of semSubs())S.open[s.id]=el.dataset.o==='1';save(true);render()},
+  filter:el=>{UI.filter=el.dataset.f;render()},
+  subForm:el=>subForm(el.dataset.id),
+  semForm:el=>semForm(el.dataset.id),
+  semSet:el=>{S.activeSem=el.dataset.id;S.plan.date='';save();render();toast('Current semester changed')},
+  addPack:()=>{const before=S.subjects.length;loadPack();S.plan.date='';save();render();toast(S.subjects.length>before?'Sem 1 subjects added back':'All Sem 1 subjects are already there')},
+  reset:el=>armed(el,()=>{S=fresh();loadPack();S.set.tutDone=true;save();go('today');toast('All progress erased')},'Tap again to erase'),
+  walk:()=>walk(0),walkGo:el=>walk(+el.dataset.i),walkEnd:()=>{$('#walk-root').innerHTML='';S.set.tutDone=true;save(true);go('today')},
+  syncCreate:()=>{SY.code=newCode();SY.dirty=true;saveSY();setSync('Uploading…');render();push().then(render)},
+  syncJoin:()=>joinCode($('#sy-join').value),
+  syncNow:()=>{setSync('Syncing…');pull(true)},
+  syncOff:el=>armed(el,()=>{SY.code='';SY.status='';SY.dirty=false;saveSY();render();toast('Sync turned off on this device. Cloud copy is kept.')},'Tap again to turn off'),
+  copyCode:()=>{try{navigator.clipboard.writeText(SY.code).then(()=>toast('Code copied'),()=>toast('Select the code and copy it'))}catch(e){toast('Select the code and copy it')}},
+  export:()=>{try{const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='study-desk-backup-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();toast('Backup downloaded')}catch(e){toast('Download blocked here. Use Copy backup text.')}},
+  copyBk:()=>{const txt=JSON.stringify(S);const fb=()=>sheet({title:'Backup text',submit:false,body:`<div class="small">Select all and copy this text into a note or email.</div><textarea readonly style="min-height:240px">${esc(txt)}</textarea>`});try{navigator.clipboard.writeText(txt).then(()=>toast('Backup copied. Paste it into a note or email.'),fb)}catch(e){fb()}},
+  pasteImp:()=>sheet({title:'Paste backup',submit:'Import',body:`<div class="small" style="color:var(--bad);font-weight:700">This replaces all data on this device.</div><label class="f">Backup text<textarea name="t" required style="min-height:200px"></textarea></label>`,onSubmit:d=>importText(d.t)}),
+  sclose:(el,e)=>{if(e.target===el)closeSheet()},sclose2:()=>closeSheet(),
+  sdel:el=>armed(el,()=>SH&&SH.del&&SH.del(),'Tap again to delete'),
+};
+function importText(t){try{let d=JSON.parse(t);if(!d||!d.subjects||!d.sems)throw 0;if(!d.plan)d=fromOld(d);S=d;migrate();save();go('today');toast('Backup imported')}catch(e){toast('That is not a valid backup');return false}}
+
+document.addEventListener('click',e=>{
+  if(e.target.closest('#toast-undo')){const f=undoFn;undoFn=null;$('#toast').hidden=true;if(f)f();return}
+  const nav=e.target.closest('[data-nav]');if(nav){go(nav.dataset.nav);return}
+  const el=e.target.closest('[data-act]');if(!el)return;const a=A[el.dataset.act];if(!a)return;
+  if(el.dataset.act==='sclose'||el.dataset.act==='setTheme'){a(el,e);return}
+  e.stopPropagation();a(el,e);
+});
+document.addEventListener('change',e=>{const t=e.target;
+  if(t.id==='semsel'){S.activeSem=t.value;S.plan.date='';save();render()}
+  else if(t.id==='brk-on'){S.set.brkOn=t.checked;save();if(t.checked&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission().then(()=>render())}catch(e){}}render();toast(t.checked?'Break reminders on':'Break reminders off')}
+  else if(t.id==='brk-sound'){S.set.brkSound=t.checked;save();if(t.checked){unlockAudio();chime()}}
+  else if(t.id==='brk-from'||t.id==='brk-to'){if(t.value){S.set[t.id==='brk-from'?'brkFrom':'brkTo']=t.value;save();toast('Saved')}}
+  else if(t.id==='pick-sub'){const p=$('#pick-top');if(p)p.innerHTML=pickOpts(t.value)}
+  else if(t.id==='sem-exam'){sem().exam=t.value;S.plan.date='';save();render();toast(t.value?'Exam date saved':'Exam date cleared')}
+  else if(t.id==='hrs-custom'){const h=Math.min(16,Math.max(0.5,parseFloat(t.value)||0));if(!parseFloat(t.value))return;S.hoursLog[today()]=h;buildPlan(h);save();render()}
+  else if(t.dataset.set){const v=parseFloat(t.value);if(isNaN(v))return;S.set[t.dataset.set]=v;S.plan.date='';save();toast('Saved')}
+  else if(t.id==='imp'&&t.files[0]){const r=new FileReader();r.onload=()=>importText(r.result);r.readAsText(t.files[0]);t.value=''}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(BRK.open&&!BRK.walkEnd){hideBreak();return}if(!$('#focus').hidden){$('#focus').hidden=true;exitFull();wake(false);return}}if(e.key==='Escape'&&SH)closeSheet();if(e.key==='Enter'&&e.target.tagName==='LABEL'&&e.target.htmlFor==='imp')$('#imp').click()});
+
+render();
+if(!S.set.tutDone)setTimeout(()=>walk(0),300);
+if(syncOn())pull();
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
