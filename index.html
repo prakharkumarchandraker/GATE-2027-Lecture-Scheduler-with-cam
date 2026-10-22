@@ -97,6 +97,7 @@ pre{background:#F3F5EF;border:1px solid var(--edge);border-radius:8px;padding:10
 .blk.past{opacity:.62}
 .blk.now{box-shadow:0 0 0 2px var(--c,var(--pen));opacity:1}
 .blk.done{opacity:.55}
+.pf .blk.past{opacity:.45}.pf .blk.past .nm{text-decoration:line-through}
 .bh{display:flex;align-items:center;gap:10px;padding:11px 12px}
 .bh .nm{flex:1;min-width:0;font-weight:700;font-size:15.5px;color:var(--c,var(--ink))}
 .bh .nm small{display:block;font-weight:500;font-size:12.5px;color:var(--ink3)}
@@ -299,41 +300,64 @@ nav button[aria-current="true"] .pip{background:var(--pen)}
 html.lvov,html.lvov body{background:transparent!important;background-image:none!important;padding:0!important;margin:0;overflow:hidden;width:100%;height:100%}
 html.lvov #app,html.lvov nav,html.lvov #sheet,html.lvov #toast,html.lvov #timer{display:none!important}
 .lv-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;font-family:"IBM Plex Sans",system-ui,sans-serif;color:#EEF1F8;pointer-events:none}
-.op{position:absolute;top:40px;width:540px;background:rgba(12,16,26,.87);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:24px 26px 22px;box-shadow:0 16px 48px rgb(0 0 0 / .35);transform:scale(var(--sc,1))}
-.op.r{right:40px;transform-origin:100% 0}.op.l{left:40px;transform-origin:0 0}
+.op{position:absolute;width:540px;background:rgba(var(--bgc),var(--op));color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:24px 26px 22px;box-shadow:0 16px 48px rgb(0 0 0 / .3);transform:scale(var(--sc,1));max-height:calc(1000px / var(--sc,1));overflow:hidden;--st:var(--ac)}
+.op.t-dark,.op.t-black{--ink:#EEF1F8;--mut:#9DA6BB;--line:rgba(255,255,255,.11);--track:rgba(255,255,255,.14);--soft:rgba(255,255,255,.07)}
+.op.t-light{--ink:#14191A;--mut:#4E5651;--line:rgba(20,30,40,.12);--track:rgba(20,30,40,.1);--soft:rgba(20,30,40,.05)}
+.pos-tr{top:40px;right:40px;transform-origin:100% 0}.pos-tl{top:40px;left:40px;transform-origin:0 0}
+.pos-br{bottom:40px;right:40px;transform-origin:100% 100%}.pos-bl{bottom:40px;left:40px;transform-origin:0 100%}
+.pos-tc{top:32px;left:50%;transform:translateX(-50%) scale(var(--sc,1));transform-origin:50% 0}.pos-bc{bottom:32px;left:50%;transform:translateX(-50%) scale(var(--sc,1));transform-origin:50% 100%}
+.op.s-break{--st:#F0A93B}.op.t-light.s-break{--st:#B36A00}.op.s-idle{--st:var(--mut)}.op.s-done{--st:#8FB4FF}.op.t-light.s-done{--st:#27436F}.op.over{--st:#FF6B57}.op.t-light.over{--st:#C0392B}
 .op-top{display:flex;justify-content:space-between;align-items:center;gap:14px}
 .op-pill{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--st);white-space:nowrap}
 .op-pill i{width:10px;height:10px;border-radius:50%;background:var(--st);color:var(--st);flex:none}
-.s-study{--st:#4CC38A}.s-break{--st:#F0A93B}.s-idle{--st:#8A93A8}.s-done{--st:#8FB4FF}
 .s-study .op-pill i{animation:lvp 2s ease-out infinite}
 @keyframes lvp{0%{box-shadow:0 0 0 0 currentColor}70%{box-shadow:0 0 0 11px transparent}100%{box-shadow:0 0 0 0 transparent}}
-.op-lab{font-size:14px;font-weight:600;color:#9DA6BB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-lab{font-size:14px;font-weight:600;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .op-big{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:76px;letter-spacing:-.03em;line-height:1;margin:16px 0 8px;font-variant-numeric:tabular-nums}
-.op-sub{font-size:16px;color:#A9B1C3}
+.op.over .op-big{color:var(--st)}
+.op-sub{font-size:16px;color:var(--mut)}
 .op-flash{margin-top:12px;padding:9px 13px;border-radius:10px;font-weight:700;font-size:16px}
-.op-flash.g{background:rgba(76,195,138,.16);color:#6FE0A6}.op-flash.r{background:rgba(240,90,70,.16);color:#FF8B78}
-.op-day{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
-.op-k{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9DA6BB}
-.op-v{font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:600}.op-v small{font-size:.68em;color:#9DA6BB;font-weight:500}
-.op-bar{height:8px;border-radius:99px;background:rgba(255,255,255,.13);overflow:hidden;margin-top:8px}
-.op-bar b{display:block;height:100%;width:0;background:#EEF1F8;opacity:.85;border-radius:inherit;transition:width .8s}
-.op-meta{display:flex;gap:18px;margin-top:10px;font-size:14px;color:#9DA6BB;white-space:nowrap}
+.op-flash.g{background:rgba(76,195,138,.16);color:#3FBF80}.op-flash.r{background:rgba(240,90,70,.16);color:#F0705C}
+.op-now{margin-top:18px;padding:14px 16px;border-radius:14px;background:var(--soft);border-left:5px solid var(--c)}
+.op-ns{font-size:14px;font-weight:700;color:var(--c);margin-top:6px;filter:brightness(1.25)}
+.op.t-light .op-ns{filter:none}
+.op-nt{font-size:23px;font-weight:700;line-height:1.25;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.op-nl{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--mut);margin-top:6px}
+.op-next{margin-top:10px;font-size:15px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-next b{filter:brightness(1.25)}
+.op-stats{margin-top:16px;padding-top:4px;border-top:1px solid var(--line)}
+.op-day{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px}
+.op-k{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.op-v{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600}.op-v small{font-size:.66em;color:var(--mut);font-weight:500}
+.op-bar{height:8px;border-radius:99px;background:var(--track);overflow:hidden;margin-top:7px}
+.op-bar b{display:block;height:100%;width:0;background:var(--ink);opacity:.85;border-radius:inherit;transition:width .8s}
+.op-bar.syl b{background:var(--ac);opacity:1}
+.op-meta{display:flex;gap:18px;margin-top:12px;font-size:14px;color:var(--mut);white-space:nowrap}
 .op-meta span:empty{display:none}
-.op-meta b{color:#EEF1F8;font-family:"IBM Plex Mono",monospace}.op-meta b.g{color:#6FE0A6}.op-meta b.r{color:#FF8B78}
-.op-lh{display:flex;justify-content:space-between;margin:16px 0 4px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
-.op-li{display:flex;gap:11px;align-items:flex-start;padding:6px 0}
-.op-li .cb{width:18px;height:18px;border-radius:5px;border:2px solid var(--c);flex:none;margin-top:3px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#0C111C;line-height:1}
+.op-meta b{color:var(--ink);font-family:"IBM Plex Mono",monospace}.op-meta b.g{color:#3FBF80}.op-meta b.r{color:#F0705C}
+.op-lh{display:flex;justify-content:space-between;margin:14px 0 2px;padding-top:12px;border-top:1px solid var(--line)}
+.op-li{display:flex;gap:10px;align-items:center;padding:4px 0}
+.op-li .cb{width:16px;height:16px;border-radius:4px;border:2px solid var(--c);flex:none;display:grid;place-items:center;font-size:11px;font-weight:800;color:#0C111C;line-height:1}
 .op-li.xd .cb{background:var(--c)}
-.op-li .tx{flex:1;min-width:0}
-.op-li .tx small{display:block;font-size:12.5px;font-weight:700;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;filter:brightness(1.35)}
-.op-li .tx b{display:block;font-size:16.5px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.op-li.xd .tx b{text-decoration:line-through;color:#7E8799;font-weight:500}
-.op-li.xd .tx small{opacity:.6}
-.op-li.cu{background:rgba(255,255,255,.07);border-radius:10px;padding:6px 8px;margin:0 -8px}
-.op-li .ln{font-family:"IBM Plex Mono",monospace;font-size:13px;color:#9DA6BB;margin-top:3px;flex:none}
-.op-more{font-size:13px;color:#9DA6BB;padding:3px 0 3px 29px}
-.op-ex{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
-.op-ex span{font-size:14px;color:#A9B1C3;background:rgba(255,255,255,.07);border-radius:8px;padding:4px 10px}.op-ex b{color:#EEF1F8;font-family:"IBM Plex Mono",monospace;font-weight:600}
+.op-li .tx{flex:1;min-width:0}.op-li .tx b{display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-li.xd .tx b{text-decoration:line-through;color:var(--mut);font-weight:500}
+.op-ex{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.op-ex span{font-size:14px;color:var(--mut);background:var(--soft);border-radius:8px;padding:4px 10px}.op-ex b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-weight:600}
+/* compact */
+.op.lay-compact{width:430px;padding:16px 18px;border-radius:18px}
+.lay-compact .op-big{font-size:54px;margin:10px 0 4px}
+.lay-compact .op-now{margin-top:12px;padding:10px 12px}
+.lay-compact .op-nt{font-size:18px;-webkit-line-clamp:1}
+.lay-compact .op-nl,.lay-compact .op-ex{display:none}
+.lay-compact .op-stats{margin-top:10px}
+/* slim bar */
+.op.lay-bar{width:auto;max-width:1820px;display:flex;align-items:center;gap:20px;height:72px;padding:0 28px;border-radius:999px;white-space:nowrap}
+.lay-bar .op-big{font-size:36px;margin:0}
+.lay-bar .sep{width:1px;height:30px;background:var(--line);flex:none}
+.lay-bar .op-bnow{font-size:18px;font-weight:600;max-width:640px;overflow:hidden;text-overflow:ellipsis}
+.lay-bar .op-bnow i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;vertical-align:1px}
+.lay-bar .op-bnow small{font-size:14px;font-weight:700;margin-right:6px}
+.lay-bar .op-bt{font-size:17px;color:var(--mut)}.lay-bar .op-bt b{color:var(--ink);font-family:"IBM Plex Mono",monospace}.lay-bar .op-bt small{font-size:14px}
 .ob{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(9,12,20,.9);gap:8px;padding:0 120px}
 .ob.over{background:rgba(44,10,10,.92)}
 .ob-lab{font-size:32px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#F0A93B}
@@ -358,8 +382,8 @@ html.lvov #app,html.lvov nav,html.lvov #sheet,html.lvov #toast,html.lvov #timer{
 .lv-tt.break{border-left:3px solid var(--meal);background:#FBF6EE}
 .lv-tt.break .n{font-weight:500;color:var(--ink2)}
 .lv-tt.cu{outline:2px solid var(--pen);outline-offset:-2px;border-radius:6px}
-.op-syl{margin-top:14px;padding-top:0;border-top:0}
-.op-bar.syl b{background:#4CC38A;opacity:1}
+.lv-sw{width:34px;height:34px;min-width:0!important;padding:0!important;border-radius:50%!important;background:var(--sw)!important;border:3px solid #fff!important;box-shadow:0 0 0 1px var(--edge)}
+.lv-sw.on{box-shadow:0 0 0 3px var(--pen)}
 </style></head><body>
 <div class="wrap" id="app"></div>
 <div id="sheet"></div>
@@ -412,6 +436,7 @@ function migrate() {
   if (!S.core) S.core = freshCore();
   const c = S.core;
   c.cfg = Object.assign({}, DEF_CFG, c.cfg || {});
+  if (!c.cfg.noBrk1) { c.cfg.chunk = 720; c.cfg.noBrk1 = 1; }   // one long block per gap: no 10-min breaks (Settings → 'Study block before a break' brings them back)
   if (!c.meds) c.meds = DATA.meds; if (!c.meals) c.meals = DATA.meals; if (!c.skin) c.skin = DATA.skin; if (!c.work) c.work = DATA.work;
   if (!c.subs) c.subs = DATA.subs;
   if (!c.work || !c.work[0] || !c.work[0].parts[0].ex[0].steps) c.work = DATA.work;
@@ -989,7 +1014,7 @@ function blockHTML(b, P, now) {
 }
 function pinHTML(p, now) {
   const on = tick(p.key);
-  return `<div class="blk" style="--c:${p.kind === 'med' ? 'var(--med)' : 'var(--meal)'}"><div class="bh">${tchip(p.at)}<span class="nm">${esc(p.label)}${p.sub ? `<small>${esc(p.sub)}</small>` : ''}</span>${box(on, `TT('${p.key}')`, p.kind === 'med' ? 'var(--med)' : 'var(--meal)')}</div></div>`;
+  return `<div class="blk ${!on && getDay().meta.perfect && p.at < now ? 'past' : ''}" style="--c:${p.kind === 'med' ? 'var(--med)' : 'var(--meal)'}"><div class="bh">${tchip(p.at)}<span class="nm">${esc(p.label)}${p.sub ? `<small>${esc(p.sub)}</small>` : ''}</span>${box(on, `TT('${p.key}')`, p.kind === 'med' ? 'var(--med)' : 'var(--meal)')}</div></div>`;
 }
 
 /* ---------------- views ---------------- */
@@ -1092,7 +1117,8 @@ function movedLines(I, P) {
   return L;
 }
 function nowCard(P, now) {
-  const due = P.pins.filter(p => p.at <= now && !tick(p.key));
+  const pf = getDay(P.d).meta.perfect;
+  const due = P.pins.filter(p => p.at <= now && !tick(p.key) && !(pf && p.at < now - 30));
   const cur = P.B.find(b => now >= b.start && now < b.end);
   const br = P.breaks.find(x => now >= x.start && now < x.end);
   const next = planRows(P).filter(r => r.t > now).slice(0, 3);
@@ -1146,6 +1172,8 @@ function viewToday() {
     return `<div class="grid"><div class="side">
      <div class="card nowcard"><h2>Right now · ${clock(now)}</h2><p class="sm muted" style="margin:0 0 12px">Tap when you're up. It asks what's already done, then builds the day from right now up to lights out at ${clock(CFG().sleep)}.</p>
      <button class="btn big" onclick="openCheckin()">I'm up — build my day</button>
+     <button class="btn quiet big" style="margin-top:8px" onclick="PERFECT()">Perfect day — run my timetable as it is</button>
+     <p class="xs faint" style="margin:6px 0 0">Starts the day at ${clock(CFG().idealWake)} like the ideal timetable. Everything before now is crossed off and Right now shows what the timetable says.</p>
      <div class="note" style="background:#F7EEF4;border-color:#E6CFE0;color:#6B2F57">Skincare: ${esc(skinNow)}</div></div>
      ${banner()}${layersCard(I)}</div><div class="main">
      <div class="card"><div class="sec"><h2>Your ideal day</h2><span class="mono muted sm">wake ${clock(CFG().idealWake)}</span></div>
@@ -1186,7 +1214,7 @@ function viewToday() {
   const ctrl = `<div class="dayhead"><button class="btn" onclick="openCheckin()">Running late? Re-plan from now</button>
     <button class="btn ${P.off ? '' : 'off'}" onclick="OFFDAY()">${P.off ? 'Off day ON' : 'Make today off'}</button></div>`;
   const doneBox = doneToday.length ? `<details class="card donebox"><summary>Done before this plan — ${doneToday.length} lecture(s) ✓</summary>${doneToday.map(x => lecRow(x, 0, false)).join('')}</details>` : '';
-  return `<div class="grid"><div class="side">${nowCard(P, now)}${summary}${layersCard(P)}${moved}${banner()}</div><div class="main">${ctrl}<h2 style="margin:4px 0 10px">Full day</h2><div class="tl">${tl}</div>${doneBox}</div></div>`;
+  return `<div class="grid"><div class="side">${nowCard(P, now)}${summary}${layersCard(P)}${moved}${banner()}</div><div class="main">${ctrl}<h2 style="margin:4px 0 10px">Full day${day.meta.perfect ? ' <span class="faint sm">· perfect day</span>' : ''}</h2><div class="tl${day.meta.perfect ? ' pf' : ''}">${tl}</div>${doneBox}</div></div>`;
 }
 function yesterdayCard() {
   const y = addD(dk(), -1), yd = S.days[y]; if (!yd || !yd.meta || yd.meta.start == null) return '';
@@ -1198,6 +1226,7 @@ function OFFDAY() { const m = getDay().meta; setMeta({ off: !m.off, start: m.sta
 
 /* ---------------- check-in sheet ---------------- */
 let CK = null;
+function PERFECT() { setMeta({ start: CFG().idealWake, perfect: true, off: false }); setTimeout(() => { const e = document.getElementById('nowblk'); if (e) e.scrollIntoView({ block: 'center' }); }, 50); }
 function openCheckin() {
   const day = getDay(), tk = day.ticks, now = curMin();
   const thy = tk.thyroid ? (now - (day.meta.thyAt != null ? day.meta.thyAt : tk.thyroid) >= 60 ? 'old' : 'now') : 'no';
@@ -1589,12 +1618,13 @@ function liveDef() {
   return {
     run: { day: '', st: 'idle', since: 0, brk: null, studyMs: 0, net: 0, flash: null },
     log: {}, list: null, exams: [],
-    look: { side: 'right', size: 1, label: 'Study with me', dayOne: '', showList: true, showExams: true, showAll: true, showSyl: true, gate: true, bits: true }
+    look: { layout: 'card', pos: 'tr', size: 1, theme: 'dark', accent: 'green', opacity: 0.88, brkStyle: 'full', sound: true, label: 'Study with me', dayOne: '',
+      showNow: true, showNext: true, showNextBrk: true, showToday: true, showSyl: true, showNet: true, showAll: false, showExams: true, showList: false, gate: true, bits: true }
   };
 }
 function liveFix(L) {
   const d = liveDef(); L = L && typeof L === 'object' ? L : {};
-  return { run: Object.assign(d.run, L.run || {}), log: L.log || {}, list: L.list || null, exams: Array.isArray(L.exams) ? L.exams : [], look: Object.assign(d.look, L.look || {}), u: L.u || 0 };
+  return { run: Object.assign(d.run, L.run || {}), log: L.log || {}, list: L.list || null, exams: Array.isArray(L.exams) ? L.exams : [], look: Object.assign(d.look, L.look || {}, L.look && L.look.side && !L.look.pos ? { pos: L.look.side === 'left' ? 'tl' : 'tr' } : {}), u: L.u || 0 };
 }
 function LW(fn, noRender) { const L = JSON.parse(JSON.stringify(S.live || liveDef())); fn(L); L.u = Date.now(); WR({ live: L }, noRender); }
 
@@ -1713,9 +1743,10 @@ function lchime(kind) {
 }
 function liveAlerts(x, now) {
   if (x.st !== 'break' || !x.brk) return;
+  const snd = S.live.look.sound !== false;
   const k = x.brk.a;
-  if (LAL.brk !== k) { LAL.brk = k; if (x.brk.auto && now - k < 90000) { lchime('break'); try { navigator.vibrate && navigator.vibrate([400, 200, 400]); } catch (e) {} } }
-  if (x.brk.e && x.over >= 0 && LAL.over !== k) { LAL.over = k; if (x.over < 90000) lchime('over'); }
+  if (LAL.brk !== k) { LAL.brk = k; if (x.brk.auto && now - k < 90000) { if (snd) lchime('break'); try { navigator.vibrate && navigator.vibrate([400, 200, 400]); } catch (e) {} } }
+  if (x.brk.e && x.over >= 0 && LAL.over !== k) { LAL.over = k; if (x.over < 90000 && snd) lchime('over'); }
 }
 
 /* ---- whole-day timetable, short ---- */
@@ -1757,7 +1788,7 @@ function LV(act) {
 }
 let LEND = 0;
 function LENDX() { if (Date.now() - LEND < 3500) { LEND = 0; LV('end'); } else { LEND = Date.now(); render(); setTimeout(() => { if (TAB === 'live') render(); }, 3600); } }
-const LLK = (k, v) => LW(L => { L.look[k] = v; });
+const LLK = (k, v) => LW(L => { L.look[k] = v; if (k === 'layout') { const p = L.look.pos || 'tr'; if (v === 'bar' && !/^(tc|bc)$/.test(p)) L.look.pos = p[0] === 't' ? 'tc' : 'bc'; if (v !== 'bar' && /^(tc|bc)$/.test(p)) L.look.pos = p[0] + 'r'; } });
 const LX = i => LW(L => { const it = L.list && L.list.items[i]; if (it) it.x = !it.x; });
 function LEXADD() {
   const n = (document.getElementById('lx-n').value || '').trim(), d = document.getElementById('lx-d').value;
@@ -1828,11 +1859,20 @@ function viewLive() {
      <div class="row2b"><input class="lv-in" id="lx-n" maxlength="24" placeholder="Name, e.g. ISRO"><input class="lv-in" type="date" id="lx-d"></div>
      <button class="btn quiet wide" style="margin-top:8px" onclick="LEXADD()">+ Add exam</button></div>
    <div class="card"><h2>How it looks on stream</h2>
-     <span class="lv-lbl" style="margin-top:0">Panel side</span>${chips('side', [['right', 'Right'], ['left', 'Left']])}
-     <span class="lv-lbl">Size</span>${chips('size', [[0.85, 'S'], [1, 'M'], [1.15, 'L']])}
+     <span class="lv-lbl" style="margin-top:0">Style</span>${chips('layout', [['card', 'Card'], ['compact', 'Compact'], ['bar', 'Slim bar']])}
+     <span class="lv-lbl">Position</span>${lk.layout === 'bar' ? chips('pos', [['tc', 'Top'], ['bc', 'Bottom']]) : chips('pos', [['tl', '↖ Top left'], ['tr', '↗ Top right'], ['bl', '↙ Bottom left'], ['br', '↘ Bottom right']])}
+     <span class="lv-lbl">Size</span>${chips('size', [[0.8, 'S'], [1, 'M'], [1.2, 'L'], [1.4, 'XL']])}
+     <span class="lv-lbl">Colour</span>${chips('theme', [['dark', 'Dark glass'], ['light', 'Light'], ['black', 'Black']])}
+     <span class="lv-lbl">Accent</span><div class="lv-ch">${Object.keys(ACC).map(k => `<button class="lv-sw ${lk.accent === k ? 'on' : ''}" style="--sw:${ACC[k]}" onclick="LLK('accent','${k}')" aria-label="${k}"></button>`).join('')}</div>
+     <span class="lv-lbl">Background</span>${chips('opacity', [[0.6, 'See-through'], [0.75, '75%'], [0.88, '90%'], [1, 'Solid']])}
+     <span class="lv-lbl">Break screen</span>${chips('brkStyle', [['full', 'Full screen'], ['card', 'Card only (camera stays)']])}
      <span class="lv-lbl">Title</span><input class="lv-in" maxlength="40" value="${esc(lk.label)}" onchange="LLK('label',this.value.trim())">
      <span class="lv-lbl">Journey Day 1 (shows “Day 12”; leave empty to hide)</span><input class="lv-in" type="date" value="${esc(lk.dayOne)}" onchange="LLK('dayOne',this.value)">
-     ${tog('showList', "Show today's lecture list")}${tog('showSyl', 'Show syllabus progress (lectures done · %)')}${tog('showExams', 'Show exam countdowns')}${tog('showAll', 'Show all-time hours')}</div>
+     <span class="lv-lbl">Show on stream</span>
+     ${tog('showNow', 'Lecture I\'m on now', 'One at a time — tick it and the next one shows')}${tog('showNext', 'The one after it', 'Card style only')}
+     ${tog('showNextBrk', 'Next break time')}${tog('showToday', 'Today: studied / planned')}${tog('showSyl', 'Syllabus: lectures done · %')}
+     ${tog('showNet', 'Break time saved / over')}${tog('showAll', 'All-time hours')}${tog('showExams', 'Exam countdowns')}
+     ${tog('showList', 'Full list of today\'s lectures', 'Off keeps the panel short')}${tog('sound', 'Sound when a break starts / runs over')}</div>
    <div class="card"><h2>Connect to OBS</h2>${SYNC.code ? `
      <ol class="sm" style="padding-left:18px;margin:0 0 10px"><li>OBS → Sources <b>+</b> → <b>Browser</b>. Paste this link. Width <b>1920</b>, height <b>1080</b>. Keep it above the camera.</li><li>Run the stream from this tab on your phone or laptop.</li></ol>
      <div class="lv-link"><input class="lv-in" id="lv-link" readonly value="${esc(link)}"><button class="btn" onclick="LCOPY()">Copy</button></div>
@@ -1858,34 +1898,52 @@ function ovKey(x) {
   const L = S.live;
   return JSON.stringify([x.st, x.brk && [x.brk.lab, x.brk.a, x.brk.e], x.over > 0, x.flash && [x.flash.at, x.flash.ms >= 0], L.look, L.exams, liveSyl().d, liveList().map(i => i.i + (i.done ? 'd' : '') + i.title + i.mins), dk(), CFG().gate, CFG().bits, CFG().speed]);
 }
+const ACC = { green: '#4CC38A', blue: '#6EA8FF', purple: '#B48CFF', orange: '#FFA94D', pink: '#FF7AB6' };
+const THM = { dark: '12,16,26', light: '255,255,255', black: '0,0,0' };
+function liveNowLec() {
+  const list = liveList(), open = list.filter(i => !i.done), cur = open[0] || null;
+  return { list, cur, next: open[1] || null, idx: cur ? list.indexOf(cur) + 1 : list.length, n: list.length, done: list.length - open.length };
+}
 function ovHTML(x) {
-  const lk = S.live.look, t = liveText(x, Date.now()), ex = lk.showExams ? liveExams() : [], list = liveList();
-  const exH = ex.map(e => `<span>${esc(e.n)} <b>${exTxt(e)}</b></span>`).join('');
+  const lk = S.live.look, t = liveText(x, Date.now()), ex = lk.showExams ? liveExams() : [], L = liveNowLec();
   const lab = [lk.label, dayNum() ? 'Day ' + dayNum() : ''].filter(Boolean).join(' · ');
-  const open = list.find(i => !i.done);
-  if (x.st === 'break') {
+  const exH = ex.map(e => `<span>${esc(e.n)} <b>${exTxt(e)}</b></span>`).join('');
+  if (x.st === 'break' && lk.brkStyle !== 'card') {
     return `<div class="ob ${x.over > 0 ? 'over' : ''}"><div class="ob-lab">${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</div>
       <div class="ob-big" data-f="big"></div><div class="ob-sub" data-f="sub"></div>
-      <div class="ob-row">Studied today <b data-f="today"></b>${open ? ` · Next up: <b>${esc(open.sub)} — ${esc(open.title)}</b>` : ''}</div>
+      <div class="ob-row">Studied today <b data-f="today"></b>${L.cur ? ` · Next up: <b>${esc(L.cur.sub)} — ${esc(L.cur.title)}</b>` : ''}</div>
       ${exH ? `<div class="ob-ex">${exH}</div>` : ''}${lab ? `<div class="ob-tag">${esc(lab)}</div>` : ''}</div>`;
   }
-  const MAX = 10; let rows = list, hidden = 0, more = 0;
-  if (rows.length > MAX) {
-    const dn = rows.filter(i => i.done), op = rows.filter(i => !i.done), keep = dn.slice(Math.max(0, dn.length - Math.max(0, Math.min(2, MAX - op.length))));
-    hidden = dn.length - keep.length; rows = keep.concat(op); more = Math.max(0, rows.length - MAX); rows = rows.slice(0, MAX);
+  const lay = ['card', 'compact', 'bar'].includes(lk.layout) ? lk.layout : 'card';
+  let pos = lk.pos || 'tr';
+  if (lay === 'bar' && !/^(tc|bc)$/.test(pos)) pos = pos[0] === 't' ? 'tc' : 'bc';
+  if (lay !== 'bar' && /^(tc|bc)$/.test(pos)) pos = pos[0] + 'r';
+  const style = `--sc:${+lk.size || 1};--op:${+lk.opacity || .88};--bgc:${THM[lk.theme] || THM.dark};--ac:${ACC[lk.accent] || ACC.green}`;
+  const cls = `op lay-${lay} pos-${pos} t-${THM[lk.theme] ? lk.theme : 'dark'} s-${x.st}${x.over > 0 ? ' over' : ''}`;
+  const nowLabel = x.st === 'study' ? 'Now studying' : x.st === 'break' ? 'Up next' : x.st === 'done' ? 'Next up tomorrow' : 'First up';
+  if (lay === 'bar') {
+    const sep = '<span class="sep"></span>';
+    return `<div class="${cls}" style="${style}"><span class="op-pill"><i></i>${esc(t.pill)}</span><span class="op-big" data-f="big"></span>
+      ${lk.showNow && L.cur ? `${sep}<span class="op-bnow"><i style="background:${esc(L.cur.color)}"></i><small style="color:${esc(L.cur.color)}">${esc(L.cur.sub)}</small> ${esc(L.cur.title)}</span>` : ''}
+      ${lk.showToday ? `${sep}<span class="op-bt">Today <b data-f="today"></b> <small data-f="goal"></small></span>` : ''}
+      ${lk.showSyl ? (() => { const y = liveSyl(); return `${sep}<span class="op-bt">Syllabus <b>${y.pct}%</b></span>`; })() : ''}
+      ${ex.length ? `${sep}<span class="op-bt">${esc(ex[0].n)} <b>${exTxt(ex[0])}</b></span>` : ''}</div>`;
   }
-  const rowH = rows.map(i => `<div class="op-li ${i.done ? 'xd' : ''} ${x.st === 'study' && i === open ? 'cu' : ''}" style="--c:${esc(i.color)}"><span class="cb">${i.done ? '✓' : ''}</span><span class="tx"><small>${esc(i.sub)}</small><b>${esc(i.title)}</b></span><span class="ln">${hm(i.mins)}</span></div>`).join('');
-  const dn = list.filter(i => i.done).length;
-  return `<div class="op ${lk.side === 'left' ? 'l' : 'r'} s-${x.st}" style="--sc:${+lk.size || 1}">
-    <div class="op-top"><span class="op-pill"><i></i>${esc(t.pill)}</span><span class="op-lab">${esc(lab)}</span></div>
-    <div class="op-big" data-f="big"></div><div class="op-sub" data-f="sub"></div>
-    ${t.flash ? `<div class="op-flash ${x.flash.ms >= 0 ? 'g' : 'r'}">${esc(t.flash)}</div>` : ''}
-    <div class="op-day"><span class="op-k">Today</span><span class="op-v"><span data-f="today"></span> <small data-f="goal"></small></span></div>
-    <div class="op-bar"><b data-f="tbar"></b></div>
-    ${lk.showSyl ? (() => { const y = liveSyl(); return `<div class="op-day op-syl"><span class="op-k">Syllabus</span><span class="op-v">${y.d}<small> / ${y.n} lectures · ${y.pct}%</small></span></div><div class="op-bar syl"><b style="width:${y.pct}%"></b></div>`; })() : ''}
-    <div class="op-meta"><span data-f="net" data-h="1"></span>${lk.showAll ? `<span>All-time <b data-f="all"></b></span>` : ''}</div>
-    ${lk.showList && list.length ? `<div class="op-lh"><span class="op-k">Today's lectures · ${CFG().speed}x</span><span class="op-k">${dn}/${list.length} done</span></div>${hidden ? `<div class="op-more">✓ ${hidden} more done</div>` : ''}${rowH}${more ? `<div class="op-more">+${more} more</div>` : ''}` : ''}
-    ${exH ? `<div class="op-ex">${exH}</div>` : ''}</div>`;
+  const nowH = !lk.showNow ? '' : L.cur
+    ? `<div class="op-now" style="--c:${esc(L.cur.color)}"><div class="op-k">${nowLabel} · ${L.idx} of ${L.n}</div><div class="op-ns">${esc(L.cur.sub)}</div><div class="op-nt">${esc(L.cur.title)}</div><div class="op-nl">${hm(L.cur.mins)} at ${CFG().speed}x</div></div>`
+    : L.n ? `<div class="op-now" style="--c:var(--ac)"><div class="op-k">Today's lectures</div><div class="op-nt">All ${L.n} done ✓</div></div>` : '';
+  const nextH = lk.showNext && L.next && lay === 'card' ? `<div class="op-next"><span class="op-k">Then</span> <b style="color:${esc(L.next.color)}">${esc(L.next.sub)}</b> — ${esc(L.next.title)}</div>` : '';
+  const listH = lk.showList && lay === 'card' && L.n ? `<div class="op-lh"><span class="op-k">Today · ${CFG().speed}x</span><span class="op-k">${L.done}/${L.n} done</span></div>${L.list.slice(0, 8).map(i => `<div class="op-li ${i.done ? 'xd' : ''}" style="--c:${esc(i.color)}"><span class="cb">${i.done ? '✓' : ''}</span><span class="tx"><b>${esc(i.title)}</b></span></div>`).join('')}` : '';
+  const syl = lk.showSyl ? (() => { const y = liveSyl(); return `<div class="op-day"><span class="op-k">Syllabus</span><span class="op-v">${y.d}<small> / ${y.n} lectures · ${y.pct}%</small></span></div><div class="op-bar syl"><b style="width:${y.pct}%"></b></div>`; })() : '';
+  const today = lk.showToday ? `<div class="op-day"><span class="op-k">Today</span><span class="op-v"><span data-f="today"></span> <small data-f="goal"></small></span></div><div class="op-bar"><b data-f="tbar"></b></div>` : '';
+  const meta = (lk.showNet ? `<span data-f="net" data-h="1"></span>` : '') + (lk.showAll ? `<span>All-time <b data-f="all"></b></span>` : '');
+  return `<div class="${cls}" style="${style}">
+    <div class="op-top"><span class="op-pill"><i></i>${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</span><span class="op-lab">${esc(lab)}</span></div>
+    <div class="op-big" data-f="big"></div>${lk.showNextBrk || x.st !== 'study' ? `<div class="op-sub" data-f="sub"></div>` : ''}
+    ${t.flash && lk.showNet ? `<div class="op-flash ${x.flash.ms >= 0 ? 'g' : 'r'}">${esc(t.flash)}</div>` : ''}
+    ${nowH}${nextH}
+    ${today || syl || meta ? `<div class="op-stats">${today}${syl}${meta ? `<div class="op-meta">${meta}</div>` : ''}</div>` : ''}
+    ${listH}${exH ? `<div class="op-ex">${exH}</div>` : ''}</div>`;
 }
 function livePaint(host, now) {
   const x = liveState(now), k = ovKey(x);
