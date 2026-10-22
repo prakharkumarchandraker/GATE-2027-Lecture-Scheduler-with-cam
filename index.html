@@ -181,7 +181,7 @@ details summary::-webkit-details-marker{display:none}
 
 /* nav */
 nav{position:fixed;left:0;right:0;bottom:0;background:rgba(252,252,250,.98);border-top:1px solid var(--edge);padding-bottom:env(safe-area-inset-bottom);z-index:20}
-.navin{max-width:660px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.navin{max-width:660px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
 nav button{background:none;border:0;padding:11px 2px 14px;color:var(--ink3);cursor:pointer;font-size:12.5px;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:600}
 nav button[aria-current="true"]{color:var(--pen)}
 nav .pip{width:6px;height:6px;border-radius:50%;background:transparent}
@@ -242,7 +242,7 @@ nav button[aria-current="true"] .pip{background:var(--pen)}
 .ls2{display:block;margin-top:2px;font-size:12.5px;color:var(--sc);font-weight:600}
 .durline{white-space:nowrap}
 .fsbtn{display:flex;align-items:center;gap:6px;border:1px solid var(--edge);background:var(--card);border-radius:10px;padding:9px 12px;font-size:13.5px;font-weight:600;color:var(--ink2);cursor:pointer;flex:0 0 auto}
-@media(max-width:520px){.fsbtn span{display:none}.fsbtn{padding:9px}.streambtn{display:none}}
+@media(max-width:520px){.fsbtn span{display:none}.fsbtn{padding:9px}}
 
 /* readability pass */
 .chill{background:linear-gradient(120deg,#1E5B45,#1F3B66);color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:14px}
@@ -257,6 +257,93 @@ nav button[aria-current="true"] .pip{background:var(--pen)}
 .chill .ft{font-size:14.5px;font-weight:600;color:#D5E0EE;margin-top:9px}
 @media(min-width:760px){.chill ul{grid-template-columns:repeat(5,1fr)}}
 @media(max-width:759px){.chill ul{grid-template-columns:1fr}.chill li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}.chill li .ms{display:inline;margin:0}}
+/* ---- Live tab (remote) ---- */
+.lvgrid .side{position:static}
+.lv-card{border-left:5px solid var(--lc,var(--edge))}
+.lv-pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lc)}
+.lv-pill i{width:9px;height:9px;border-radius:50%;background:var(--lc)}
+.lv-big{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:46px;letter-spacing:-.03em;line-height:1.05;margin:8px 0 2px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.lv-sub{font-size:14.5px;color:var(--ink2)}
+.lv-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.lv-acts .solo{grid-column:1/-1}
+.lv-acts .btn{min-height:58px;font-size:17px}
+.btn.lv-go{background:var(--moss);border-color:var(--moss)}
+.btn.lv-brk{background:var(--meal);border-color:var(--meal)}
+.btn.lv-end{background:#fff;color:var(--clay);border-color:var(--clay)}
+.btn.lv-end.arm{background:var(--clay);color:#fff}
+.lv-flash{margin-top:10px;padding:8px 12px;border-radius:9px;font-weight:600;font-size:14px}
+.lv-flash.g{background:#EFF6F1;color:var(--moss)}.lv-flash.r{background:#FAF1ED;color:var(--clay)}
+.lv-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lv-stats div{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:8px 10px;min-width:0}
+.lv-stats span{display:block;font-size:12px;color:var(--ink3);font-weight:600}
+.lv-stats b{font-family:"IBM Plex Mono",monospace;font-size:17px;white-space:nowrap}
+.lv-stats b.g{color:var(--moss)}.lv-stats b.r{color:var(--clay)}
+.lv-l{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);cursor:pointer}
+.lv-l input{width:22px;height:22px;accent-color:var(--lc,var(--pen));flex:none}
+.lv-l .tx{flex:1;min-width:0}
+.lv-l .tx small{display:block;font-size:12.5px;font-weight:700;color:var(--lc,var(--ink3))}
+.lv-l .tx b{font-weight:600;display:block;overflow-wrap:anywhere}
+.lv-l.xd .tx b{text-decoration:line-through;color:var(--ink3);font-weight:500}
+.lv-l .ln{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink3);flex:none}
+.lv-ch{display:flex;flex-wrap:wrap;gap:6px}
+.lv-ch button{border:1px solid var(--edge);background:#fff;border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink);min-width:48px}
+.lv-ch button.on{background:var(--pen);border-color:var(--pen);color:#fff}
+.lv-in{width:100%;border:1px solid var(--edge);border-radius:9px;padding:9px 11px;font:inherit;background:#fff;min-height:42px;min-width:0}
+.lv-lbl{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:12px 0 5px}
+.lv-ex{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.lv-link{display:flex;gap:8px}.lv-link input{font-family:"IBM Plex Mono",monospace;font-size:12px}
+.lv-save{position:sticky;bottom:calc(78px + env(safe-area-inset-bottom));z-index:5;display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:9px 10px;box-shadow:0 6px 20px rgb(0 0 0 / .08);margin:0 0 13px}
+.lv-save .btn{flex:none;padding:10px 16px}
+
+/* ---- overlay (OBS Browser Source) ---- */
+html.lvov,html.lvov body{background:transparent!important;background-image:none!important;padding:0!important;margin:0;overflow:hidden;width:100%;height:100%}
+html.lvov #app,html.lvov nav,html.lvov #sheet,html.lvov #toast,html.lvov #timer{display:none!important}
+.lv-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;font-family:"IBM Plex Sans",system-ui,sans-serif;color:#EEF1F8;pointer-events:none}
+.op{position:absolute;top:40px;width:540px;background:rgba(12,16,26,.87);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:24px 26px 22px;box-shadow:0 16px 48px rgb(0 0 0 / .35);transform:scale(var(--sc,1))}
+.op.r{right:40px;transform-origin:100% 0}.op.l{left:40px;transform-origin:0 0}
+.op-top{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.op-pill{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--st);white-space:nowrap}
+.op-pill i{width:10px;height:10px;border-radius:50%;background:var(--st);color:var(--st);flex:none}
+.s-study{--st:#4CC38A}.s-break{--st:#F0A93B}.s-idle{--st:#8A93A8}.s-done{--st:#8FB4FF}
+.s-study .op-pill i{animation:lvp 2s ease-out infinite}
+@keyframes lvp{0%{box-shadow:0 0 0 0 currentColor}70%{box-shadow:0 0 0 11px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.op-lab{font-size:14px;font-weight:600;color:#9DA6BB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-big{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:76px;letter-spacing:-.03em;line-height:1;margin:16px 0 8px;font-variant-numeric:tabular-nums}
+.op-sub{font-size:16px;color:#A9B1C3}
+.op-flash{margin-top:12px;padding:9px 13px;border-radius:10px;font-weight:700;font-size:16px}
+.op-flash.g{background:rgba(76,195,138,.16);color:#6FE0A6}.op-flash.r{background:rgba(240,90,70,.16);color:#FF8B78}
+.op-day{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
+.op-k{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#9DA6BB}
+.op-v{font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:600}.op-v small{font-size:.68em;color:#9DA6BB;font-weight:500}
+.op-bar{height:8px;border-radius:99px;background:rgba(255,255,255,.13);overflow:hidden;margin-top:8px}
+.op-bar b{display:block;height:100%;width:0;background:#EEF1F8;opacity:.85;border-radius:inherit;transition:width .8s}
+.op-meta{display:flex;gap:18px;margin-top:10px;font-size:14px;color:#9DA6BB;white-space:nowrap}
+.op-meta span:empty{display:none}
+.op-meta b{color:#EEF1F8;font-family:"IBM Plex Mono",monospace}.op-meta b.g{color:#6FE0A6}.op-meta b.r{color:#FF8B78}
+.op-lh{display:flex;justify-content:space-between;margin:16px 0 4px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
+.op-li{display:flex;gap:11px;align-items:flex-start;padding:6px 0}
+.op-li .cb{width:18px;height:18px;border-radius:5px;border:2px solid var(--c);flex:none;margin-top:3px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#0C111C;line-height:1}
+.op-li.xd .cb{background:var(--c)}
+.op-li .tx{flex:1;min-width:0}
+.op-li .tx small{display:block;font-size:12.5px;font-weight:700;color:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;filter:brightness(1.35)}
+.op-li .tx b{display:block;font-size:16.5px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op-li.xd .tx b{text-decoration:line-through;color:#7E8799;font-weight:500}
+.op-li.xd .tx small{opacity:.6}
+.op-li.cu{background:rgba(255,255,255,.07);border-radius:10px;padding:6px 8px;margin:0 -8px}
+.op-li .ln{font-family:"IBM Plex Mono",monospace;font-size:13px;color:#9DA6BB;margin-top:3px;flex:none}
+.op-more{font-size:13px;color:#9DA6BB;padding:3px 0 3px 29px}
+.op-ex{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
+.op-ex span{font-size:14px;color:#A9B1C3;background:rgba(255,255,255,.07);border-radius:8px;padding:4px 10px}.op-ex b{color:#EEF1F8;font-family:"IBM Plex Mono",monospace;font-weight:600}
+.ob{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(9,12,20,.9);gap:8px;padding:0 120px}
+.ob.over{background:rgba(44,10,10,.92)}
+.ob-lab{font-size:32px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#F0A93B}
+.ob.over .ob-lab{color:#FF8B78}
+.ob-big{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:230px;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;margin:10px 0}
+.ob.over .ob-big{color:#FF6B57}
+.ob-sub{font-size:32px;color:#B4BCCC}
+.ob-row{margin-top:44px;font-size:25px;color:#B4BCCC;max-width:1500px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ob-row b{color:#EEF1F8}
+.ob-ex{display:flex;gap:12px;margin-top:24px}.ob-ex span{font-size:21px;color:#B4BCCC;background:rgba(255,255,255,.08);border-radius:10px;padding:6px 14px}.ob-ex b{color:#fff;font-family:"IBM Plex Mono",monospace}
+.ob-tag{position:absolute;left:48px;bottom:40px;font-size:20px;font-weight:600;color:#8F98AB}
 </style></head><body>
 <div class="wrap" id="app"></div>
 <div id="sheet"></div>
@@ -302,7 +389,7 @@ function saveLocal() {
   try { localStorage.setItem(LS_KEY, JSON.stringify({ S, code: SYNC.code, pending: SYNC.pending, tab: TAB })); } catch (e) {}
 }
 function loadLocal() {
-  try { const o = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if (o && o.S) { S = o.S; SYNC.code = o.code || null; SYNC.pending = o.pending || {}; TAB = ['today','study','body','progress','set'].includes(o.tab) ? o.tab : 'today'; return true; } } catch (e) {}
+  try { const o = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if (o && o.S) { S = o.S; SYNC.code = o.code || null; SYNC.pending = o.pending || {}; TAB = ['today','study','body','progress','live','set'].includes(o.tab) ? o.tab : 'today'; return true; } } catch (e) {}
   return false;
 }
 function migrate() {
@@ -312,6 +399,7 @@ function migrate() {
   if (!c.meds) c.meds = DATA.meds; if (!c.meals) c.meals = DATA.meals; if (!c.skin) c.skin = DATA.skin; if (!c.work) c.work = DATA.work;
   if (!c.subs) c.subs = DATA.subs;
   if (!c.work || !c.work[0] || !c.work[0].parts[0].ex[0].steps) c.work = DATA.work;
+  S.live = liveFix(S.live);
   S.done = S.done || {}; S.mods = S.mods || {}; S.pos = S.pos || {}; S.days = S.days || {}; S.logs = S.logs || {}; S.weight = S.weight || {};
 }
 
@@ -348,6 +436,7 @@ function encVal(path, v) {
 function applyPath(T, path, v) {               // v already decoded
   const p = path.split('/');
   if (p[0] === 'core') { if (v != null) T.core = v; return; }
+  if (p[0] === 'live') { if (v != null) T.live = v; return; }
   if (p[0] === 'done') { if (v == null) delete T.done[ufk(p[1])]; else T.done[ufk(p[1])] = v; return; }
   if (p[0] === 'logs' || p[0] === 'weight') { T[p[0]] = T[p[0]] || {}; if (v == null) delete T[p[0]][ufk(p[1])]; else T[p[0]][ufk(p[1])] = v; return; }
   if (p[0] === 'pos') { if (v == null) delete T.pos[ufk(p[1])]; else T.pos[ufk(p[1])] = v; return; }
@@ -363,6 +452,7 @@ function decodeRemote(v) {
   const T = { core: null, done: {}, mods: {}, pos: {}, days: {}, logs: {}, weight: {} };
   if (!v) return T;
   try { T.core = v.core ? JSON.parse(v.core) : null; } catch (e) {}
+  try { if (v.live) T.live = JSON.parse(v.live); } catch (e) {}
   for (const k in (v.done || {})) try { T.done[ufk(k)] = JSON.parse(v.done[k]); } catch (e) {}
   for (const k in (v.logs || {})) try { T.logs[ufk(k)] = JSON.parse(v.logs[k]); } catch (e) {}
   for (const k in (v.weight || {})) try { T.weight[ufk(k)] = JSON.parse(v.weight[k]); } catch (e) {}
@@ -378,6 +468,7 @@ function decodeRemote(v) {
 }
 function fullMap() {
   const m = { core: JSON.stringify(S.core) };
+  if (S.live) m.live = JSON.stringify(S.live);
   for (const id in S.done) m['done/' + fk(id)] = JSON.stringify(S.done[id]);
   for (const k in S.mods) m['mods/' + fk(k)] = JSON.stringify(S.mods[k]);
   for (const k in S.pos) m['pos/' + fk(k)] = JSON.stringify(S.pos[k]);
@@ -914,7 +1005,6 @@ function head() {
   const g = diffD(dk(), CFG().gate), b = diffD(dk(), CFG().bits);
   return `<div class="topbar"><div class="bigclock" id="bigclock">${clockS()}</div>
    <div class="tb2"><div class="tbd">${fmt(dk())}</div><div class="tbc"><b>${g}</b> days to GATE · <b>${b}</b> to BITS · <span id="syncline">${syncLine()}</span></div></div>
-   <a class="fsbtn streambtn" href="stream.html" title="Stream timer for YouTube" style="text-decoration:none">🎥<span>Stream</span></a>
    <button class="fsbtn" id="fsbtn" onclick="FS()" title="Full screen">${fsIcon()}</button></div>${TAB === 'today' ? chill() : ''}`;
 }
 const HOURS = [6, 7, 8, 9, 10, 11];
@@ -990,7 +1080,7 @@ function nowCard(P, now) {
   const cur = P.B.find(b => now >= b.start && now < b.end);
   const br = P.breaks.find(x => now >= x.start && now < x.end);
   const next = planRows(P).filter(r => r.t > now).slice(0, 3);
-  let h = `<div class="card nowcard"><div class="sec"><h2>Right now · ${clock(now)}</h2>${cur ? `<span class="mono muted sm">${hm(cur.end - now)} left${cur.kind === 'study' ? ` · <a href="stream.html" style="color:var(--pen)">🎥 Stream timer</a>` : ''}</span>` : ''}</div>`;
+  let h = `<div class="card nowcard"><div class="sec"><h2>Right now · ${clock(now)}</h2>${cur ? `<span class="mono muted sm">${hm(cur.end - now)} left</span>` : ''}</div>`;
   due.forEach(p => h += pinHTML(p, now));
   if (cur) h += blockHTML(cur, P, now).replace('id="nowblk"', '');
   else if (br) h += `<div class="empty" style="padding:10px">Break till ${clock(br.end)} — water, stretch, no phone scroll.</div>`;
@@ -1471,21 +1561,307 @@ function paintTimer() {
   el.innerHTML = `<span>${esc(TIMER.label)}</span><b>${TIMER.left > 0 ? Math.floor(TIMER.left / 60) + ':' + pad(TIMER.left % 60) : 'Done!'}</b><button onclick="TIMER.left+=15;paintTimer()">+15</button><button onclick="clearInterval(TIMER.h);TIMER=null;paintTimer()">✕</button>`;
 }
 
-/* ---------------- stream timer feed ----------------
-   stream.html (same site, same device) reads today's study items from here for its "Now studying" chips.
-   Only study data goes in: lecture name, subject, colour, block time. No meds, meals or body data. */
-let STREAM_AT = 0;
-function publishStream(force) {
-  if (!force && Date.now() - STREAM_AT < 30000) return; STREAM_AT = Date.now();
+/* ================= LIVE — YouTube study stream =================
+   Remote: the Live tab.  Overlay: index.html?live=<sync code> as an OBS Browser Source (1920×1080).
+   The overlay only reads synced data and never writes.
+   It shows study info only: lectures, study timer, breaks by type, exam countdowns. Never meds, food, skincare or body data.
+   Breaks come from the timetable: the gaps between today's study blocks. They are worked out from the clock,
+   so the overlay switches to the break screen on time even if the phone running the Live tab is asleep. */
+const LIVE_OV = new URLSearchParams(location.search).get('live');
+const LM = 60000;
+function liveDef() {
+  return {
+    run: { day: '', st: 'idle', since: 0, brk: null, studyMs: 0, net: 0, flash: null },
+    log: {}, list: null, exams: [],
+    look: { side: 'right', size: 1, label: 'Study with me', dayOne: '', showList: true, showExams: true, showAll: true, gate: true, bits: true }
+  };
+}
+function liveFix(L) {
+  const d = liveDef(); L = L && typeof L === 'object' ? L : {};
+  return { run: Object.assign(d.run, L.run || {}), log: L.log || {}, list: L.list || null, exams: Array.isArray(L.exams) ? L.exams : [], look: Object.assign(d.look, L.look || {}), u: L.u || 0 };
+}
+function LW(fn, noRender) { const L = JSON.parse(JSON.stringify(S.live || liveDef())); fn(L); L.u = Date.now(); WR({ live: L }, noRender); }
+
+/* ---- time ---- */
+let LPLAN = null, LPLAN_T = 0;
+function livePlan() { if (!LPLAN || Date.now() - LPLAN_T > 30000) { LPLAN = todayPlan(); LPLAN_T = Date.now(); } return LPLAN; }
+const dayBase = () => { const d = D(dk()); d.setHours(0, 0, 0, 0); return +d; };
+const lclock = ms => { const s = Math.floor(Math.max(0, ms) / 1000); return Math.floor(s / 3600) + ':' + pad(Math.floor(s % 3600 / 60)) + ':' + pad(s % 60); };
+const lmmss = ms => { const s = Math.floor(Math.max(0, ms) / 1000), h = Math.floor(s / 3600); return (h ? h + ':' + pad(Math.floor(s % 3600 / 60)) : Math.floor(s / 60)) + ':' + pad(s % 60); };
+const lhm = ms => { const t = Math.floor(Math.max(0, ms) / LM), h = Math.floor(t / 60), m = t % 60; return h >= 100 || (h && !m) ? h + 'h' : h ? h + 'h ' + pad(m) + 'm' : m + 'm'; };
+const lhhmm = ts => { const d = new Date(ts); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+
+/* ---- timetable → break spans (gaps between study blocks) ---- */
+function spanLab(bs, len) {
+  const p = [];
+  if (bs.some(b => b.kind === 'gym' || b.kind === 'home')) p.push('Workout');
+  ['breakfast', 'lunch', 'dinner'].forEach(k => { if (bs.some(b => b.kind === 'meal' && b.meal === k)) p.push(cap(k)); });
+  return p.length ? p.join(' + ') + ' break' : len <= 15 ? 'Short break' : 'Break';
+}
+function liveTL() {
+  const P = livePlan() || { B: [], studyMins: 0 }, base = dayBase();
+  const st = P.B.filter(b => b.kind === 'study').sort((a, b) => a.start - b.start), spans = [];
+  for (let i = 0; i + 1 < st.length; i++) {
+    const a = st[i].end, e = st[i + 1].start; if (e - a < 1) continue;
+    spans.push({ A: base + a * LM, E: base + e * LM, lab: spanLab(P.B.filter(b => b.kind !== 'study' && b.start < e && b.end > a), e - a) });
+  }
+  return { P, spans, sEnd: st.length ? base + st[st.length - 1].end * LM : 0, planned: P.studyMins || 0 };
+}
+/* ---- derived state: same answer on the phone and in OBS ---- */
+function liveState(now) {
+  const r = S.live.run, T = liveTL(), fresh = r.day !== dk();
+  let st = fresh ? 'idle' : r.st, since = r.since, studyMs = fresh ? 0 : r.studyMs, brk = fresh ? null : r.brk, cur = 0;
+  if (st === 'study') {
+    const nx = T.spans.find(s => s.A > since && s.A <= now);    // a timetable break started while studying (one already running when you start doesn't count)
+    if (nx) { studyMs += nx.A - since; st = 'break'; brk = { lab: nx.lab, a: nx.A, e: nx.E, auto: 1 }; since = nx.A; }
+    else { cur = now - since; studyMs += cur; }
+  }
+  if (st === 'break' && brk && !brk.e) {                         // manual break that ran into a timetable break
+    const sp = T.spans.find(s => s.A >= brk.a && s.A <= now); if (sp) brk = { lab: sp.lab, a: brk.a, e: sp.E };
+  }
+  let past = 0; for (const k in S.live.log) if (k !== dk()) past += +S.live.log[k] || 0;
+  return {
+    st, since, studyMs, brk, cur, T, net: fresh ? 0 : r.net || 0, all: past + studyMs,
+    next: st === 'study' ? T.spans.find(s => s.A > now) : null,
+    over: st === 'break' && brk && brk.e ? now - brk.e : 0,
+    brkEl: st === 'break' && brk ? now - brk.a : 0,
+    flash: !fresh && r.flash && now - r.flash.at < 20000 ? r.flash : null
+  };
+}
+function liveText(x, now) {
+  const o = {};
+  o.pill = { study: 'Studying', break: x.brk ? x.brk.lab : 'Break', idle: 'Not started', done: 'Done for today' }[x.st];
+  if (x.st === 'study') { o.big = lclock(x.cur); o.sub = x.next ? `Next: ${x.next.lab} at ${lhhmm(x.next.A)} · in ${lhm(x.next.A - now + 59999)}` : now >= x.T.sEnd ? 'Planned study done · bonus time' : 'No more breaks planned today'; }
+  else if (x.st === 'break') {
+    if (x.brk && x.brk.e) { o.big = x.over < 0 ? lmmss(-x.over + 999) : '+' + lmmss(x.over); o.sub = x.over < 0 ? `back by ${lhhmm(x.brk.e)}` : `overtime · was due back at ${lhhmm(x.brk.e)}`; }
+    else { o.big = lmmss(x.brkEl); o.sub = 'quick break'; }
+  } else if (x.st === 'done') { o.big = lhm(x.studyMs); o.sub = 'studied today ✓'; }
+  else { o.big = lhm(x.studyMs); o.sub = 'starting soon'; }
+  o.today = lhm(x.studyMs); o.goal = '/ ' + lhm(x.T.planned * LM); o.all = lhm(x.all);
+  o.tbar = Math.min(100, x.T.planned ? x.studyMs / (x.T.planned * LM) * 100 : 0).toFixed(1) + '%';
+  const net = x.net - Math.max(0, x.over);
+  o.netTxt = x.net || x.over > 0 ? (net >= 0 ? lhm(net) + ' saved' : lhm(-net) + ' over') : '';
+  o.netCls = net >= 0 ? 'g' : 'r';
+  o.net = o.netTxt ? `Breaks <b class="${o.netCls}">${o.netTxt}</b>` : '';
+  o.flash = x.flash ? (x.flash.ms >= 0 ? `✓ Back ${lmmss(x.flash.ms)} early · time saved` : `Back ${lmmss(-x.flash.ms)} late · overtime`) : '';
+  return o;
+}
+
+/* ---- today's lecture list: fixed for the day at the chosen speed; ticks cross it out ---- */
+function buildList() {
+  const P = livePlan() || { items: [], studyMins: 0 }, d = dk(), sp = CFG().speed, items = [], seen = new Set();
+  Object.keys(S.done).filter(id => S.done[id].d === d && findLect(id)).sort((a, b) => (S.done[a].at || 0) - (S.done[b].at || 0))
+    .forEach(id => { items.push({ t: 'lec', id, raw: Math.max(1, findLect(id).l.len - (S.done[id].from || 0)) }); seen.add(id); });
+  let room = getDay().meta.start == null ? (P.studyMins || 0) - items.reduce((a, i) => a + W(i.raw, sp), 0) : 1e9;
+  (P.items || []).forEach(it => {
+    if (room <= 0) return;
+    if (it.type === 'lec') { const id = it.x.l.id; if (seen.has(id)) return; seen.add(id); items.push({ t: 'lec', id, raw: it.part ? it.part.raw : it.x.rem }); }
+    else items.push({ t: it.type, mins: it.mins });
+    room -= it.mins;
+  });
+  return { day: d, sp, items };
+}
+let LTMP = null, LTMP_T = 0;
+function liveListRaw() {
+  const li = S.live.list;
+  if (li && li.day === dk() && li.sp === CFG().speed) return li;
+  if (!LTMP || Date.now() - LTMP_T > 30000) { LTMP = buildList(); LTMP_T = Date.now(); }
+  return LTMP;
+}
+function liveList() {
+  const li = liveListRaw();
+  return li.items.map((it, i) => {
+    if (it.t === 'lec') { const f = findLect(it.id); if (!f) return null; return { i, t: 'lec', id: it.id, title: f.l.t, sub: f.s.name, color: f.s.color, mins: W(it.raw, li.sp), done: !!S.done[it.id] }; }
+    return { i, t: it.t, title: it.t === 'rev' ? 'Revision' : 'PYQ practice', sub: it.t === 'rev' ? 'Revise earlier lectures' : 'Questions on today\'s topics', color: it.t === 'rev' ? '#A98BC0' : '#8A93A8', mins: it.mins, done: !!it.x };
+  }).filter(Boolean);
+}
+function ensureList() { const li = S.live.list; if (!li || li.day !== dk() || li.sp !== CFG().speed) LW(L => { L.list = buildList(); }, true); }
+function liveExams() {
+  const L = S.live, c = CFG(), out = [], t = dk();
+  if (L.look.gate && c.gate) out.push({ n: 'GATE', d: c.gate });
+  if (L.look.bits && c.bits) out.push({ n: 'BITS', d: c.bits });
+  (L.exams || []).forEach(e => { if (e && e.n && e.d) out.push(e); });
+  return out.map(e => ({ n: e.n, left: diffD(t, e.d) })).filter(e => e.left >= 0).sort((a, b) => a.left - b.left);
+}
+const exTxt = e => e.left === 0 ? 'today' : e.left === 1 ? '1 day' : e.left + ' days';
+const dayNum = () => { const o = S.live.look.dayOne; if (!o) return 0; const n = diffD(o, dk()) + 1; return n > 0 ? n : 0; };
+
+/* ---- sound ---- */
+let LAC = null, LAL = { brk: null, over: null };
+function lunlock() { try { LAC = LAC || new (window.AudioContext || window.webkitAudioContext)(); LAC.resume(); } catch (e) {} }
+function lchime(kind) {
   try {
-    const P = todayPlan(), items = [];
-    P.B.filter(b => b.kind === 'study').forEach(b => (b.items || []).forEach(p => {
-      const it = p.it;
-      if (it.type === 'lec') items.push({ n: it.x.l.t, s: it.x.s.name, c: it.x.s.color, a: b.start, e: b.end, done: !!S.done[it.x.l.id] });
-      else items.push({ n: it.type === 'rev' ? 'Revision' : 'PYQ practice', s: '', c: '', a: b.start, e: b.end, done: false });
-    }));
-    localStorage.setItem('dayos.stream', JSON.stringify({ d: dk(), dayStart: CFG().dayStart, studyMins: P.studyMins || 0, chunk: CFG().chunk, gap: CFG().gap, gate: CFG().gate, items }));
+    lunlock(); const t = LAC.currentTime, notes = kind === 'over' ? [660, 520, 660, 520] : [784, 988, 1175];
+    notes.forEach((f, i) => { const o = LAC.createOscillator(), g = LAC.createGain(), s = t + i * .24; o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(.32, s + .02); g.gain.exponentialRampToValueAtTime(.001, s + .95); o.connect(g).connect(LAC.destination); o.start(s); o.stop(s + 1); });
   } catch (e) {}
+}
+function liveAlerts(x, now) {
+  if (x.st !== 'break' || !x.brk) return;
+  const k = x.brk.a;
+  if (LAL.brk !== k) { LAL.brk = k; if (x.brk.auto && now - k < 90000) { lchime('break'); try { navigator.vibrate && navigator.vibrate([400, 200, 400]); } catch (e) {} } }
+  if (x.brk.e && x.over >= 0 && LAL.over !== k) { LAL.over = k; if (x.over < 90000) lchime('over'); }
+}
+
+/* ---- actions (remote only) ---- */
+function LV(act) {
+  lunlock();
+  const now = Date.now(), x = liveState(now), today = dk();
+  LW(L => {
+    const r = L.run;
+    if (r.day !== today) { if (r.day && r.studyMs > 0) L.log[r.day] = r.studyMs; Object.assign(r, { day: today, st: 'idle', since: 0, brk: null, studyMs: 0, net: 0, flash: null }); }
+    if (act === 'start') Object.assign(r, { st: 'study', since: now, brk: null, studyMs: x.studyMs, flash: null });
+    else if (act === 'pause' && x.st === 'study') Object.assign(r, { st: 'break', since: now, studyMs: x.studyMs, brk: { lab: 'Break', a: now, e: null } });
+    else if (act === 'resume' && x.st === 'break') {
+      const early = x.brk && x.brk.e ? x.brk.e - now : null;      // + saved, − overtime
+      Object.assign(r, { st: 'study', since: now, brk: null, studyMs: x.studyMs, net: (r.net || 0) + (early || 0), flash: early == null ? null : { ms: early, at: now } });
+    } else if (act === 'end') { Object.assign(r, { st: 'done', since: now, brk: null, studyMs: x.studyMs, flash: null }); L.log[today] = x.studyMs; }
+  });
+}
+let LEND = 0;
+function LENDX() { if (Date.now() - LEND < 3500) { LEND = 0; LV('end'); } else { LEND = Date.now(); render(); setTimeout(() => { if (TAB === 'live') render(); }, 3600); } }
+const LLK = (k, v) => LW(L => { L.look[k] = v; });
+const LX = i => LW(L => { const it = L.list && L.list.items[i]; if (it) it.x = !it.x; });
+function LEXADD() {
+  const n = (document.getElementById('lx-n').value || '').trim(), d = document.getElementById('lx-d').value;
+  if (!n || !d) return toast('Type the exam name and pick its date');
+  LW(L => { L.exams.push({ id: uid(), n: n.slice(0, 24), d }); }); toast(n + ' added');
+}
+const LEXDEL = id => LW(L => { L.exams = L.exams.filter(e => e.id !== id); });
+function LCOPY() { const i = document.getElementById('lv-link'); const ok = () => toast('Overlay link copied'); try { navigator.clipboard.writeText(i.value).then(ok, () => { i.select(); document.execCommand('copy'); ok(); }); } catch (e) { i.select(); document.execCommand('copy'); ok(); } }
+function saveTxt() {
+  const n = Object.keys(SYNC.pending || {}).length;
+  if (!SYNC.code) return 'Saved on this device';
+  if (n) return navigator.onLine ? 'Saved on this device · uploading…' : 'Saved on this device · uploads when online';
+  return SYNC.status === 'on' ? 'Saved ✓ · ' + (SYNC.msg || 'synced').toLowerCase() : 'Saved on this device';
+}
+function LSAVE() {
+  saveLocal();
+  const done = () => { const e = document.getElementById('lv-saved'); if (e) e.textContent = saveTxt(); };
+  Promise.resolve(flush()).then(done, done); done();
+  const e = document.getElementById('lv-saved'); if (e) { e.style.fontWeight = '700'; setTimeout(() => { e.style.fontWeight = ''; }, 1200); }
+}
+
+/* ---- Live tab (remote) ---- */
+function viewLive() {
+  ensureList();
+  const now = Date.now(), x = liveState(now), t = liveText(x, now), L = S.live, lk = L.look, list = liveList(), c = CFG(), sp = c.speed;
+  const col = { study: 'var(--moss)', break: x.over > 0 ? 'var(--clay)' : 'var(--meal)', idle: 'var(--ink3)', done: 'var(--pen)' }[x.st];
+  const armed = Date.now() - LEND < 3500;
+  const end = `<button class="btn lv-end ${armed ? 'arm' : ''}" onclick="LENDX()">${armed ? 'Tap again to end' : '■ End for today'}</button>`;
+  const acts = x.st === 'idle' || x.st === 'done' ? `<button class="btn lv-go solo" onclick="LV('start')">▶ ${x.st === 'done' ? 'Start again' : 'Start studying'}</button>`
+    : x.st === 'study' ? `<button class="btn lv-brk" onclick="LV('pause')">☕ Break now</button>${end}`
+    : `<button class="btn lv-go" onclick="LV('resume')">▶ Resume studying</button>${end}`;
+  const dn = list.filter(i => i.done).length, totM = list.reduce((a, i) => a + i.mins, 0);
+  const tog = (k, label, sub) => `<label class="ck"><input type="checkbox" ${lk[k] ? 'checked' : ''} onchange="LLK('${k}',this.checked)"><span>${label}${sub ? `<small>${sub}</small>` : ''}</span></label>`;
+  const chips = (k, opts) => `<div class="lv-ch">${opts.map(([v, l]) => `<button class="${String(lk[k]) === String(v) ? 'on' : ''}" onclick="LLK('${k}',${typeof v === 'string' ? `'${v}'` : v})">${l}</button>`).join('')}</div>`;
+  const link = location.href.split(/[?#]/)[0] + '?live=' + encodeURIComponent(SYNC.code || '');
+
+  const main = `<div class="card lv-card" style="--lc:${col}">
+     <span class="lv-pill" id="lv-pill"><i></i>${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</span>
+     <div class="lv-big" id="lv-big">${esc(t.big)}</div><div class="lv-sub" id="lv-sub">${esc(t.sub)}</div>
+     ${t.flash ? `<div class="lv-flash ${x.flash.ms >= 0 ? 'g' : 'r'}">${esc(t.flash)}</div>` : ''}
+     <div class="lv-acts">${acts}</div>
+     <p class="xs faint" style="margin:10px 0 0">Breaks start on their own at your timetable times (gaps between study blocks), with a sound, and stay on screen till you tap Resume.</p></div>
+   <div class="lv-stats"><div><span>Studied today</span><b id="lv-today">${t.today}</b></div><div><span>Planned</span><b>${lhm(x.T.planned * LM)}</b></div><div><span>Breaks</span><b id="lv-net" class="${t.netTxt ? t.netCls : ''}">${t.netTxt || '—'}</b></div></div>
+   <div class="card" style="margin-top:13px"><div class="sec"><h2>Today's lectures</h2><span class="mono muted sm">${dn}/${list.length} done · ${hm(totM)}</span></div>
+     <div class="sl2">Speed — pick it first, the list follows</div>
+     <div class="spd">${SPEEDS.map(s => `<button class="${s === sp ? 'on' : ''}" onclick="SETSP(${s})">${s}x</button>`).join('')}</div>
+     <div style="margin-top:8px">${list.map(i => `<label class="lv-l ${i.done ? 'xd' : ''}" style="--lc:${esc(i.color)}"><input type="checkbox" ${i.done ? 'checked' : ''} onchange="${i.t === 'lec' ? `TK('${i.id}')` : `LX(${i.i})`};render()"><span class="tx"><small>${esc(i.sub)}</small><b>${esc(i.title)}</b></span><span class="ln">${hm(i.mins)}</span></label>`).join('') || '<div class="sm muted" style="padding:8px 0">No lectures fit today.</div>'}</div>
+     <p class="xs faint" style="margin:8px 0 0">Ticking here ticks it in Day OS too, and the other way round. Changing speed rebuilds the list; lectures already done stay crossed.</p></div>`;
+
+  const ex = (L.exams || []).map(e => `<div class="lv-ex"><span class="grow"><b>${esc(e.n)}</b> <span class="faint sm">${fmt2(e.d)} · ${exTxt({ left: diffD(dk(), e.d) })}</span></span><button class="btn quiet mini" onclick="LEXDEL('${e.id}')" aria-label="Remove ${esc(e.n)}">✕</button></div>`).join('');
+  const side = `<div class="card"><h2>Exam countdowns on stream</h2>
+     ${tog('gate', 'GATE · ' + fmt2(c.gate), exTxt({ left: diffD(dk(), c.gate) }) + ' left · date is in Settings')}
+     ${tog('bits', 'BITS · ' + fmt2(c.bits), exTxt({ left: diffD(dk(), c.bits) }) + ' left · date is in Settings')}
+     ${ex}
+     <span class="lv-lbl">Add another exam</span>
+     <div class="row2b"><input class="lv-in" id="lx-n" maxlength="24" placeholder="Name, e.g. ISRO"><input class="lv-in" type="date" id="lx-d"></div>
+     <button class="btn quiet wide" style="margin-top:8px" onclick="LEXADD()">+ Add exam</button></div>
+   <div class="card"><h2>How it looks on stream</h2>
+     <span class="lv-lbl" style="margin-top:0">Panel side</span>${chips('side', [['right', 'Right'], ['left', 'Left']])}
+     <span class="lv-lbl">Size</span>${chips('size', [[0.85, 'S'], [1, 'M'], [1.15, 'L']])}
+     <span class="lv-lbl">Title</span><input class="lv-in" maxlength="40" value="${esc(lk.label)}" onchange="LLK('label',this.value.trim())">
+     <span class="lv-lbl">Journey Day 1 (shows “Day 12”; leave empty to hide)</span><input class="lv-in" type="date" value="${esc(lk.dayOne)}" onchange="LLK('dayOne',this.value)">
+     ${tog('showList', "Show today's lecture list")}${tog('showExams', 'Show exam countdowns')}${tog('showAll', 'Show all-time hours')}</div>
+   <div class="card"><h2>Connect to OBS</h2>${SYNC.code ? `
+     <ol class="sm" style="padding-left:18px;margin:0 0 10px"><li>OBS → Sources <b>+</b> → <b>Browser</b>. Paste this link. Width <b>1920</b>, height <b>1080</b>. Keep it above the camera.</li><li>Run the stream from this tab on your phone or laptop.</li></ol>
+     <div class="lv-link"><input class="lv-in" id="lv-link" readonly value="${esc(link)}"><button class="btn" onclick="LCOPY()">Copy</button></div>
+     <p class="xs faint" style="margin:8px 0 0">The overlay shows study info only — never meds, food or skincare. The link contains your sync code: keep it off the stream and out of chat.</p>` : '<p class="sm">Turn on sync in Settings first.</p>'}</div>`;
+  return `<div class="grid lvgrid"><div class="main">${main}</div><div class="side">${side}</div></div>
+   <div class="lv-save"><button class="btn" onclick="LSAVE()">💾 Save</button><span class="sm muted" id="lv-saved">${esc(saveTxt())}</span></div>`;
+}
+let LTICK_K = '';
+setInterval(() => {
+  if (LIVE_OV || !S || TAB !== 'live') return;
+  const now = Date.now(), x = liveState(now), t = liveText(x, now);
+  const k = [x.st, x.brk && x.brk.a, x.brk && x.brk.e, x.over > 0, !!x.flash, dk()].join('|');
+  if (LTICK_K && LTICK_K !== k && !SHEET) render();
+  LTICK_K = k;
+  const set = (id, v) => { const e = document.getElementById(id); if (e && e.textContent !== v) e.textContent = v; };
+  set('lv-big', t.big); set('lv-sub', t.sub); set('lv-today', t.today);
+  liveAlerts(x, now);
+}, 1000);
+
+/* ---- overlay (OBS) ---- */
+function ovKey(x) {
+  const L = S.live;
+  return JSON.stringify([x.st, x.brk && [x.brk.lab, x.brk.a, x.brk.e], x.over > 0, x.flash && [x.flash.at, x.flash.ms >= 0], L.look, L.exams, liveList().map(i => i.i + (i.done ? 'd' : '') + i.title + i.mins), dk(), CFG().gate, CFG().bits, CFG().speed]);
+}
+function ovHTML(x) {
+  const lk = S.live.look, t = liveText(x, Date.now()), ex = lk.showExams ? liveExams() : [], list = liveList();
+  const exH = ex.map(e => `<span>${esc(e.n)} <b>${exTxt(e)}</b></span>`).join('');
+  const lab = [lk.label, dayNum() ? 'Day ' + dayNum() : ''].filter(Boolean).join(' · ');
+  const open = list.find(i => !i.done);
+  if (x.st === 'break') {
+    return `<div class="ob ${x.over > 0 ? 'over' : ''}"><div class="ob-lab">${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</div>
+      <div class="ob-big" data-f="big"></div><div class="ob-sub" data-f="sub"></div>
+      <div class="ob-row">Studied today <b data-f="today"></b>${open ? ` · Next up: <b>${esc(open.sub)} — ${esc(open.title)}</b>` : ''}</div>
+      ${exH ? `<div class="ob-ex">${exH}</div>` : ''}${lab ? `<div class="ob-tag">${esc(lab)}</div>` : ''}</div>`;
+  }
+  const MAX = 10; let rows = list, hidden = 0, more = 0;
+  if (rows.length > MAX) {
+    const dn = rows.filter(i => i.done), op = rows.filter(i => !i.done), keep = dn.slice(Math.max(0, dn.length - Math.max(0, Math.min(2, MAX - op.length))));
+    hidden = dn.length - keep.length; rows = keep.concat(op); more = Math.max(0, rows.length - MAX); rows = rows.slice(0, MAX);
+  }
+  const rowH = rows.map(i => `<div class="op-li ${i.done ? 'xd' : ''} ${x.st === 'study' && i === open ? 'cu' : ''}" style="--c:${esc(i.color)}"><span class="cb">${i.done ? '✓' : ''}</span><span class="tx"><small>${esc(i.sub)}</small><b>${esc(i.title)}</b></span><span class="ln">${hm(i.mins)}</span></div>`).join('');
+  const dn = list.filter(i => i.done).length;
+  return `<div class="op ${lk.side === 'left' ? 'l' : 'r'} s-${x.st}" style="--sc:${+lk.size || 1}">
+    <div class="op-top"><span class="op-pill"><i></i>${esc(t.pill)}</span><span class="op-lab">${esc(lab)}</span></div>
+    <div class="op-big" data-f="big"></div><div class="op-sub" data-f="sub"></div>
+    ${t.flash ? `<div class="op-flash ${x.flash.ms >= 0 ? 'g' : 'r'}">${esc(t.flash)}</div>` : ''}
+    <div class="op-day"><span class="op-k">Today</span><span class="op-v"><span data-f="today"></span> <small data-f="goal"></small></span></div>
+    <div class="op-bar"><b data-f="tbar"></b></div>
+    <div class="op-meta"><span data-f="net" data-h="1"></span>${lk.showAll ? `<span>All-time <b data-f="all"></b></span>` : ''}</div>
+    ${lk.showList && list.length ? `<div class="op-lh"><span class="op-k">Today's lectures · ${CFG().speed}x</span><span class="op-k">${dn}/${list.length} done</span></div>${hidden ? `<div class="op-more">✓ ${hidden} more done</div>` : ''}${rowH}${more ? `<div class="op-more">+${more} more</div>` : ''}` : ''}
+    ${exH ? `<div class="op-ex">${exH}</div>` : ''}</div>`;
+}
+function livePaint(host, now) {
+  const x = liveState(now), k = ovKey(x);
+  if (host._k !== k) { host._k = k; host.innerHTML = ovHTML(x); host._els = [...host.querySelectorAll('[data-f]')]; }
+  const t = liveText(x, now);
+  for (const el of host._els) {
+    const f = el.dataset.f, v = t[f] == null ? '' : t[f];
+    if (f === 'tbar') { if (el.style.width !== v) el.style.width = v; }
+    else if (el.dataset.h) { if (el.innerHTML !== v) el.innerHTML = v; }
+    else if (el.textContent !== v) el.textContent = v;
+  }
+  liveAlerts(x, now);
+}
+function liveOverlayInit() {
+  document.documentElement.classList.add('lvov');
+  // read-only: nothing from the overlay is ever saved or uploaded
+  saveLocal = () => {}; flush = async () => {}; WR = () => {}; paintSync = () => {};
+  S = { core: freshCore(), done: {}, mods: {}, days: {} }; migrate();
+  SYNC.code = LIVE_OV;
+  let ready = false;
+  const orig = onRemote;
+  onRemote = v => { if (v && v.core) { ready = true; orig(v); } };
+  render = () => { LPLAN = null; LTMP = null; };
+  const stage = document.createElement('div'); stage.className = 'lv-stage'; document.body.appendChild(stage);
+  const fit = () => { stage.style.transform = `scale(${(window.innerWidth || 1920) / 1920})`; };
+  fit(); addEventListener('resize', fit);
+  startSync();
+  setInterval(() => { if (ready) { try { livePaint(stage, Date.now()); } catch (e) { console.error(e); } } }, 250);
 }
 
 /* ---------------- shell ---------------- */
@@ -1495,8 +1871,8 @@ function render() {
   // never redraw under the keyboard: wait until the field loses focus
   const ae = document.activeElement;
   if (ae && /INPUT|TEXTAREA|SELECT/.test(ae.tagName) && ae.type !== 'checkbox' && document.getElementById('app').contains(ae) && !SHEET) { renderQueued = true; return; }
-  renderQueued = false;
-  const V = { today: viewToday, study: viewStudy, body: viewBody, progress: viewProgress, set: viewSet }[TAB] || viewToday;
+  renderQueued = false; LPLAN = null; LTMP = null;
+  const V = { today: viewToday, study: viewStudy, body: viewBody, progress: viewProgress, live: viewLive, set: viewSet }[TAB] || viewToday;
   let body;
   try { body = head() + V(); }
   catch (err) { console.error(err); body = `<h1>Something broke</h1><div class="card warn"><p class="sm">${esc(err && err.message || err)}</p><button class="btn wide" onclick="go('today')">Go to Today</button></div>`; }
@@ -1505,9 +1881,8 @@ function render() {
   document.getElementById('app').innerHTML = body;
   document.getElementById('sheet').innerHTML = sheetHTML() + joinHTML();
   paintTimer();
-  publishStream();
   const rc = dueRev(dk(), 1e9).all.length;
-  document.getElementById('nav').innerHTML = [['today', 'Today'], ['study', 'Study'], ['body', 'Body'], ['progress', 'Progress'], ['set', 'Settings']]
+  document.getElementById('nav').innerHTML = [['today', 'Today'], ['study', 'Study'], ['body', 'Body'], ['progress', 'Progress'], ['live', 'Live'], ['set', 'Settings']]
     .map(([k, l]) => `<button aria-current="${TAB === k}" onclick="go('${k}')"><span class="pip"></span>${l}${k === 'study' && rc ? ' · ' + rc : ''}</button>`).join('');
   window.scrollTo(0, y);
 }
@@ -1521,6 +1896,7 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { render(); flush(); } });
 
 (function init() {
+  if (LIVE_OV) return liveOverlayInit();
   if (!loadLocal()) {
     S = { core: freshCore(), done: {}, mods: {}, days: {} };
     SYNC.code = newCode();                 // sync on by default, private random code
