@@ -1,84 +1,56 @@
-# Pragati Study Desk
+# Day OS
 
-Offline study tracker for BCom (all semesters). One HTML file plus a few support files. No build step.
+One app for meds, food, gym, study (GATE/BITS lectures + revision) and skincare.
+You tap **"I'm up — build my day"**. It asks what's already done, then plans the rest of the day up to lights out (23:00).
 
-## 1. Put it online (free, ~5 min)
+## Put it online (GitHub Pages)
+1. Create a new repo, e.g. `day-os`.
+2. Upload these 6 files to the repo root: `index.html`, `stream.html`, `sw.js`, `manifest.webmanifest`, `icon-192.png`, `icon-512.png`.
+3. Settings → Pages → Source: `main` branch, `/ (root)` → Save.
+4. Open `https://<username>.github.io/day-os/` in Chrome on the phone → ⋮ → **Add to Home screen**.
 
-Pick one:
+## Sync between phone and laptop
+- The first device creates a private sync code by itself (Settings → Sync).
+- On the second device: Settings → Sync → **Use a different code** → type the code once.
+- Keep the code safe. A new phone just needs the same code.
 
-- **Netlify Drop**: go to https://app.netlify.com/drop, drag this whole `study-desk` folder in. You get a link like `https://something.netlify.app`. Make a free account so the site doesn't expire.
-- **GitHub Pages**: new repo → upload these files → Settings → Pages → Deploy from branch `main` / root.
-
-It must be served over https (both options do this) for offline mode and install to work.
-
-## 2. Install on Pragati's phone and laptop
-
-- **Android**: open the link in Chrome → ⋮ menu → **Add to Home screen / Install app**.
-- **Laptop**: open in Chrome or Edge → install icon at the right end of the address bar.
-
-After the first open it works fully offline.
-
-## 3. Cloud sync (Firebase Realtime Database, no login)
-
-One-time setup in the Firebase console:
-
-1. Realtime Database → **Rules** tab → replace everything with the contents of `database.rules.json` → **Publish**.
-   This lets the app read and write only `/desks/<sync code>`. Nobody can list the codes, so the data is reachable only with the code.
-
-In the app:
-
-1. **First device** (e.g. Pragati's phone): Settings → Cloud sync → **Turn on sync**. A code like `pragati-xxxxxxxxxxxx` appears. Copy it and keep it somewhere safe (WhatsApp it to yourself).
-2. **Second device** (laptop): Settings → Cloud sync → paste the code → **Use a code**. The laptop's data is replaced by the cloud copy.
-
-After that, every change saves on the device first and uploads about 3 seconds later. Offline changes upload when the internet is back. When the app opens it pulls the newer copy. If both devices are edited while offline, the one edited last wins.
-
-Anyone who has the code can read and change the data, so don't post it publicly. Weekly **Download backup** is still the safety net.
-
-## 4. Updating the app later
-
-Replace `index.html`, then in `sw.js` change `VERSION` (e.g. `desk-v2`) and redeploy. Data is not touched by updates.
-
-## Adding a new semester
-
-Settings → Semesters → Add semester (set the exam start date, make it current). Then Syllabus → + Add subject for each subject and paste its syllabus:
-
-```
-Unit 1: Introduction
-- Meaning and scope
-- Accounting concepts
-Unit 2: Final Accounts
-- Trading account
-```
-
-## Adding lecture videos
-
-Settings → Lecture videos → **Get the Claude prompt** → copy it → paste in Claude with the lecture names, lengths, links and subject → copy the JSON reply → Settings → **+ Add lectures** → paste.
-
-JSON format:
+### Firebase rule (one-time, only if Settings shows "Sync blocked")
+Firebase console → project `gate-2027-d5fbf` → Realtime Database → Rules:
 
 ```json
-[
-  {"subject": "Financial Accounting",
-   "videos": [
-     {"title": "Depreciation one-shot", "minutes": 95, "url": "https://youtu.be/...", "topic": ""}
-   ]}
-]
+{
+  "rules": {
+    "plans": {
+      "$id": { ".read": true, ".write": true }
+    }
+  }
+}
 ```
+Nobody can list all plans; a plan can only be opened with its exact code.
+
+## Rules the planner follows
+- Thyroid tablet first, no food for 60 min.
+- Breakfast only if food is allowed by 11:00. Morning meds ride on breakfast, else on lunch, else on dinner.
+- Lunch 13:30, never after 14:30. Dinner 19:30. Lights out 23:00.
+- Outside gym (90 min with travel) always before lunch. If it can't fit before 14:30 lunch → 40 min home workout, 2h after a meal.
+- Everything else is study, in 90-min blocks with 10-min breaks: revision first, then lectures. A long lecture can stop mid-way; the rest continues tomorrow.
+- "Make today off": no gym, 2h light study.
+All times and durations are editable in Settings.
 
 ## Stream timer (YouTube live with OBS)
 
-`stream.html` is a study timer made for live streams. One page, two modes:
+`stream.html` is a study timer for live streams. Same site, two modes:
 
-- **Remote** (`stream.html`, also the **🎥 Stream** button on Today): big Start / Break / Back / End buttons, session length, break countdown, "Now studying", daily goal, look of the overlay.
-- **Overlay** (`stream.html?o=<code>`): transparent card or slim bar for OBS. It updates live from the remote through Firebase (same `/desks/` rules, nothing new to publish).
+- **Remote** (`stream.html`; 🎥 button in the top bar on laptop, "🎥 Stream timer" in the Right now card during a study block on phone): Start / Take a break / Back to studying / End session.
+- **Overlay** (`stream.html?o=<code>`): transparent card or slim bar for an OBS Browser Source. Updates live through Firebase at `plans/stream-…`, so the rule above already covers it.
 
-What it tracks: session time (breaks don't count), break countdown ("back in 4:12", or "+0:45" if it runs over), today's total vs goal, number of breaks, all-time hours, "Day 12" of the journey.
+From Day OS (same device) it picks up: today's lectures as "Now studying" chips (the one planned for right now is marked ●), your block and break length (90 / 10) as defaults, today's planned study hours as the daily goal, the GATE date for "GATE in N days", and the 04:00 day start, so late-night study counts to the right day. Only study items are shared with the stream page. Meds, meals and body data never are.
+
+On stream it shows: session time (breaks excluded), break countdown ("+0:45" if it runs over), today vs goal, breaks, all-time hours, Day N, GATE countdown.
 
 Setup once:
+1. Upload `stream.html` with the rest. Open `…/stream.html` on the laptop.
+2. OBS → Sources **+** → **Browser** → paste the **overlay link**. Width 1920, height 1080, above the camera.
+3. Open the **phone link** on the phone (WhatsApp it to yourself). Or OBS → Docks → Custom Browser Docks → paste the phone link.
 
-1. Deploy as usual (the new file goes up with the rest). Open `…/stream.html` on the laptop.
-2. OBS → Sources **+** → **Browser** → paste the **overlay link** from "Connect to OBS". Width 1920, height 1080. Keep it above the camera source.
-3. Open the **phone link** on the phone (WhatsApp it to yourself). That phone is now the remote. Or in OBS: Docks → Custom Browser Docks → paste the phone link.
-
-Daily use: open the remote → tap **Start studying** → **Take a break** / **Back to studying** → **End session** (tap twice). On a laptop: Space = start/break/back, E twice = end.
-Forgot to start it? Today → +15 min / +1 hr.
+Laptop keys: Space = start / break / back, E twice = end. Forgot to start? Today → +15 min / +1 hr.

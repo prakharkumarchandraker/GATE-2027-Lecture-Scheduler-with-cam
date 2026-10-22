@@ -3,37 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#2343A6">
+<meta name="theme-color" content="#EFF1EC">
 <title>Stream Timer</title>
 <link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@450;500;600;700&display=swap">
 <style>
-/* Stream timer for Study Desk.
+/* Stream timer for Day OS.
    stream.html          → remote control (phone, laptop, or OBS dock)
    stream.html?o=CODE   → transparent overlay for an OBS Browser Source (1920×1080)
-   Both talk through Firebase /desks/<CODE>, same rules as the main app. */
+   Both talk through Firebase /plans/<CODE>, same rules as Day OS sync.
+   Today's lectures come from Day OS on the same device (localStorage "dayos.stream"). Nothing else from Day OS is read. */
 [hidden]{display:none!important}
 :root{
-  --bg:#EEF0F5; --surface:#FFFFFF; --sunk:#E4E8F1; --ink:#1A1F2E; --muted:#5B6377; --line:#D3D9E5;
-  --accent:#2343A6; --accent-ink:#FFFFFF; --accent-soft:#E2E8FA; --margin:#C8452E;
-  --good:#1D7748; --good-soft:#DDF1E5; --warn:#9A5B00; --warn-soft:#FBEED6; --bad:#B3261E; --bad-soft:#FBE2DF;
-  --f-display:'Young Serif',Georgia,serif;
-  --f-body:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
-  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --bg:#EFF1EC; --surface:#FCFCFA; --sunk:#E8EBE4; --ink:#14191A; --muted:#4E5651; --line:#D6DACE;
+  --accent:#27436F; --accent-ink:#FFFFFF; --accent-soft:#E4E9F1; --margin:#27436F;
+  --good:#2F6B48; --good-soft:#EFF6F1; --warn:#B7701B; --warn-soft:#FAF1E4; --bad:#A34328; --bad-soft:#FAF1ED;
+  --f-display:'Bricolage Grotesque','IBM Plex Sans',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
   --r:12px;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0C111C; --surface:#161C2A; --sunk:#1F2738; --ink:#E5E8F1; --muted:#9AA3B8; --line:#2C3549;
-  --accent:#8FA8F5; --accent-ink:#0E1320; --accent-soft:#222F57; --margin:#E07A62;
-  --good:#5CC08D; --good-soft:#163427; --warn:#E3A74A; --warn-soft:#3A2B11; --bad:#F08A80; --bad-soft:#3D1D1B; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0C111C; --surface:#161C2A; --sunk:#1F2738; --ink:#E5E8F1; --muted:#9AA3B8; --line:#2C3549;
-  --accent:#8FA8F5; --accent-ink:#0E1320; --accent-soft:#222F57; --margin:#E07A62;
-  --good:#5CC08D; --good-soft:#163427; --warn:#E3A74A; --warn-soft:#3A2B11; --bad:#F08A80; --bad-soft:#3D1D1B; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+body{background:var(--bg);background-image:linear-gradient(#DDE1D7 1px,transparent 1px),linear-gradient(90deg,#DDE1D7 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;font-weight:500}
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
@@ -71,7 +64,7 @@ html.ovmode,html.ovmode body{background:transparent!important;overflow:hidden;wi
 /* card layout */
 .ocard{width:470px;padding:22px 24px 20px;border-radius:20px}
 .ocard .o-top{display:flex;justify-content:space-between;align-items:center;gap:14px}
-.ocard .o-big{font-size:78px;margin:16px 0 8px}
+.ocard .o-big{font-size:76px;margin:16px 0 8px}
 .ocard .o-sub{font-size:16px;color:var(--o-mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ocard .o-bar.sess{margin-top:12px}
 .ocard .o-foot{margin-top:18px;padding-top:16px;border-top:1px solid var(--o-line)}
@@ -83,6 +76,7 @@ html.ovmode,html.ovmode body{background:transparent!important;overflow:hidden;wi
 .ocard .o-meta b{color:var(--o-ink);font-family:var(--f-mono);font-weight:600}
 .ocard .o-now{margin-top:12px;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ocard .o-now span{color:var(--o-mut);font-weight:500}
+.o-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;vertical-align:1px}
 
 /* strip layout */
 .ostrip{display:flex;align-items:center;gap:22px;height:70px;padding:0 28px;border-radius:999px;white-space:nowrap;max-width:1780px}
@@ -98,12 +92,13 @@ html.ovmode,html.ovmode body{background:transparent!important;overflow:hidden;wi
 /* ---------- control mode ---------- */
 .wrap{max-width:1120px;margin:0 auto;padding:16px 16px 60px}
 .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--margin)}
-.top h1{font-family:var(--f-display);font-weight:400;font-size:27px;line-height:1.15;margin:0}
+.top h1{font-family:var(--f-display);font-weight:700;letter-spacing:-.02em;font-size:27px;line-height:1.15;margin:0}
 .eyebrow{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .net{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
 .net i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
 .net.ok i{background:var(--good)} .net.bad{color:var(--bad)} .net.bad i{background:var(--bad)}
-.grid{display:grid;gap:16px}
+.grid{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+.grid>*{min-width:0}
 @media (min-width:900px){.grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}.left{position:sticky;top:16px}}
 .box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
 .box h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:12px 14px;background:var(--sunk);border-bottom:1px solid var(--line)}
@@ -119,8 +114,6 @@ html.ovmode,html.ovmode body{background:transparent!important;overflow:hidden;wi
 .bigbtn{min-height:64px;border-radius:14px;border:0;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;padding:0 16px}
 .bigbtn.go{background:var(--good);color:#fff}
 .bigbtn.brk{background:var(--warn);color:#fff}
-:root[data-theme="dark"] .bigbtn.go,:root[data-theme="dark"] .bigbtn.brk{color:#0C111C}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bigbtn.go,:root:not([data-theme="light"]) .bigbtn.brk{color:#0C111C}}
 .bigbtn.end{background:var(--surface);color:var(--bad);border:1.5px solid var(--bad)}
 .bigbtn.end.arm{background:var(--bad);color:#fff}
 .keys{margin-top:8px;text-align:center}
@@ -160,8 +153,8 @@ ol.steps li{margin-bottom:8px}
 
 <div class="wrap" id="ctl" hidden>
   <header class="top">
-    <div><div class="eyebrow">Study Desk</div><h1>Stream timer</h1></div>
-    <div class="row"><span class="net" id="net"><i></i><span>Connecting…</span></span><a class="btn ghost" href="./">← Desk</a></div>
+    <div><div class="eyebrow">Day OS</div><h1>Stream timer</h1></div>
+    <div class="row"><span class="net" id="net"><i></i><span>Connecting…</span></span><a class="btn ghost" href="./">← Day OS</a></div>
   </header>
 
   <div class="grid">
@@ -180,7 +173,7 @@ ol.steps li{margin-bottom:8px}
         <span class="lbl" id="brk-lbl">Break length (shown as a countdown)</span>
         <div class="chips" id="c-break"></div>
         <span class="lbl">Now studying</span>
-        <input type="text" id="topic" maxlength="80" placeholder="e.g. Depreciation · Financial Accounting">
+        <input type="text" id="topic" maxlength="80" placeholder="e.g. About Printf and Signature · C programming">
         <div class="chips" id="c-topics" style="margin-top:8px"></div>
       </div></section>
 
@@ -189,6 +182,7 @@ ol.steps li{margin-bottom:8px}
         <div class="stat"><span class="muted">All-time</span><b id="d-all" style="font-size:18px">0m</b></div>
         <span class="lbl">Daily goal (hours, 0 = none)</span>
         <input type="number" id="goal" min="0" max="18" step="0.5" inputmode="decimal">
+        <label class="switch" id="goal-auto-row"><input type="checkbox" id="goal-auto"> Use today's study hours from Day OS <span class="small muted" id="goal-auto-v"></span></label>
         <span class="lbl">Forgot to start the timer? Fix today's total</span>
         <div class="row"><button class="btn ghost" data-adj="-15">−15 min</button><button class="btn ghost" data-adj="15">+15 min</button><button class="btn ghost" data-adj="60">+1 hr</button></div>
         <div class="days" id="days"></div>
@@ -205,6 +199,7 @@ ol.steps li{margin-bottom:8px}
         <input type="date" id="dayone">
         <label class="switch"><input type="checkbox" id="sh-topic"> Show “Now studying”</label>
         <label class="switch"><input type="checkbox" id="sh-total"> Show all-time hours</label>
+        <label class="switch"><input type="checkbox" id="sh-gate"> Show “GATE in N days”</label>
       </div></section>
 
       <section class="box"><h2>Connect to OBS</h2><div class="bd">
@@ -219,7 +214,7 @@ ol.steps li{margin-bottom:8px}
         <div class="link"><input type="text" id="l-ph" readonly><button class="btn" data-copy="l-ph">Copy</button></div>
         <div class="note small">Anyone with these links can see or change the timer. Keep them off the stream and out of chat.</div>
         <span class="lbl">Use a timer code from another device</span>
-        <div class="link"><input type="text" id="code-in" placeholder="live-…"><button class="btn ghost" id="code-go">Use</button></div>
+        <div class="link"><input type="text" id="code-in" placeholder="stream-…"><button class="btn ghost" id="code-go">Use</button></div>
       </div></section>
     </div>
   </div>
@@ -228,8 +223,9 @@ ol.steps li{margin-bottom:8px}
 
 <script>
 'use strict';
-const DB='https://pragati-study-desk-default-rtdb.asia-southeast1.firebasedatabase.app';
-const LK='desk-stream-v1', DESK='pragati-desk-v2', H=3.6e6, M=6e4;
+const DB='https://gate-2027-d5fbf-default-rtdb.asia-southeast1.firebasedatabase.app';
+const LK='dayos.stream-timer', FEED='dayos.stream', H=3.6e6, M=6e4;
+let DS=0; // Day OS day start (minutes after midnight); late-night study counts to the day before
 const Q=new URLSearchParams(location.search);
 const OVCODE=(Q.get('o')||'').trim();
 const $=s=>document.querySelector(s);
@@ -239,14 +235,14 @@ const clock=ms=>{const s=Math.floor(Math.max(0,ms)/1000);return Math.floor(s/360
 const mmss=ms=>{const s=Math.floor(Math.max(0,ms)/1000),h=Math.floor(s/3600);return (h?h+':'+pad(Math.floor(s%3600/60)):Math.floor(s/60))+':'+pad(s%60)};
 const hm=ms=>{const t=Math.floor(Math.max(0,ms)/M),h=Math.floor(t/60),m=t%60;return h>=100||(h&&!m)?h+'h':h?`${h}h ${pad(m)}m`:`${m}m`};
 const hrsTxt=h=>(h%1?h.toFixed(1).replace(/\.0$/,''):h)+'h';
-const dkey=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-const node=c=>DB+'/desks/'+encodeURIComponent(c)+'.json';
+const dkey=(d=new Date())=>{d=new Date(+d-DS*M);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+const node=c=>DB+'/plans/'+encodeURIComponent(c)+'.json';
 
 /* ---------- state ---------- */
 function blank(){return{v:1,u:0,status:'idle',sessStart:0,segStart:0,studyMs:0,breakMs:0,breaks:0,
-  target:180,breakPlan:10,topic:'',day:dkey(),dayMs:0,goal:8,log:{},
-  look:{layout:'card',pos:'bl',size:1,theme:'dark',label:'Study with me',dayOne:'',showTopic:true,showTotal:true}}}
-function norm(s){const b=blank();s=s&&typeof s==='object'?s:{};const o=Object.assign(b,s);o.look=Object.assign(blank().look,s.look||{});o.log=s.log&&typeof s.log==='object'?s.log:{};return o}
+  target:90,breakPlan:10,topic:'',topicColor:'',day:dkey(),dayMs:0,goal:8,goalAuto:true,dayStart:0,log:{},
+  look:{layout:'card',pos:'bl',size:1,theme:'dark',label:'Study with me',dayOne:'',showTopic:true,showTotal:true,showGate:false,gate:'2027-02-01'}}}
+function norm(s){const b=blank();s=s&&typeof s==='object'?s:{};const o=Object.assign(b,s);o.look=Object.assign(blank().look,s.look||{});o.log=s.log&&typeof s.log==='object'?s.log:{};DS=+o.dayStart||0;return o}
 function roll(s){ // move a finished day into the log once you're not mid-session
   const t=dkey();if(s.status!=='idle'||s.day===t)return false;
   if(s.dayMs>0)s.log[s.day]=(+s.log[s.day]||0)+s.dayMs;
@@ -258,23 +254,25 @@ function calc(s,now){
   const today=(sameDay?s.dayMs:0)+(live?study:0);
   let past=0;for(const k in s.log)past+=+s.log[k]||0;
   const all=past+s.dayMs+(live?study:0);
-  let dayN=0;if(s.look.dayOne){const [y,m,d]=s.look.dayOne.split('-').map(Number);const a=new Date(y,m-1,d),n=new Date(now);n.setHours(0,0,0,0);dayN=Math.round((n-a)/864e5)+1}
-  return{live,study,brk,brkTot:s.breakMs+brk,today,all,dayN}}
+  const n0=new Date(dkey(new Date(now))+'T00:00:00'),dOf=k=>{const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
+  const dayN=s.look.dayOne?Math.round((n0-dOf(s.look.dayOne))/864e5)+1:0;
+  const gateIn=s.look.gate?Math.round((dOf(s.look.gate)-n0)/864e5):-1;
+  return{live,study,brk,brkTot:s.breakMs+brk,today,all,dayN,gateIn}}
 
 /* ---------- overlay rendering (used on stream and in the preview) ---------- */
-function shape(s){const L=s.look;return [s.status,L.layout,L.pos,L.size,L.theme,L.label,L.dayOne,L.showTopic&&s.topic,L.showTotal,s.target>0,s.breakPlan>0,s.goal>0].join('|')}
+function shape(s){const L=s.look;return [s.status,L.layout,L.pos,L.size,L.theme,L.label,L.dayOne,L.showTopic&&s.topic,s.topicColor,L.showTotal,L.showGate&&L.gate,s.target>0,s.breakPlan>0,s.goal>0].join('|')}
 function view(s){
   const L=s.look,st=s.status,showNow=L.showTopic&&s.topic;
   const pill={study:'Studying',break:'On break',idle:'Off air'}[st];
-  const topic=s.topic.split(' · ');const nowHTML=showNow?`<div class="o-now">Now · ${esc(topic[0])}${topic[1]?` <span>${esc(topic.slice(1).join(' · '))}</span>`:''}</div>`:'';
+  const topic=s.topic.split(' · '),dot=s.topicColor&&/^#[0-9a-f]{3,8}$/i.test(s.topicColor)?`<i class="o-dot" style="background:${s.topicColor}"></i>`:'';const nowHTML=showNow?`<div class="o-now">${dot}Now · ${esc(topic[0])}${topic[1]?` <span>${esc(topic.slice(1).join(' · '))}</span>`:''}</div>`:'';
   if(L.layout==='strip'){
     return `<div class="o ostrip t-${L.theme} s-${st}" data-f="root">
       <span class="o-pill"><i></i>${pill}</span>
       <span class="o-big" data-f="big"></span>
       <span class="sep"></span>
       <span class="o-day"><span class="o-mut">Today</span><b data-f="today"></b>${s.goal>0?`<span class="o-mut" data-f="goal"></span><span class="o-bar g"><b data-f="gbar"></b></span>`:''}</span>
-      ${showNow?`<span class="sep"></span><span class="o-now">${esc(topic[0])}${topic[1]?` <span>${esc(topic.slice(1).join(' · '))}</span>`:''}</span>`:''}
-      ${L.label||L.dayOne?`<span class="sep"></span><span class="o-label" data-f="label"></span>`:''}
+      ${showNow?`<span class="sep"></span><span class="o-now">${dot}${esc(topic[0])}${topic[1]?` <span>${esc(topic.slice(1).join(' · '))}</span>`:''}</span>`:''}
+      ${L.label||L.dayOne?`<span class="sep"></span><span class="o-label" data-f="label"></span>`:''}${L.showGate&&L.gate?`<span class="sep"></span><span class="o-label" data-f="gate"></span>`:''}
     </div>`}
   const barOn=(st==='study'&&s.target>0)||(st==='break'&&s.breakPlan>0);
   return `<div class="o ocard t-${L.theme} s-${st}" data-f="root">
@@ -285,7 +283,7 @@ function view(s){
     <div class="o-foot">
       <div class="o-goal"><span class="o-k">Today</span><span class="o-v"><span data-f="today"></span>${s.goal>0?` <small data-f="goal"></small>`:''}</span></div>
       ${s.goal>0?`<div class="o-bar g"><b data-f="gbar"></b></div>`:''}
-      ${st!=='idle'||L.showTotal?`<div class="o-meta">${st!=='idle'?`<span>Breaks <b data-f="brks"></b></span>`:''}${L.showTotal?`<span>All-time <b data-f="all"></b></span>`:''}</div>`:''}
+      ${st!=='idle'||L.showTotal||L.showGate?`<div class="o-meta">${st!=='idle'?`<span>Breaks <b data-f="brks"></b></span>`:''}${L.showTotal?`<span>All-time <b data-f="all"></b></span>`:''}${L.showGate&&L.gate?`<span data-f="gate"></span>`:''}</div>`:''}
       ${nowHTML}
     </div>
   </div>`}
@@ -294,7 +292,7 @@ function fields(s,now){
   f.label=[L.label,c.dayN>0?'Day '+c.dayN:''].filter(Boolean).join(' · ');
   f.today=hm(c.today);f.all=hm(c.all);
   f.goal='/ '+hrsTxt(s.goal);f.gbar=Math.min(100,c.today/(s.goal*H)*100||0).toFixed(1)+'%';
-  f.brks=s.breaks+' · '+hm(c.brkTot);
+  f.brks=s.breaks+' · '+hm(c.brkTot);f.gate=c.gateIn>0?`GATE in ${c.gateIn} days`:c.gateIn===0?'GATE today':'';
   if(s.status==='study'){
     f.big=clock(c.study);const T=s.target*M;
     if(T){if(c.study<T){f.sub=`${hm(T-c.study+59999)} left of ${hm(T)} session`;f.sbar=(c.study/T*100).toFixed(2)+'%'}else{f.sub=`✓ ${hm(T)} session done · keep going`;f.sbar='100%'}}
@@ -352,8 +350,13 @@ else{
   const qc=(Q.get('c')||'').trim();
   if(qc&&qc!==code){code=qc;S=norm(null);dirty=false}
   if(!code){code=newCode();dirty=true}
+  function syncFromFeed(s){const F=feed();if(!F)return false;let ch=false;const set=(o,k,v)=>{if(v!==undefined&&o[k]!==v){o[k]=v;ch=true}};
+    set(s,'dayStart',+F.dayStart||0);if(F.gate)set(s.look,'gate',F.gate);
+    if(s.goalAuto&&F.studyMins)set(s,'goal',Math.round(F.studyMins/30)/2);return ch}
+  if(!S.u){const F=feed();if(F){if(F.chunk)S.target=+F.chunk;if(F.gap)S.breakPlan=+F.gap}}
+  syncFromFeed(S);DS=+S.dayStart||0;
   roll(S);
-  function newCode(){const a='abcdefghijkmnpqrstuvwxyz23456789',r=crypto.getRandomValues(new Uint8Array(16));return 'live-'+[...r].map(x=>a[x%a.length]).join('')}
+  function newCode(){const a='abcdefghijkmnpqrstuvwxyz23456789',r=crypto.getRandomValues(new Uint8Array(16));return 'stream-'+[...r].map(x=>a[x%a.length]).join('')}
   const keep=()=>{try{localStorage.setItem(LK,JSON.stringify({code,st:S,dirty}))}catch(e){}};
 
   let pushing=false,again=false;
@@ -372,7 +375,7 @@ else{
 
   function setNet(ok,msg){if(netState===ok&&(ok||msg===netMsg))return;netState=ok;netMsg=msg||'';
     const n=$('#net');n.className='net '+(ok?'ok':'bad');n.lastElementChild.textContent=ok?'Live':'Offline';
-    $('#netnote').innerHTML=ok?'':`<div class="note bad">Not reaching Firebase${netMsg?' ('+esc(netMsg)+')':''}. The timer keeps running here and catches up when the connection is back. If it never connects, publish database.rules.json (see README).</div>`}
+    $('#netnote').innerHTML=ok?'':`<div class="note bad">Not reaching Firebase${netMsg?' ('+esc(netMsg)+')':''}. The timer keeps running here and catches up when the connection is back. If it never connects, check the Firebase rules for plans (see README).</div>`}
 
   function commit(fn){roll(S);fn(S);S.u=Math.max(Date.now(),(S.u||0)+1);keep();renderCtl();push()}
   const A={
@@ -397,10 +400,13 @@ else{
     else h=(st==='study'?`<button class="bigbtn brk" data-a="primary">☕ Take a break</button>`:`<button class="bigbtn go" data-a="primary">▶ Back to studying</button>`)+
       `<button class="bigbtn end${armed?' arm':''}" data-a="end">${armed?'Tap again to end':'■ End session'}</button>`;
     $('#acts').innerHTML=h}
-  function deskTopics(){try{const D=JSON.parse(localStorage.getItem(DESK)||'null');if(!D||!D.subjects)return[];
-      const subs=D.subjects.filter(s=>!D.activeSem||s.semId===D.activeSem),out=[],seen=new Set();
-      const P=D.plan||{};for(const id of [...(P.ids||[]),...((P.rev||[]).map(r=>r.id))]){for(const s of subs)for(const u of s.units||[]){const x=(u.topics||[]).find(t=>t.id===id);if(x&&!seen.has(id)){seen.add(id);out.push(x.name.slice(0,50)+' · '+s.name)}}}
-      for(const s of subs)out.push(s.name);return out.slice(0,16)}catch(e){return[]}}
+  function feed(){try{const F=JSON.parse(localStorage.getItem(FEED)||'null');if(!F||!Array.isArray(F.items))return null;
+      DS=+F.dayStart||0;return F.d===dkey()?F:null}catch(e){return null}}
+  function planTopics(){const F=feed();if(!F)return[];const d=new Date();let m=d.getHours()*60+d.getMinutes();if(m<(+F.dayStart||0))m+=1440;
+    const out=[],seen=new Set();
+    for(const it of F.items){const v=it.n+(it.s?' · '+it.s:'');if(seen.has(v))continue;const now=m>=it.a&&m<it.e;
+      if(it.done&&!now)continue;seen.add(v);out.push({v,c:it.c||'',now,a:it.a})}
+    out.sort((x,y)=>(y.now-x.now)||(x.a-y.a));return out.slice(0,14)}
   function renderCtl(){
     renderActs();const L=S.look;
     chipRow($('#c-target'),[[0,'Open'],[60,'1h'],[90,'1.5h'],[120,'2h'],[180,'3h'],[240,'4h']],S.target,'target');
@@ -410,7 +416,8 @@ else{
     chipRow($('#c-pos'),L.layout==='strip'?[['bc','Bottom'],['tc','Top']]:[['bl','↙ Bottom left'],['br','↘ Bottom right'],['tl','↖ Top left'],['tr','↗ Top right']],L.pos,'pos');
     chipRow($('#c-size'),[[0.8,'S'],[1,'M'],[1.2,'L'],[1.45,'XL']],L.size,'size');
     chipRow($('#c-theme'),[['dark','Dark glass'],['light','Light']],L.theme,'theme');
-    const tps=deskTopics();$('#c-topics').innerHTML=(S.topic?`<button class="chip" data-k="topic" data-v="">✕ Clear</button>`:'')+tps.map(t=>`<button class="chip${t===S.topic?' on':''}" data-k="topic" data-v="${esc(t)}">${esc(t)}</button>`).join('');
+    const tps=planTopics();$('#c-topics').innerHTML=(S.topic?`<button class="chip" data-k="topic" data-v="">✕ Clear</button>`:'')+tps.map(t=>`<button class="chip${t.v===S.topic?' on':''}" data-k="topic" data-v="${esc(t.v)}" data-c="${esc(t.c)}" style="${t.c?`border-left:5px solid ${esc(t.c)}`:''}">${t.now?'● ':''}${esc(t.v)}</button>`).join('')+(tps.length?'':`<span class="small muted">Open Day OS today and its planned lectures show up here.</span>`);
+    const F=feed();$('#goal-auto-row').hidden=!F;$('#goal-auto').checked=!!S.goalAuto;$('#goal-auto-v').textContent=F&&F.studyMins?'('+hrsTxt(Math.round(F.studyMins/30)/2)+' planned)':'';$('#sh-gate').checked=!!L.showGate;
     const setv=(id,v)=>{const el=$(id);if(document.activeElement!==el&&!tT[id.slice(1)]&&el.value!==String(v))el.value=v};
     setv('#topic',S.topic);setv('#goal',S.goal);setv('#label',L.label);setv('#dayone',L.dayOne);
     $('#sh-topic').checked=!!L.showTopic;$('#sh-total').checked=!!L.showTotal;
@@ -433,7 +440,7 @@ else{
   document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;unlockAudio();
     if(b.dataset.a==='primary')return primary();if(b.dataset.a==='end')return tryEnd();
     if(b.dataset.k){const k=b.dataset.k,raw=b.dataset.v;
-      if(k==='topic')return commit(s=>{s.topic=raw});
+      if(k==='topic')return commit(s=>{s.topic=raw;s.topicColor=b.dataset.c||''});
       if(k==='target'||k==='breakPlan')return commit(s=>{s[k]=+raw});
       if(k==='size')return commit(s=>{s.look.size=+raw});
       if(k==='layout')return commit(s=>{s.look.layout=raw;const strip=raw==='strip',p=s.look.pos;if(strip&&!/^(bc|tc)$/.test(p))s.look.pos=p[0]==='t'?'tc':'bc';if(!strip&&/^(bc|tc)$/.test(p))s.look.pos=p==='tc'?'tl':'bl'});
@@ -444,10 +451,12 @@ else{
       code=v;S=norm(null);dirty=false;keep();$('#code-in').value='';netState=null;connect();renderCtl();toast('Switched to that timer')}});
   const tT={};const debounce=(k,fn)=>{clearTimeout(tT[k]);tT[k]=setTimeout(()=>{delete tT[k];fn()},500)};
   const flush=(k,fn)=>{if(tT[k]){clearTimeout(tT[k]);delete tT[k];fn()}};
-  const setTopic=()=>commit(s=>{s.topic=$('#topic').value.trim()}),setLabel=()=>commit(s=>{s.look.label=$('#label').value.trim()});
+  const setTopic=()=>commit(s=>{const v=$('#topic').value.trim();if(v!==s.topic){s.topic=v;s.topicColor=''}}),setLabel=()=>commit(s=>{s.look.label=$('#label').value.trim()});
   $('#topic').addEventListener('input',()=>debounce('topic',setTopic));$('#topic').addEventListener('blur',()=>flush('topic',setTopic));
   $('#label').addEventListener('input',()=>debounce('label',setLabel));$('#label').addEventListener('blur',()=>flush('label',setLabel));
-  $('#goal').addEventListener('change',e=>commit(s=>{s.goal=Math.max(0,Math.min(18,+e.target.value||0))}));
+  $('#goal').addEventListener('change',e=>commit(s=>{s.goal=Math.max(0,Math.min(18,+e.target.value||0));s.goalAuto=false}));
+  $('#goal-auto').addEventListener('change',e=>commit(s=>{s.goalAuto=e.target.checked;syncFromFeed(s)}));
+  $('#sh-gate').addEventListener('change',e=>commit(s=>{s.look.showGate=e.target.checked;const F=feed();if(F&&F.gate)s.look.gate=F.gate}));
   $('#dayone').addEventListener('change',e=>commit(s=>{s.look.dayOne=e.target.value||''}));
   $('#sh-topic').addEventListener('change',e=>commit(s=>{s.look.showTopic=e.target.checked}));
   $('#sh-total').addEventListener('change',e=>commit(s=>{s.look.showTotal=e.target.checked}));
@@ -466,7 +475,7 @@ else{
   let lastMin='';
   setInterval(()=>{const n=Date.now();paint(pstage,S,n);alerts(n);
     const c=calc(S,n);$('#d-today').textContent=hm(c.today);$('#d-all').textContent=hm(c.all);
-    const m=dkey()+Math.floor(n/M);if(m!==lastMin){lastMin=m;if(roll(S)){S.u=Date.now();keep();push()}renderDays()}},250);
+    const m=dkey()+Math.floor(n/M);if(m!==lastMin){lastMin=m;const ch=S.status==='idle'&&syncFromFeed(S);if(roll(S)||ch){S.u=Date.now();keep();push();renderCtl()}renderDays()}},250);
   renderCtl();connect();if(dirty)push();
 }
 </script>
