@@ -344,6 +344,22 @@ html.lvov #app,html.lvov nav,html.lvov #sheet,html.lvov #toast,html.lvov #timer{
 .ob-row{margin-top:44px;font-size:25px;color:#B4BCCC;max-width:1500px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ob-row b{color:#EEF1F8}
 .ob-ex{display:flex;gap:12px;margin-top:24px}.ob-ex span{font-size:21px;color:#B4BCCC;background:rgba(255,255,255,.08);border-radius:10px;padding:6px 14px}.ob-ex b{color:#fff;font-family:"IBM Plex Mono",monospace}
 .ob-tag{position:absolute;left:48px;bottom:40px;font-size:20px;font-weight:600;color:#8F98AB}
+
+.lv-pv{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--edge);background:radial-gradient(120% 90% at 50% 35%,#5a6378 0%,#2c3345 45%,#151a26 100%)}
+.lv-pv .lv-stage{position:absolute;left:0;top:0}
+.lv-pvcam{position:absolute;left:50%;top:20%;width:24%;aspect-ratio:1/1.25;transform:translateX(-50%);border-radius:50% 50% 42% 42%;background:rgba(255,255,255,.07)}
+.lv-pvcam:after{content:'';position:absolute;left:-55%;right:-55%;top:88%;height:90%;border-radius:50% 50% 0 0;background:rgba(255,255,255,.05)}
+.lv-prog{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.lv-prog b{display:block;height:100%;background:var(--moss);border-radius:inherit}
+.lv-tt{display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 8px;border-top:1px solid var(--line);font-size:14px}
+.lv-tt .t{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink2)}
+.lv-tt .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lv-tt .d{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink3)}
+.lv-tt.study{border-left:3px solid var(--moss)}
+.lv-tt.break{border-left:3px solid var(--meal);background:#FBF6EE}
+.lv-tt.break .n{font-weight:500;color:var(--ink2)}
+.lv-tt.cu{outline:2px solid var(--pen);outline-offset:-2px;border-radius:6px}
+.op-syl{margin-top:14px;padding-top:0;border-top:0}
+.op-bar.syl b{background:#4CC38A;opacity:1}
 </style></head><body>
 <div class="wrap" id="app"></div>
 <div id="sheet"></div>
@@ -1573,7 +1589,7 @@ function liveDef() {
   return {
     run: { day: '', st: 'idle', since: 0, brk: null, studyMs: 0, net: 0, flash: null },
     log: {}, list: null, exams: [],
-    look: { side: 'right', size: 1, label: 'Study with me', dayOne: '', showList: true, showExams: true, showAll: true, gate: true, bits: true }
+    look: { side: 'right', size: 1, label: 'Study with me', dayOne: '', showList: true, showExams: true, showAll: true, showSyl: true, gate: true, bits: true }
   };
 }
 function liveFix(L) {
@@ -1702,6 +1718,28 @@ function liveAlerts(x, now) {
   if (x.brk.e && x.over >= 0 && LAL.over !== k) { LAL.over = k; if (x.over < 90000) lchime('over'); }
 }
 
+/* ---- whole-day timetable, short ---- */
+function liveTT() {
+  const P = livePlan() || { B: [] }, base = dayBase(), now = Date.now();
+  const st = P.B.filter(b => b.kind === 'study').sort((a, b) => a.start - b.start), rows = [];
+  st.forEach((b, i) => {
+    const subs = [];
+    (b.items || []).forEach(p => { const n = p.it.type === 'rev' ? 'Revision' : p.it.type === 'prac' ? 'PYQ practice' : p.it.x.s.name; if (!subs.includes(n)) subs.push(n); });
+    rows.push({ a: b.start, e: b.end, k: 'study', lab: 'Study' + (subs.length ? ' · ' + subs.join(', ') : '') });
+    const nx = st[i + 1];
+    if (nx && nx.start > b.end) rows.push({ a: b.end, e: nx.start, k: 'break', lab: spanLab(P.B.filter(x => x.kind !== 'study' && x.start < nx.start && x.end > b.end), nx.start - b.end) });
+  });
+  rows.forEach(r => { r.cur = now >= base + r.a * LM && now < base + r.e * LM; });
+  return rows;
+}
+function liveSyl() { const T0 = totals(); return { n: T0.t, d: T0.d, pct: T0.t ? Math.round(T0.d / T0.t * 100) : 0, hpct: T0.raw ? Math.round(T0.rawD / T0.raw * 100) : 0 }; }
+function paintPv() {
+  const pv = document.getElementById('lv-pv'); if (!pv) return;
+  let st = pv.querySelector('.lv-stage'); if (!st) { st = document.createElement('div'); st.className = 'lv-stage'; pv.appendChild(st); }
+  st.style.transform = `scale(${pv.clientWidth / 1920})`;
+  livePaint(st, Date.now());
+}
+
 /* ---- actions (remote only) ---- */
 function LV(act) {
   lunlock();
@@ -1756,14 +1794,26 @@ function viewLive() {
   const chips = (k, opts) => `<div class="lv-ch">${opts.map(([v, l]) => `<button class="${String(lk[k]) === String(v) ? 'on' : ''}" onclick="LLK('${k}',${typeof v === 'string' ? `'${v}'` : v})">${l}</button>`).join('')}</div>`;
   const link = location.href.split(/[?#]/)[0] + '?live=' + encodeURIComponent(SYNC.code || '');
 
-  const main = `<div class="card lv-card" style="--lc:${col}">
+  const syl = liveSyl(), tt = liveTT();
+  setTimeout(paintPv, 0);
+  const ttH = tt.map(r => `<div class="lv-tt ${r.k}${r.cur ? ' cu' : ''}"><span class="t">${clock(r.a)}–${clock(r.e)}</span><span class="n">${esc(r.lab)}</span><span class="d">${hm(r.e - r.a)}</span></div>`).join('');
+  const nStudy = tt.filter(r => r.k === 'study').length;
+  const main = `<div class="lv-pv" id="lv-pv"><div class="lv-pvcam"></div></div>
+   <div class="sm faint" style="margin:6px 2px 13px">What viewers see · live preview</div>
+   <div class="card lv-card" style="--lc:${col}">
      <span class="lv-pill" id="lv-pill"><i></i>${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</span>
      <div class="lv-big" id="lv-big">${esc(t.big)}</div><div class="lv-sub" id="lv-sub">${esc(t.sub)}</div>
      ${t.flash ? `<div class="lv-flash ${x.flash.ms >= 0 ? 'g' : 'r'}">${esc(t.flash)}</div>` : ''}
      <div class="lv-acts">${acts}</div>
      <p class="xs faint" style="margin:10px 0 0">Breaks start on their own at your timetable times (gaps between study blocks), with a sound, and stay on screen till you tap Resume.</p></div>
    <div class="lv-stats"><div><span>Studied today</span><b id="lv-today">${t.today}</b></div><div><span>Planned</span><b>${lhm(x.T.planned * LM)}</b></div><div><span>Breaks</span><b id="lv-net" class="${t.netTxt ? t.netCls : ''}">${t.netTxt || '—'}</b></div></div>
-   <div class="card" style="margin-top:13px"><div class="sec"><h2>Today's lectures</h2><span class="mono muted sm">${dn}/${list.length} done · ${hm(totM)}</span></div>
+   <div class="card" style="margin-top:13px"><div class="sec"><h2>Syllabus</h2><span class="mono muted sm">${syl.pct}%</span></div>
+     <div class="lv-prog"><b style="width:${syl.pct}%"></b></div>
+     <div class="sm" style="margin-top:8px"><b>${syl.d}</b> of <b>${syl.n}</b> lectures done · <b>${syl.n - syl.d}</b> left · ${syl.hpct}% by video hours</div></div>
+   <div class="card"><div class="sec"><h2>Today's timetable</h2><span class="mono muted sm">${hm(x.T.planned)} study · ${nStudy} blocks</span></div>
+     ${ttH || '<div class="sm muted">No study blocks today.</div>'}
+     <p class="xs faint" style="margin:8px 0 0">Breaks on stream follow these times. Meds, food and skincare stay off the stream.</p></div>
+   <div class="card"><div class="sec"><h2>Today's lectures</h2><span class="mono muted sm">${dn}/${list.length} done · ${hm(totM)}</span></div>
      <div class="sl2">Speed — pick it first, the list follows</div>
      <div class="spd">${SPEEDS.map(s => `<button class="${s === sp ? 'on' : ''}" onclick="SETSP(${s})">${s}x</button>`).join('')}</div>
      <div style="margin-top:8px">${list.map(i => `<label class="lv-l ${i.done ? 'xd' : ''}" style="--lc:${esc(i.color)}"><input type="checkbox" ${i.done ? 'checked' : ''} onchange="${i.t === 'lec' ? `TK('${i.id}')` : `LX(${i.i})`};render()"><span class="tx"><small>${esc(i.sub)}</small><b>${esc(i.title)}</b></span><span class="ln">${hm(i.mins)}</span></label>`).join('') || '<div class="sm muted" style="padding:8px 0">No lectures fit today.</div>'}</div>
@@ -1782,7 +1832,7 @@ function viewLive() {
      <span class="lv-lbl">Size</span>${chips('size', [[0.85, 'S'], [1, 'M'], [1.15, 'L']])}
      <span class="lv-lbl">Title</span><input class="lv-in" maxlength="40" value="${esc(lk.label)}" onchange="LLK('label',this.value.trim())">
      <span class="lv-lbl">Journey Day 1 (shows “Day 12”; leave empty to hide)</span><input class="lv-in" type="date" value="${esc(lk.dayOne)}" onchange="LLK('dayOne',this.value)">
-     ${tog('showList', "Show today's lecture list")}${tog('showExams', 'Show exam countdowns')}${tog('showAll', 'Show all-time hours')}</div>
+     ${tog('showList', "Show today's lecture list")}${tog('showSyl', 'Show syllabus progress (lectures done · %)')}${tog('showExams', 'Show exam countdowns')}${tog('showAll', 'Show all-time hours')}</div>
    <div class="card"><h2>Connect to OBS</h2>${SYNC.code ? `
      <ol class="sm" style="padding-left:18px;margin:0 0 10px"><li>OBS → Sources <b>+</b> → <b>Browser</b>. Paste this link. Width <b>1920</b>, height <b>1080</b>. Keep it above the camera.</li><li>Run the stream from this tab on your phone or laptop.</li></ol>
      <div class="lv-link"><input class="lv-in" id="lv-link" readonly value="${esc(link)}"><button class="btn" onclick="LCOPY()">Copy</button></div>
@@ -1799,13 +1849,14 @@ setInterval(() => {
   LTICK_K = k;
   const set = (id, v) => { const e = document.getElementById(id); if (e && e.textContent !== v) e.textContent = v; };
   set('lv-big', t.big); set('lv-sub', t.sub); set('lv-today', t.today);
+  paintPv();
   liveAlerts(x, now);
 }, 1000);
 
 /* ---- overlay (OBS) ---- */
 function ovKey(x) {
   const L = S.live;
-  return JSON.stringify([x.st, x.brk && [x.brk.lab, x.brk.a, x.brk.e], x.over > 0, x.flash && [x.flash.at, x.flash.ms >= 0], L.look, L.exams, liveList().map(i => i.i + (i.done ? 'd' : '') + i.title + i.mins), dk(), CFG().gate, CFG().bits, CFG().speed]);
+  return JSON.stringify([x.st, x.brk && [x.brk.lab, x.brk.a, x.brk.e], x.over > 0, x.flash && [x.flash.at, x.flash.ms >= 0], L.look, L.exams, liveSyl().d, liveList().map(i => i.i + (i.done ? 'd' : '') + i.title + i.mins), dk(), CFG().gate, CFG().bits, CFG().speed]);
 }
 function ovHTML(x) {
   const lk = S.live.look, t = liveText(x, Date.now()), ex = lk.showExams ? liveExams() : [], list = liveList();
@@ -1831,6 +1882,7 @@ function ovHTML(x) {
     ${t.flash ? `<div class="op-flash ${x.flash.ms >= 0 ? 'g' : 'r'}">${esc(t.flash)}</div>` : ''}
     <div class="op-day"><span class="op-k">Today</span><span class="op-v"><span data-f="today"></span> <small data-f="goal"></small></span></div>
     <div class="op-bar"><b data-f="tbar"></b></div>
+    ${lk.showSyl ? (() => { const y = liveSyl(); return `<div class="op-day op-syl"><span class="op-k">Syllabus</span><span class="op-v">${y.d}<small> / ${y.n} lectures · ${y.pct}%</small></span></div><div class="op-bar syl"><b style="width:${y.pct}%"></b></div>`; })() : ''}
     <div class="op-meta"><span data-f="net" data-h="1"></span>${lk.showAll ? `<span>All-time <b data-f="all"></b></span>` : ''}</div>
     ${lk.showList && list.length ? `<div class="op-lh"><span class="op-k">Today's lectures · ${CFG().speed}x</span><span class="op-k">${dn}/${list.length} done</span></div>${hidden ? `<div class="op-more">✓ ${hidden} more done</div>` : ''}${rowH}${more ? `<div class="op-more">+${more} more</div>` : ''}` : ''}
     ${exH ? `<div class="op-ex">${exH}</div>` : ''}</div>`;
