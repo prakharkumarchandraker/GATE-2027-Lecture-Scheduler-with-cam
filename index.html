@@ -856,14 +856,17 @@ function planDay(d, ideal) {
     }
   });
   const studyMins = study.reduce((a, s) => a + s.end - s.start, 0);
+  // perfect day: the timetable stays as it is; lectures are poured from right now, so anything not done slides into the next slots
+  const pf = !ideal && !!meta.perfect && d === dk(), cut = pf ? Math.floor(curMinFor(d) / 5) * 5 : -1;
+  const studyLeft = pf ? study.reduce((a, s) => a + Math.max(0, s.end - Math.max(s.start, cut)), 0) : studyMins;
   // 11. what goes into the study time
   // work already ticked since this plan started keeps its place (so the budget isn't handed out twice)
   const kept = [];
-  if (!ideal) Object.keys(S.done).filter(id => S.done[id].d === d && (S.done[id].at ?? -1) >= s0).sort((a, b) => S.done[a].at - S.done[b].at).forEach(id => {
+  if (!ideal && !pf) Object.keys(S.done).filter(id => S.done[id].d === d && (S.done[id].at ?? -1) >= s0).sort((a, b) => S.done[a].at - S.done[b].at).forEach(id => {
     const f = findLect(id); if (!f) return; const raw = Math.max(1, f.l.len - (S.done[id].from || 0));
     kept.push({ type: 'lec', mins: W(raw), x: { s: f.s, l: f.l, rem: raw } });
   });
-  if (!ideal) Object.keys(S.pos || {}).forEach(id => {
+  if (!ideal && !pf) Object.keys(S.pos || {}).forEach(id => {
     const r = S.pos[id]; if (S.done[id] || r.d !== d || (r.at ?? -1) < s0 || r.p <= r.f) return;
     const f = findLect(id); if (!f) return;
     kept.push({ type: 'lec', mins: W(r.p - r.f), x: { s: f.s, l: f.l, rem: f.l.len - r.p }, part: { from: r.f, raw: r.p - r.f } });
@@ -871,9 +874,9 @@ function planDay(d, ideal) {
   const keptMins = kept.reduce((a, k) => a + k.mins, 0);
   let revDone = 0;
   if (!ideal) for (const id in S.done) { const r = S.done[id]; if (r.revd === d) { const f = findLect(id); if (f) revDone += revMins(f.l, Math.max(0, (r.stage >= 99 ? 4 : r.stage) - 1)); } }
-  const rev = dueRev(d, Math.max(0, Math.min(c.revCap, Math.round(studyMins * 0.3)) - revDone));
+  const rev = dueRev(d, Math.max(0, Math.min(c.revCap, Math.round(studyLeft * 0.3)) - revDone));
   const pracOn = doneSubs() >= 2;
-  const vidBudget = Math.max(0, studyMins - rev.mins - revDone - keptMins);
+  const vidBudget = Math.max(0, studyLeft - rev.mins - revDone - keptMins);
   const prac = pracOn ? Math.round(vidBudget * 0.15 / 5) * 5 : 0;
   const emDone = !ideal && Object.keys(S.done).some(id => S.done[id].d === d && (findLect(id) || {}).s && findLect(id).s.track === 'em') || kept.some(k => k.x.s.track === 'em');
   const asg = assignDay(makePool(), vidBudget - prac, dayIdxOf(d), c.speed, emDone);
@@ -886,7 +889,7 @@ function planDay(d, ideal) {
   // pour items into study chunks (an item may continue into the next chunk)
   let qi = 0, qLeft = items.length ? items[0].mins : 0;
   study.forEach(sb => {
-    sb.items = []; let room = sb.end - sb.start;
+    sb.items = []; let room = pf ? Math.max(0, sb.end - Math.max(sb.start, cut)) : sb.end - sb.start;
     while (room > 0 && qi < items.length) {
       const take = Math.min(room, qLeft), it = items[qi];
       sb.items.push({ it, mins: take, cont: qLeft < it.mins });
@@ -897,7 +900,7 @@ function planDay(d, ideal) {
   const overflow = items.slice(qi);
   study.forEach(s => B.push(s));
   B.sort((a, b) => a.start - b.start || (a.kind === 'study' ? 1 : -1));
-  return { vb: vidBudget - prac, emDone, ideal: !!ideal, d, s0, B, pins: pins.sort((a, b) => a.at - b.at), breaks, notes, gymMode, studyMins, foodOK, rev, items, overflow, off };
+  return { vb: vidBudget - prac, emDone, ideal: !!ideal, d, s0, B, pins: pins.sort((a, b) => a.at - b.at), breaks, notes, gymMode, studyMins, foodOK, rev, items, overflow, off, pf, cut };
 }
 function curMinFor(d) { return d === dk() ? curMin() : 0; }
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
@@ -1002,7 +1005,7 @@ function blockHTML(b, P, now) {
       if (p.it.type === 'lec') return p.it.part ? partRow(p.it.x, p.it.part, p.cont) : lecRow(p.it.x, p.mins, p.cont);
       if (p.it.type === 'rev') return (p.cont ? '<div class="task"><div class="tx faint">Revision continued…</div></div>' : p.it.rev.items.map(revRow).join(''));
       return `<div class="task"><div class="tx">PYQ practice on today's topics<small>No video. Questions are where the marks come from.</small></div><span class="len">${hm(p.mins)}</span></div>`;
-    }).join('') || '<div class="task"><div class="tx faint">Free study — pick anything from the Courses tab</div></div>';
+    }).join('') || (P.pf && d === dk() && now >= b.end ? '<div class="task"><div class="tx faint">Time passed — anything not done here moved to the next slots</div></div>' : '<div class="task"><div class="tx faint">Free study — pick anything from the Courses tab</div></div>');
   }
   const done = doneKey && tick(doneKey);
   const isNow = d === dk() && now >= b.start && now < b.end;
@@ -1192,7 +1195,7 @@ function viewToday() {
     tl += r.h;
   });
   tl += `<div class="brk">${tchip(CFG().sleep)}<span>Lights out</span></div>`;
-  const doneToday = Object.keys(S.done).filter(id => S.done[id].d === d && (S.done[id].at ?? -1) < P.s0).map(findLect).filter(Boolean);
+  const doneToday = Object.keys(S.done).filter(id => S.done[id].d === d && (P.pf || (S.done[id].at ?? -1) < P.s0)).map(findLect).filter(Boolean);
   const doneMins = doneToday.reduce((a, x) => a + W(x.l.len), 0);
   const vidPlanned = P.items.filter(i => i.type === 'lec').reduce((a, i) => a + i.mins, 0);
   const nLec = P.items.filter(i => i.type === 'lec').length;
@@ -1213,7 +1216,7 @@ function viewToday() {
     <details class="more"><summary>See the full ideal timetable ▾</summary>${idealHTML(I)}</details></div>`;
   const ctrl = `<div class="dayhead"><button class="btn" onclick="openCheckin()">Running late? Re-plan from now</button>
     <button class="btn ${P.off ? '' : 'off'}" onclick="OFFDAY()">${P.off ? 'Off day ON' : 'Make today off'}</button></div>`;
-  const doneBox = doneToday.length ? `<details class="card donebox"><summary>Done before this plan — ${doneToday.length} lecture(s) ✓</summary>${doneToday.map(x => lecRow(x, 0, false)).join('')}</details>` : '';
+  const doneBox = doneToday.length ? `<details class="card donebox"><summary>${P.pf ? 'Done today' : 'Done before this plan'} — ${doneToday.length} lecture(s) ✓</summary>${doneToday.map(x => lecRow(x, 0, false)).join('')}</details>` : '';
   return `<div class="grid"><div class="side">${nowCard(P, now)}${summary}${layersCard(P)}${moved}${banner()}</div><div class="main">${ctrl}<h2 style="margin:4px 0 10px">Full day${day.meta.perfect ? ' <span class="faint sm">· perfect day</span>' : ''}</h2><div class="tl${day.meta.perfect ? ' pf' : ''}">${tl}</div>${doneBox}</div></div>`;
 }
 function yesterdayCard() {
@@ -1624,7 +1627,7 @@ function liveDef() {
 }
 function liveFix(L) {
   const d = liveDef(); L = L && typeof L === 'object' ? L : {};
-  return { run: Object.assign(d.run, L.run || {}), log: L.log || {}, list: L.list || null, exams: Array.isArray(L.exams) ? L.exams : [], look: Object.assign(d.look, L.look || {}, L.look && L.look.side && !L.look.pos ? { pos: L.look.side === 'left' ? 'tl' : 'tr' } : {}), u: L.u || 0 };
+  return { run: Object.assign(d.run, L.run || {}), log: L.log || {}, list: null, xd: L.xd || null, exams: Array.isArray(L.exams) ? L.exams : [], look: Object.assign(d.look, L.look || {}, L.look && L.look.side && !L.look.pos ? { pos: L.look.side === 'left' ? 'tl' : 'tr' } : {}), u: L.u || 0 };
 }
 function LW(fn, noRender) { const L = JSON.parse(JSON.stringify(S.live || liveDef())); fn(L); L.u = Date.now(); WR({ live: L }, noRender); }
 
@@ -1708,20 +1711,18 @@ function buildList() {
   return { day: d, sp, items };
 }
 let LTMP = null, LTMP_T = 0;
-function liveListRaw() {
-  const li = S.live.list;
-  if (li && li.day === dk() && li.sp === CFG().speed) return li;
-  if (!LTMP || Date.now() - LTMP_T > 30000) { LTMP = buildList(); LTMP_T = Date.now(); }
+function liveListRaw() {   // always worked out from today's plan, so course on/off, speed and re-plans show up straight away
+  if (!LTMP || LTMP.day !== dk() || LTMP.sp !== CFG().speed || Date.now() - LTMP_T > 30000) { LTMP = buildList(); LTMP_T = Date.now(); }
   return LTMP;
 }
 function liveList() {
   const li = liveListRaw();
   return li.items.map((it, i) => {
-    if (it.t === 'lec') { const f = findLect(it.id); if (!f) return null; return { i, t: 'lec', id: it.id, title: f.l.t, sub: f.s.name, color: f.s.color, mins: W(it.raw, li.sp), done: !!S.done[it.id] }; }
-    return { i, t: it.t, title: it.t === 'rev' ? 'Revision' : 'PYQ practice', sub: it.t === 'rev' ? 'Revise earlier lectures' : 'Questions on today\'s topics', color: it.t === 'rev' ? '#A98BC0' : '#8A93A8', mins: it.mins, done: !!it.x };
+    if (it.t === 'lec') { const f = findLect(it.id); if (!f || !f.s.on) return null; return { i, t: 'lec', id: it.id, title: f.l.t, sub: f.s.name, color: f.s.color, mins: W(it.raw, li.sp), done: !!S.done[it.id] }; }
+    return { i, t: it.t, title: it.t === 'rev' ? 'Revision' : 'PYQ practice', sub: it.t === 'rev' ? 'Revise earlier lectures' : 'Questions on today\'s topics', color: it.t === 'rev' ? '#A98BC0' : '#8A93A8', mins: it.mins, done: !!(S.live.xd && S.live.xd.day === dk() && S.live.xd[it.t]) };
   }).filter(Boolean);
 }
-function ensureList() { const li = S.live.list; if (!li || li.day !== dk() || li.sp !== CFG().speed) LW(L => { L.list = buildList(); }, true); }
+function ensureList() {}
 function liveExams() {
   const L = S.live, c = CFG(), out = [], t = dk();
   if (L.look.gate && c.gate) out.push({ n: 'GATE', d: c.gate });
@@ -1789,7 +1790,7 @@ function LV(act) {
 let LEND = 0;
 function LENDX() { if (Date.now() - LEND < 3500) { LEND = 0; LV('end'); } else { LEND = Date.now(); render(); setTimeout(() => { if (TAB === 'live') render(); }, 3600); } }
 const LLK = (k, v) => LW(L => { L.look[k] = v; if (k === 'layout') { const p = L.look.pos || 'tr'; if (v === 'bar' && !/^(tc|bc)$/.test(p)) L.look.pos = p[0] === 't' ? 'tc' : 'bc'; if (v !== 'bar' && /^(tc|bc)$/.test(p)) L.look.pos = p[0] + 'r'; } });
-const LX = i => LW(L => { const it = L.list && L.list.items[i]; if (it) it.x = !it.x; });
+const LX = t => LW(L => { if (!L.xd || L.xd.day !== dk()) L.xd = { day: dk() }; L.xd[t] = !L.xd[t]; });
 function LEXADD() {
   const n = (document.getElementById('lx-n').value || '').trim(), d = document.getElementById('lx-d').value;
   if (!n || !d) return toast('Type the exam name and pick its date');
@@ -1847,7 +1848,7 @@ function viewLive() {
    <div class="card"><div class="sec"><h2>Today's lectures</h2><span class="mono muted sm">${dn}/${list.length} done · ${hm(totM)}</span></div>
      <div class="sl2">Speed — pick it first, the list follows</div>
      <div class="spd">${SPEEDS.map(s => `<button class="${s === sp ? 'on' : ''}" onclick="SETSP(${s})">${s}x</button>`).join('')}</div>
-     <div style="margin-top:8px">${list.map(i => `<label class="lv-l ${i.done ? 'xd' : ''}" style="--lc:${esc(i.color)}"><input type="checkbox" ${i.done ? 'checked' : ''} onchange="${i.t === 'lec' ? `TK('${i.id}')` : `LX(${i.i})`};render()"><span class="tx"><small>${esc(i.sub)}</small><b>${esc(i.title)}</b></span><span class="ln">${hm(i.mins)}</span></label>`).join('') || '<div class="sm muted" style="padding:8px 0">No lectures fit today.</div>'}</div>
+     <div style="margin-top:8px">${list.map(i => `<label class="lv-l ${i.done ? 'xd' : ''}" style="--lc:${esc(i.color)}"><input type="checkbox" ${i.done ? 'checked' : ''} onchange="${i.t === 'lec' ? `TK('${i.id}')` : `LX('${i.t}')`};render()"><span class="tx"><small>${esc(i.sub)}</small><b>${esc(i.title)}</b></span><span class="ln">${hm(i.mins)}</span></label>`).join('') || '<div class="sm muted" style="padding:8px 0">No lectures fit today.</div>'}</div>
      <p class="xs faint" style="margin:8px 0 0">Ticking here ticks it in Day OS too, and the other way round. Changing speed rebuilds the list; lectures already done stay crossed.</p></div>`;
 
   const ex = (L.exams || []).map(e => `<div class="lv-ex"><span class="grow"><b>${esc(e.n)}</b> <span class="faint sm">${fmt2(e.d)} · ${exTxt({ left: diffD(dk(), e.d) })}</span></span><button class="btn quiet mini" onclick="LEXDEL('${e.id}')" aria-label="Remove ${esc(e.n)}">✕</button></div>`).join('');
