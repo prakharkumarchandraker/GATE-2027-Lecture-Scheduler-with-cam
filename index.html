@@ -411,7 +411,7 @@ const DEF_CFG = {
   nightMeds: 1250, bedSnack: 1290, pmSkin: 1350, pmMins: 15,
   studyMin: 360, studyMax: 660, offStudy: 120, revCap: 60, chunk: 90, gap: 10,
   target: '2026-12-31', gate: '2027-02-01', bits: '2027-05-01',
-  emDaily: true, water: 12, dayStart: 240, idealWake: 540, textScale: 0
+  emDaily: true, water: 12, dayStart: 240, idealWake: 540, textScale: 0, gymAt: 0, shopAt: 1155
 };
 function freshCore() {
   return JSON.parse(JSON.stringify({
@@ -436,7 +436,8 @@ function migrate() {
   if (!S.core) S.core = freshCore();
   const c = S.core;
   c.cfg = Object.assign({}, DEF_CFG, c.cfg || {});
-  if (!c.cfg.noBrk1) { c.cfg.chunk = 720; c.cfg.noBrk1 = 1; }   // one long block per gap: no 10-min breaks (Settings → 'Study block before a break' brings them back)
+  if (!c.cfg.noBrk1) { c.cfg.chunk = 720; c.cfg.noBrk1 = 1; }
+  if (!c.cfg.tt2) { Object.assign(c.cfg, { idealWake: 330, gymAt: 360, gymMins: 110, bathMins: 10, amMins: 30, mealMins: 30, lunch: 810, lunchMax: 870, dinner: 1170, bfLatest: 660, nightMeds: 1260, bedSnack: 1315, pmSkin: 1320, pmMins: 30, sleep: 1350, studyMax: 750, shopAt: 1155, tt2: 1 }); }   // timetable from Daily_Timetable.docx   // one long block per gap: no 10-min breaks (Settings → 'Study block before a break' brings them back)
   if (!c.meds) c.meds = DATA.meds; if (!c.meals) c.meals = DATA.meals; if (!c.skin) c.skin = DATA.skin; if (!c.work) c.work = DATA.work;
   if (!c.subs) c.subs = DATA.subs;
   if (!c.work || !c.work[0] || !c.work[0].parts[0].ex[0].steps) c.work = DATA.work;
@@ -772,14 +773,21 @@ function planDay(d, ideal) {
   if (!tk.thyroid) pins.push({ at: s0, key: 'thyroid', kind: 'med', label: (S.core.meds.wake || ['Thyroid tablet'])[0] || 'Thyroid tablet', sub: 'Empty stomach — no food till ' + clock(foodOK) });
   const amNeeded = !tk.amskin;
   const ready = s0 + (amNeeded ? c.amMins : 0);
+  // 1b. morning gym at a fixed time (Daily_Timetable.docx): gym → bath → breakfast → study. Woke too late for it → old rule (gym before lunch).
+  let gymMode = off ? 'off' : (tk.gym || tk.home) ? 'done' : 'home', gym = null, bath = null, amGym = false;
+  if (gymMode === 'home' && +c.gymAt > 0 && ready <= +c.gymAt + 15 && !tk.lunch) {
+    const gs = snap5(Math.max(+c.gymAt, ready));
+    gym = add({ kind: 'gym', start: gs, end: gs + c.gymMins, am: true });
+    if (!tk.bath) bath = add({ kind: 'bath', start: gym.end, end: gym.end + c.bathMins });
+    gymMode = 'gym'; amGym = true;
+  }
   // 2. breakfast (only on early days)
   let bf = null;
   if (!tk.breakfast && !tk.lunch && !tk.dinner) {
-    const t = snap5(Math.max(ready, foodOK));
+    const t = snap5(Math.max(ready, foodOK, amGym ? (bath || gym).end : 0));
     if (t <= c.bfLatest) bf = add({ kind: 'meal', meal: 'breakfast', start: t, end: t + c.mealMins });
   }
   // 3. gym — always before lunch; if gym + lunch-by-lunchMax doesn't fit → 40 min home workout
-  let gymMode = off ? 'off' : (tk.gym || tk.home) ? 'done' : 'home', gym = null, bath = null;
   if (gymMode === 'home' && !tk.lunch) {
     let early = ready; if (bf) early = Math.max(early, bf.end + 45);
     const gs = snap5(Math.max(early, c.lunch - c.bathMins - c.gymMins));
@@ -818,6 +826,8 @@ function planDay(d, ideal) {
     const t = Math.max(c.bedSnack, dinner ? dinner.end + 30 : 0, s0);
     if (t < c.pmSkin) pins.push({ at: t, key: 'bedtime', kind: 'meal', label: mealOf('bedtime').name, sub: mealOf('bedtime').items.map(i => i.f).join(' · '), meal: 'bedtime' });
   }
+  // Wed & Sat: buy chicken + curd before dinner
+  if ([3, 6].includes(D(d).getDay()) && +c.shopAt > 0 && !tk.shop && !off) pins.push({ at: Math.max(+c.shopAt, s0), key: 'shop', kind: 'meal', label: 'Buy chicken + curd — 10 min', sub: 'Wed & Sat only · enough for 3–4 days' });
   // 7. night skincare + wind down
   let pm = null;
   if (!tk.pmskin) { const t = Math.max(c.pmSkin, s0); pm = add({ kind: 'night', start: t, end: t + c.pmMins }); }
@@ -975,7 +985,7 @@ function blockHTML(b, P, now) {
     if (b.meal === 'lunch' && P.s0 < 900) body += taskRow('spf2', 'Face wash + reapply SPF', '', 'skin', 'var(--skin)');
     body += foodRows(b.meal, color);
   } else if (b.kind === 'gym') {
-    name = 'Gym'; sub = `${c.gymMins} min incl. travel · empty-ish stomach, lunch right after`; doneKey = 'gym';
+    name = 'Gym'; sub = b.am ? `Travel 20 · warm-up 7 · exercise 50 · cardio 10 + shake · leave by ${clock(b.end - 23)}, back ${clock(b.end)}` : `${c.gymMins} min incl. travel · empty-ish stomach, lunch right after`; doneKey = 'gym';
     body = workList(d);
   } else if (b.kind === 'home') {
     name = 'Home workout'; sub = `${c.homeMins} min — outside gym didn't fit before lunch`; doneKey = 'home';
@@ -1417,7 +1427,7 @@ function viewSet() {
     : `<p class="sm muted">Sync is off. This device keeps everything locally.</p><div class="row2b"><button class="btn" onclick="NEWSYNC()">Turn on sync</button><button class="btn quiet" onclick="SHEET='join';render()">I have a code</button></div>`}</div>
 
   <div class="card"><h2>Fixed times</h2>
-   ${timeRow('Ideal wake-up (for the ideal timetable)', 'idealWake')}${timeRow('Lunch', 'lunch')}${timeRow('Lunch — latest ever', 'lunchMax')}${timeRow('Dinner', 'dinner')}
+   ${timeRow('Ideal wake-up (for the ideal timetable)', 'idealWake')}${timeRow('Morning gym start (00:00 = gym before lunch instead)', 'gymAt')}${timeRow('Wed & Sat shopping (00:00 = off)', 'shopAt')}${timeRow('Lunch', 'lunch')}${timeRow('Lunch — latest ever', 'lunchMax')}${timeRow('Dinner', 'dinner')}
    ${timeRow('Breakfast only if food is OK by', 'bfLatest')}${timeRow('Night meds', 'nightMeds')}${timeRow('Bedtime snack', 'bedSnack')}
    ${timeRow('Night skincare', 'pmSkin')}${timeRow('Lights out', 'sleep')}</div>
   <div class="card"><h2>Durations</h2>
