@@ -53,7 +53,8 @@ Live tab = the remote. OBS overlay = this site with `?live=<sync code>` (Live ta
 
 - **Start studying** once. Then the timetable runs it: lunch and dinner come up on stream at their times (full screen or card), with a sound, even if the phone is asleep.
 - The break stays until you tap **Resume studying**. Late → red **overtime**; early → green **time saved**.
+- **Today's log** (Live tab) lists every study stretch and break with times; the stream card shows studied time, breaks (count · time) and saved / over.
 - Stream shows **one lecture at a time** (subject + lecture). Tick it here or anywhere in Day OS → the next one shows.
-- Style, position, size, colour, accent, background, break screen, sound and every item are in Live → How it looks on stream. Live preview at the top of the tab.
+- Style, position, size, colour, accent, background (also used by the full-screen break), break screen, sound and every item are in Live → How it looks on stream. Live preview at the top of the tab.
 - Exams: GATE and BITS from Settings, plus any you add on the Live tab.
 - The overlay only reads, and shows study info only — never meds, food, skincare or body data.

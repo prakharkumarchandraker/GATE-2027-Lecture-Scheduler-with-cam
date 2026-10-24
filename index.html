@@ -358,8 +358,8 @@ html.lvov #app,html.lvov nav,html.lvov #sheet,html.lvov #toast,html.lvov #timer{
 .lay-bar .op-bnow i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;vertical-align:1px}
 .lay-bar .op-bnow small{font-size:14px;font-weight:700;margin-right:6px}
 .lay-bar .op-bt{font-size:17px;color:var(--mut)}.lay-bar .op-bt b{color:var(--ink);font-family:"IBM Plex Mono",monospace}.lay-bar .op-bt small{font-size:14px}
-.ob{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(9,12,20,.9);gap:8px;padding:0 120px}
-.ob.over{background:rgba(44,10,10,.92)}
+.ob{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(9,12,20,var(--op,.9));gap:8px;padding:0 120px}
+.ob.over{background:rgba(44,10,10,var(--op,.92))}
 .ob-lab{font-size:32px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#F0A93B}
 .ob.over .ob-lab{color:#FF8B78}
 .ob-big{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:230px;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;margin:10px 0}
@@ -384,6 +384,14 @@ html.lvov #app,html.lvov nav,html.lvov #sheet,html.lvov #toast,html.lvov #timer{
 .lv-tt.cu{outline:2px solid var(--pen);outline-offset:-2px;border-radius:6px}
 .lv-sw{width:34px;height:34px;min-width:0!important;padding:0!important;border-radius:50%!important;background:var(--sw)!important;border:3px solid #fff!important;box-shadow:0 0 0 1px var(--edge)}
 .lv-sw.on{box-shadow:0 0 0 3px var(--pen)}
+.op-tr{display:flex;align-items:center;gap:10px;min-width:0}
+.op-dn{flex:none;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ac);border:1.5px solid var(--ac);border-radius:9px;padding:3px 10px;white-space:nowrap}
+.op-dn b{font-family:"IBM Plex Mono",monospace;font-size:1.15em}
+.op.t-light .op-dn{filter:brightness(.75)}
+.lay-bar .op-dn{font-size:17px}
+.ob-tag{font-size:24px!important;color:#B4BCCC!important}
+.ob-dn{margin-left:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#F0A93B;border:2px solid #F0A93B;border-radius:10px;padding:3px 12px}
+.lv-dn{margin-left:10px;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pen);border:1.5px solid var(--pen);border-radius:7px;padding:2px 8px;vertical-align:1px}
 </style></head><body>
 <div class="wrap" id="app"></div>
 <div id="sheet"></div>
@@ -1629,7 +1637,7 @@ const LIVE_OV = new URLSearchParams(location.search).get('live');
 const LM = 60000;
 function liveDef() {
   return {
-    run: { day: '', st: 'idle', since: 0, brk: null, studyMs: 0, net: 0, flash: null },
+    run: { day: '', st: 'idle', since: 0, brk: null, studyMs: 0, net: 0, flash: null, brkMs: 0, brkN: 0, segs: [] },
     log: {}, list: null, exams: [],
     look: { layout: 'card', pos: 'tr', size: 1, theme: 'dark', accent: 'green', opacity: 0.88, brkStyle: 'full', sound: true, label: 'Study with me', dayOne: '',
       showNow: true, showNext: true, showNextBrk: true, showToday: true, showSyl: true, showNet: true, showAll: false, showExams: true, showList: false, gate: true, bits: true }
@@ -1648,6 +1656,7 @@ const dayBase = () => { const d = D(dk()); d.setHours(0, 0, 0, 0); return +d; };
 const lclock = ms => { const s = Math.floor(Math.max(0, ms) / 1000); return Math.floor(s / 3600) + ':' + pad(Math.floor(s % 3600 / 60)) + ':' + pad(s % 60); };
 const lmmss = ms => { const s = Math.floor(Math.max(0, ms) / 1000), h = Math.floor(s / 3600); return (h ? h + ':' + pad(Math.floor(s % 3600 / 60)) : Math.floor(s / 60)) + ':' + pad(s % 60); };
 const lhm = ms => { const t = Math.floor(Math.max(0, ms) / LM), h = Math.floor(t / 60), m = t % 60; return h >= 100 || (h && !m) ? h + 'h' : h ? h + 'h ' + pad(m) + 'm' : m + 'm'; };
+const ldur = ms => { const s = Math.floor(Math.max(0, ms) / 1000); return s < 60 ? s + 's' : s < 3600 ? Math.floor(s / 60) + 'm ' + pad(s % 60) + 's' : lhm(ms); };
 const lhhmm = ts => { const d = new Date(ts); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
 
 /* ---- timetable → break spans (gaps between study blocks) ---- */
@@ -1679,8 +1688,16 @@ function liveState(now) {
     const sp = T.spans.find(s => s.A >= brk.a && s.A <= now); if (sp) brk = { lab: sp.lab, a: brk.a, e: sp.E };
   }
   let past = 0; for (const k in S.live.log) if (k !== dk()) past += +S.live.log[k] || 0;
+  // today's record: break count + time, and study/break segments (an automatic break is added here until Resume saves it)
+  let brkMs = fresh ? 0 : +r.brkMs || 0, brkN = fresh ? 0 : +r.brkN || 0;
+  const segs = (fresh ? [] : r.segs || []).map(g => Object.assign({}, g));
+  if (st === 'break' && brk) {
+    brkMs += now - brk.a;
+    if (brk.auto) { brkN++; const l = segs[segs.length - 1]; if (l && l.k === 'study' && !l.e) l.e = brk.a; segs.push({ k: 'break', a: brk.a, lab: brk.lab }); }
+    else { const l = segs[segs.length - 1]; if (l && l.k === 'break') l.lab = brk.lab; }
+  }
   return {
-    st, since, studyMs, brk, cur, T, net: fresh ? 0 : r.net || 0, all: past + studyMs,
+    st, since, studyMs, brk, cur, T, net: fresh ? 0 : r.net || 0, all: past + studyMs, brkMs, brkN, segs,
     next: st === 'study' ? T.spans.find(s => s.A > now) : null,
     over: st === 'break' && brk && brk.e ? now - brk.e : 0,
     brkEl: st === 'break' && brk ? now - brk.a : 0,
@@ -1694,14 +1711,15 @@ function liveText(x, now) {
   else if (x.st === 'break') {
     if (x.brk && x.brk.e) { o.big = x.over < 0 ? lmmss(-x.over + 999) : '+' + lmmss(x.over); o.sub = x.over < 0 ? `back by ${lhhmm(x.brk.e)}` : `overtime · was due back at ${lhhmm(x.brk.e)}`; }
     else { o.big = lmmss(x.brkEl); o.sub = 'quick break'; }
-  } else if (x.st === 'done') { o.big = lhm(x.studyMs); o.sub = 'studied today ✓'; }
-  else { o.big = lhm(x.studyMs); o.sub = 'starting soon'; }
-  o.today = lhm(x.studyMs); o.goal = '/ ' + lhm(x.T.planned * LM); o.all = lhm(x.all);
+  } else if (x.st === 'done') { o.big = ldur(x.studyMs); o.sub = 'studied today ✓' + (x.brkN ? ` · ${x.brkN} break${x.brkN > 1 ? 's' : ''} (${ldur(x.brkMs)})` : ''); }
+  else { o.big = ldur(x.studyMs); o.sub = x.studyMs ? 'studied today' : 'starting soon'; }
+  o.today = ldur(x.studyMs); o.goal = '/ ' + lhm(x.T.planned * LM); o.all = lhm(x.all);
   o.tbar = Math.min(100, x.T.planned ? x.studyMs / (x.T.planned * LM) * 100 : 0).toFixed(1) + '%';
   const net = x.net - Math.max(0, x.over);
-  o.netTxt = x.net || x.over > 0 ? (net >= 0 ? lhm(net) + ' saved' : lhm(-net) + ' over') : '';
+  o.netTxt = x.net || x.over > 0 ? (net >= 0 ? ldur(net) + ' saved' : ldur(-net) + ' over') : '';
   o.netCls = net >= 0 ? 'g' : 'r';
-  o.net = o.netTxt ? `Breaks <b class="${o.netCls}">${o.netTxt}</b>` : '';
+  o.brk = x.brkN ? `${x.brkN} · ${ldur(x.brkMs)}` : '—';
+  o.net = x.brkN || o.netTxt ? `Breaks <b>${o.brk}</b>${o.netTxt ? ` · <b class="${o.netCls}">${o.netTxt}</b>` : ''}` : '';
   o.flash = x.flash ? (x.flash.ms >= 0 ? `✓ Back ${lmmss(x.flash.ms)} early · time saved` : `Back ${lmmss(-x.flash.ms)} late · overtime`) : '';
   return o;
 }
@@ -1788,13 +1806,17 @@ function LV(act) {
   const now = Date.now(), x = liveState(now), today = dk();
   LW(L => {
     const r = L.run;
-    if (r.day !== today) { if (r.day && r.studyMs > 0) L.log[r.day] = r.studyMs; Object.assign(r, { day: today, st: 'idle', since: 0, brk: null, studyMs: 0, net: 0, flash: null }); }
-    if (act === 'start') Object.assign(r, { st: 'study', since: now, brk: null, studyMs: x.studyMs, flash: null });
-    else if (act === 'pause' && x.st === 'study') Object.assign(r, { st: 'break', since: now, studyMs: x.studyMs, brk: { lab: 'Break', a: now, e: null } });
+    if (r.day !== today) { if (r.day && r.studyMs > 0) L.log[r.day] = r.studyMs; Object.assign(r, { day: today, st: 'idle', since: 0, brk: null, studyMs: 0, net: 0, flash: null, brkMs: 0, brkN: 0, segs: [] }); }
+    const segs = x.segs.map(g => Object.assign({}, g)), last = segs[segs.length - 1];
+    const closeLast = (lab) => { if (last && !last.e) { last.e = now; if (lab) last.lab = lab; } };
+    if (act === 'start') { closeLast(); segs.push({ k: 'study', a: now }); Object.assign(r, { st: 'study', since: now, brk: null, studyMs: x.studyMs, flash: null }); }
+    else if (act === 'pause' && x.st === 'study') { closeLast(); segs.push({ k: 'break', a: now, lab: 'Break' }); Object.assign(r, { st: 'break', since: now, studyMs: x.studyMs, brk: { lab: 'Break', a: now, e: null }, brkN: x.brkN + 1, brkMs: x.brkMs }); }
     else if (act === 'resume' && x.st === 'break') {
       const early = x.brk && x.brk.e ? x.brk.e - now : null;      // + saved, − overtime
-      Object.assign(r, { st: 'study', since: now, brk: null, studyMs: x.studyMs, net: (r.net || 0) + (early || 0), flash: early == null ? null : { ms: early, at: now } });
-    } else if (act === 'end') { Object.assign(r, { st: 'done', since: now, brk: null, studyMs: x.studyMs, flash: null }); L.log[today] = x.studyMs; }
+      closeLast(x.brk && x.brk.lab); segs.push({ k: 'study', a: now });
+      Object.assign(r, { st: 'study', since: now, brk: null, studyMs: x.studyMs, net: (r.net || 0) + (early || 0), flash: early == null ? null : { ms: early, at: now }, brkMs: x.brkMs, brkN: x.brkN });
+    } else if (act === 'end') { closeLast(); Object.assign(r, { st: 'done', since: now, brk: null, studyMs: x.studyMs, flash: null, brkMs: x.brkMs, brkN: x.brkN }); L.log[today] = x.studyMs; }
+    r.segs = segs.slice(-80);
   });
 }
 let LEND = 0;
@@ -1843,12 +1865,14 @@ function viewLive() {
   const main = `<div class="lv-pv" id="lv-pv"><div class="lv-pvcam"></div></div>
    <div class="sm faint" style="margin:6px 2px 13px">What viewers see · live preview</div>
    <div class="card lv-card" style="--lc:${col}">
-     <span class="lv-pill" id="lv-pill"><i></i>${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</span>
+     <span class="lv-pill" id="lv-pill"><i></i>${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</span>${dayNum() ? `<span class="lv-dn">Day ${dayNum()}</span>` : ''}
      <div class="lv-big" id="lv-big">${esc(t.big)}</div><div class="lv-sub" id="lv-sub">${esc(t.sub)}</div>
      ${t.flash ? `<div class="lv-flash ${x.flash.ms >= 0 ? 'g' : 'r'}">${esc(t.flash)}</div>` : ''}
      <div class="lv-acts">${acts}</div>
      <p class="xs faint" style="margin:10px 0 0">Breaks start on their own at your timetable times (gaps between study blocks), with a sound, and stay on screen till you tap Resume.</p></div>
-   <div class="lv-stats"><div><span>Studied today</span><b id="lv-today">${t.today}</b></div><div><span>Planned</span><b>${lhm(x.T.planned * LM)}</b></div><div><span>Breaks</span><b id="lv-net" class="${t.netTxt ? t.netCls : ''}">${t.netTxt || '—'}</b></div></div>
+   <div class="lv-stats"><div><span>Studied today · of ${lhm(x.T.planned * LM)}</span><b id="lv-today">${t.today}</b></div><div><span>Breaks · count · time</span><b id="lv-brk">${t.brk}</b></div><div><span>Break time vs timetable</span><b id="lv-net" class="${t.netTxt ? t.netCls : ''}">${t.netTxt || '—'}</b></div></div>
+   <div class="card" style="margin-top:13px"><div class="sec"><h2>Today's log</h2><span class="mono muted sm">study ${ldur(x.studyMs)} · breaks ${ldur(x.brkMs)}</span></div>
+     ${x.segs.length ? x.segs.map(g => `<div class="lv-tt ${g.k === 'study' ? 'study' : 'break'}${g.e ? '' : ' cu'}"><span class="t">${lhhmm(g.a)}–${g.e ? lhhmm(g.e) : 'now'}</span><span class="n">${g.k === 'study' ? 'Study' : esc(g.lab || 'Break')}</span><span class="d">${ldur((g.e || now) - g.a)}</span></div>`).join('') : '<div class="sm muted">Nothing yet today. Tap Start studying.</div>'}</div>
    <div class="card" style="margin-top:13px"><div class="sec"><h2>Syllabus</h2><span class="mono muted sm">${syl.pct}%</span></div>
      <div class="lv-prog"><b style="width:${syl.pct}%"></b></div>
      <div class="sm" style="margin-top:8px"><b>${syl.d}</b> of <b>${syl.n}</b> lectures done · <b>${syl.n - syl.d}</b> left · ${syl.hpct}% by video hours</div></div>
@@ -1878,11 +1902,11 @@ function viewLive() {
      <span class="lv-lbl">Background</span>${chips('opacity', [[0.6, 'See-through'], [0.75, '75%'], [0.88, '90%'], [1, 'Solid']])}
      <span class="lv-lbl">Break screen</span>${chips('brkStyle', [['full', 'Full screen'], ['card', 'Card only (camera stays)']])}
      <span class="lv-lbl">Title</span><input class="lv-in" maxlength="40" value="${esc(lk.label)}" onchange="LLK('label',this.value.trim())">
-     <span class="lv-lbl">Journey Day 1 (shows “Day 12”; leave empty to hide)</span><input class="lv-in" type="date" value="${esc(lk.dayOne)}" onchange="LLK('dayOne',this.value)">
+     <span class="lv-lbl">Journey Day 1 — the date you started (stream shows “Day 1”, “Day 2”…; empty = hide)${dayNum() ? ` · today is <b>Day ${dayNum()}</b>` : ''}</span><input class="lv-in" type="date" value="${esc(lk.dayOne)}" onchange="LLK('dayOne',this.value)">
      <span class="lv-lbl">Show on stream</span>
      ${tog('showNow', 'Lecture I\'m on now', 'One at a time — tick it and the next one shows')}${tog('showNext', 'The one after it', 'Card style only')}
      ${tog('showNextBrk', 'Next break time')}${tog('showToday', 'Today: studied / planned')}${tog('showSyl', 'Syllabus: lectures done · %')}
-     ${tog('showNet', 'Break time saved / over')}${tog('showAll', 'All-time hours')}${tog('showExams', 'Exam countdowns')}
+     ${tog('showNet', 'Breaks: count, time, saved / over')}${tog('showAll', 'All-time hours')}${tog('showExams', 'Exam countdowns')}
      ${tog('showList', 'Full list of today\'s lectures', 'Off keeps the panel short')}${tog('sound', 'Sound when a break starts / runs over')}</div>
    <div class="card"><h2>Connect to OBS</h2>${SYNC.code ? `
      <ol class="sm" style="padding-left:18px;margin:0 0 10px"><li>OBS → Sources <b>+</b> → <b>Browser</b>. Paste this link. Width <b>1920</b>, height <b>1080</b>. Keep it above the camera.</li><li>Run the stream from this tab on your phone or laptop.</li></ol>
@@ -1899,7 +1923,7 @@ setInterval(() => {
   if (LTICK_K && LTICK_K !== k && !SHEET) render();
   LTICK_K = k;
   const set = (id, v) => { const e = document.getElementById(id); if (e && e.textContent !== v) e.textContent = v; };
-  set('lv-big', t.big); set('lv-sub', t.sub); set('lv-today', t.today);
+  set('lv-big', t.big); set('lv-sub', t.sub); set('lv-today', t.today); set('lv-brk', t.brk);
   paintPv();
   liveAlerts(x, now);
 }, 1000);
@@ -1917,13 +1941,13 @@ function liveNowLec() {
 }
 function ovHTML(x) {
   const lk = S.live.look, t = liveText(x, Date.now()), ex = lk.showExams ? liveExams() : [], L = liveNowLec();
-  const lab = [lk.label, dayNum() ? 'Day ' + dayNum() : ''].filter(Boolean).join(' · ');
+  const lab = lk.label || '', dn = dayNum(), dnH = dn ? `<span class="op-dn">Day <b>${dn}</b></span>` : '';
   const exH = ex.map(e => `<span>${esc(e.n)} <b>${exTxt(e)}</b></span>`).join('');
   if (x.st === 'break' && lk.brkStyle !== 'card') {
-    return `<div class="ob ${x.over > 0 ? 'over' : ''}"><div class="ob-lab">${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</div>
+    return `<div class="ob ${x.over > 0 ? 'over' : ''}" style="--op:${+lk.opacity || .9}"><div class="ob-lab">${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</div>
       <div class="ob-big" data-f="big"></div><div class="ob-sub" data-f="sub"></div>
-      <div class="ob-row">Studied today <b data-f="today"></b>${L.cur ? ` · Next up: <b>${esc(L.cur.sub)} — ${esc(L.cur.title)}</b>` : ''}</div>
-      ${exH ? `<div class="ob-ex">${exH}</div>` : ''}${lab ? `<div class="ob-tag">${esc(lab)}</div>` : ''}</div>`;
+      <div class="ob-row">Studied today <b data-f="today"></b> · Breaks <b data-f="brk"></b>${L.cur ? ` · Next up: <b>${esc(L.cur.sub)} — ${esc(L.cur.title)}</b>` : ''}</div>
+      ${exH ? `<div class="ob-ex">${exH}</div>` : ''}${lab || dn ? `<div class="ob-tag">${esc(lab)}${dn ? ` <span class="ob-dn">Day ${dn}</span>` : ''}</div>` : ''}</div>`;
   }
   const lay = ['card', 'compact', 'bar'].includes(lk.layout) ? lk.layout : 'card';
   let pos = lk.pos || 'tr';
@@ -1934,7 +1958,7 @@ function ovHTML(x) {
   const nowLabel = x.st === 'study' ? 'Now studying' : x.st === 'break' ? 'Up next' : x.st === 'done' ? 'Next up tomorrow' : 'First up';
   if (lay === 'bar') {
     const sep = '<span class="sep"></span>';
-    return `<div class="${cls}" style="${style}"><span class="op-pill"><i></i>${esc(t.pill)}</span><span class="op-big" data-f="big"></span>
+    return `<div class="${cls}" style="${style}"><span class="op-pill"><i></i>${esc(t.pill)}</span>${dnH}<span class="op-big" data-f="big"></span>
       ${lk.showNow && L.cur ? `${sep}<span class="op-bnow"><i style="background:${esc(L.cur.color)}"></i><small style="color:${esc(L.cur.color)}">${esc(L.cur.sub)}</small> ${esc(L.cur.title)}</span>` : ''}
       ${lk.showToday ? `${sep}<span class="op-bt">Today <b data-f="today"></b> <small data-f="goal"></small></span>` : ''}
       ${lk.showSyl ? (() => { const y = liveSyl(); return `${sep}<span class="op-bt">Syllabus <b>${y.pct}%</b></span>`; })() : ''}
@@ -1949,7 +1973,7 @@ function ovHTML(x) {
   const today = lk.showToday ? `<div class="op-day"><span class="op-k">Today</span><span class="op-v"><span data-f="today"></span> <small data-f="goal"></small></span></div><div class="op-bar"><b data-f="tbar"></b></div>` : '';
   const meta = (lk.showNet ? `<span data-f="net" data-h="1"></span>` : '') + (lk.showAll ? `<span>All-time <b data-f="all"></b></span>` : '');
   return `<div class="${cls}" style="${style}">
-    <div class="op-top"><span class="op-pill"><i></i>${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</span><span class="op-lab">${esc(lab)}</span></div>
+    <div class="op-top"><span class="op-pill"><i></i>${esc(x.over > 0 ? 'Overtime · ' + t.pill : t.pill)}</span><span class="op-tr"><span class="op-lab">${esc(lab)}</span>${dnH}</span></div>
     <div class="op-big" data-f="big"></div>${lk.showNextBrk || x.st !== 'study' ? `<div class="op-sub" data-f="sub"></div>` : ''}
     ${t.flash && lk.showNet ? `<div class="op-flash ${x.flash.ms >= 0 ? 'g' : 'r'}">${esc(t.flash)}</div>` : ''}
     ${nowH}${nextH}
