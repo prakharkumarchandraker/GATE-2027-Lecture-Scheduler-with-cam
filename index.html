@@ -392,6 +392,35 @@ html.lvov #app,html.lvov nav,html.lvov #sheet,html.lvov #toast,html.lvov #timer{
 .ob-tag{font-size:24px!important;color:#B4BCCC!important}
 .ob-dn{margin-left:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#F0A93B;border:2px solid #F0A93B;border-radius:10px;padding:3px 12px}
 .lv-dn{margin-left:10px;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pen);border:1.5px solid var(--pen);border-radius:7px;padding:2px 8px;vertical-align:1px}
+/* ---- full-screen reminder ---- */
+.alfs{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,40,70,.94);color:#fff;animation:alin .25s ease-out}
+.alfs.t{background:rgba(70,30,10,.95)}
+@keyframes alin{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+.alin{max-width:560px;width:100%;text-align:center}
+.alic{font-size:84px;line-height:1;animation:alpulse 1s ease-in-out infinite alternate}
+@keyframes alpulse{from{transform:scale(1)}to{transform:scale(1.12)}}
+.alt{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;font-weight:700;font-size:40px;letter-spacing:-.02em;line-height:1.1;margin-top:14px}
+.als{font-size:18px;opacity:.85;margin-top:8px}
+.alb{display:grid;gap:10px;margin-top:26px}
+.alb .btn{background:#fff;color:#14191A;border-color:#fff;font-size:19px;padding:16px}
+.alb .btn.quiet{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.alb .faint{color:#5b6377}
+/* ---- floating "Now" box ---- */
+.nfw{position:fixed;right:14px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;width:330px;max-width:calc(100vw - 28px);background:rgba(252,252,250,.97);border:1px solid var(--edge);border-radius:14px;box-shadow:0 10px 30px rgb(0 0 0 / .14);padding:10px 12px;font-size:13.5px}
+.nfw.min{width:auto;max-width:calc(100vw - 28px);padding:7px 8px 7px 12px}
+.nfw-h{display:flex;align-items:center;gap:10px;min-width:0}
+.nfw-t{font-family:"IBM Plex Mono",monospace;font-size:16px;color:var(--pen);flex:none}
+.nfw-now{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:4px solid var(--c);padding-left:8px;color:var(--ink)}
+.nfw-b{flex:none;border:1px solid var(--edge);background:#fff;border-radius:8px;width:30px;height:28px;cursor:pointer;color:var(--ink2);font-size:13px}
+.nfw-r,.nfw-l{display:flex;gap:10px;align-items:baseline;margin-top:7px;padding-top:7px;border-top:1px solid var(--line);color:var(--ink2)}
+.nfw-r b{color:var(--ink);font-family:"IBM Plex Mono",monospace}
+.nfw .k{flex:none;width:54px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.nfw-l{align-items:center}
+.nfw-lt{flex:1;min-width:0;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nfw-lt small{display:block;font-size:11.5px;font-weight:700;color:var(--c)}
+.nfw-tk{flex:none;width:32px;height:32px;border-radius:8px;border:2px solid var(--c);background:#fff;color:var(--c);font-weight:800;cursor:pointer}
+.nfw-tk:hover{background:var(--c);color:#fff}
+@media(min-width:980px){.nfw{bottom:84px;right:20px}}
 </style></head><body>
 <div class="wrap" id="app"></div>
 <div id="sheet"></div>
@@ -419,7 +448,7 @@ const DEF_CFG = {
   nightMeds: 1250, bedSnack: 1290, pmSkin: 1350, pmMins: 15,
   studyMin: 360, studyMax: 660, offStudy: 120, revCap: 60, chunk: 90, gap: 10,
   target: '2026-12-31', gate: '2027-02-01', bits: '2027-05-01',
-  emDaily: true, water: 12, dayStart: 240, idealWake: 540, textScale: 0, gymAt: 0, shopAt: 1155
+  emDaily: true, water: 12, dayStart: 240, idealWake: 540, textScale: 0, gymAt: 0, shopAt: 1155, waterEvery: 45, tAlarm: true, nowBox: true
 };
 function freshCore() {
   return JSON.parse(JSON.stringify({
@@ -1434,6 +1463,13 @@ function viewSet() {
    <div class="row2b"><button class="btn quiet" onclick="COPYCODE()">Copy code</button><button class="btn quiet" onclick="SHEET='join';render()">Use a different code</button></div>`
     : `<p class="sm muted">Sync is off. This device keeps everything locally.</p><div class="row2b"><button class="btn" onclick="NEWSYNC()">Turn on sync</button><button class="btn quiet" onclick="SHEET='join';render()">I have a code</button></div>`}</div>
 
+  <div class="card"><h2>Reminders</h2>
+   ${numRow('Water reminder every (0 = off)', 'waterEvery', 'min')}
+   <label class="ck"><input type="checkbox" ${c.tAlarm !== false ? 'checked' : ''} onchange="CFV('tAlarm',this.checked)"><span>Loud alarm when each timetable item starts<small>Study, meals, gym, meds… full screen + sound, e.g. 19:30 Dinner</small></span></label>
+   <label class="ck"><input type="checkbox" ${c.nowBox !== false ? 'checked' : ''} onchange="CFV('nowBox',this.checked)"><span>Floating "Now" box on every tab<small>Time, what the timetable says now, next item, first unticked lecture</small></span></label>
+   <div class="row2b" style="margin-top:10px"><button class="btn quiet" onclick="ALTEST('water')">Test water reminder</button><button class="btn quiet" onclick="ALTEST('tt')">Test timetable alarm</button></div>
+   ${'Notification' in window && Notification.permission !== 'granted' ? `<button class="btn quiet wide" style="margin-top:8px" onclick="ALPERM()">Also show as phone / desktop notifications</button>` : ''}
+   <p class="xs faint" style="margin:8px 0 0">Works while Day OS is open in a tab or window (keep it open on the laptop). A locked phone can hold sounds back.</p></div>
   <div class="card"><h2>Fixed times</h2>
    ${timeRow('Ideal wake-up (for the ideal timetable)', 'idealWake')}${timeRow('Morning gym start (00:00 = gym before lunch instead)', 'gymAt')}${timeRow('Wed & Sat shopping (00:00 = off)', 'shopAt')}${timeRow('Lunch', 'lunch')}${timeRow('Lunch — latest ever', 'lunchMax')}${timeRow('Dinner', 'dinner')}
    ${timeRow('Breakfast only if food is OK by', 'bfLatest')}${timeRow('Night meds', 'nightMeds')}${timeRow('Bedtime snack', 'bedSnack')}
@@ -2007,6 +2043,98 @@ function liveOverlayInit() {
   fit(); addEventListener('resize', fit);
   startSync();
   setInterval(() => { if (ready) { try { livePaint(stage, Date.now()); } catch (e) { console.error(e); } } }, 250);
+}
+
+/* ================= Reminders: water, timetable alarms, floating "Now" box =================
+   Runs only in the app (never in the OBS overlay). Needs Day OS open in a tab/window; a locked phone may hold sounds back. */
+const AKEY = 'dayos.alerts';
+let AL = (() => { try { return JSON.parse(localStorage.getItem(AKEY) || '{}') || {}; } catch (e) { return {}; } })();
+const alSave = () => { try { localStorage.setItem(AKEY, JSON.stringify(AL)); } catch (e) {} };
+let ALM = null, ALREP = null;
+function loudBeep(kind) {
+  try {
+    lunlock(); if (!LAC) return;
+    const t0 = LAC.currentTime + .02, seq = kind === 'water' ? [[880, 0], [1175, .2], [880, .4], [1175, .6]] : [[988, 0], [784, .24], [988, .48], [784, .72], [1318, .96], [1318, 1.2]];
+    seq.forEach(([f, d]) => { const o = LAC.createOscillator(), g = LAC.createGain(), s = t0 + d; o.type = 'square'; o.frequency.value = f; g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(.45, s + .01); g.gain.exponentialRampToValueAtTime(.001, s + .21); o.connect(g).connect(LAC.destination); o.start(s); o.stop(s + .23); });
+  } catch (e) {}
+}
+function sysNote(title, body, kind) {
+  try {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const opt = { body: body || '', tag: 'dayos-' + kind, renotify: true, requireInteraction: true, icon: 'icon-192.png' };
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) navigator.serviceWorker.getRegistration().then(r => r ? r.showNotification(title, opt) : new Notification(title, opt)).catch(() => {});
+    else new Notification(title, opt);
+  } catch (e) {}
+}
+function alertShow(kind, title, sub) {
+  ALM = { kind, title, sub }; paintAlert(); loudBeep(kind);
+  try { navigator.vibrate && navigator.vibrate([500, 200, 500, 200, 500]); } catch (e) {}
+  sysNote(title, sub, kind);
+  clearInterval(ALREP); let n = 0;
+  ALREP = setInterval(() => { if (!ALM || ++n > 5) { clearInterval(ALREP); return; } loudBeep(ALM.kind); }, 8000);   // keeps ringing every 8 s (max 5 times) till you tap
+}
+function paintAlert() {
+  let el = document.getElementById('alfs');
+  if (!ALM) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement('div'); el.id = 'alfs'; document.body.appendChild(el); }
+  const w = ALM.kind === 'water', n = getDay().meta.water || 0;
+  el.className = 'alfs ' + (w ? 'w' : 't');
+  el.innerHTML = `<div class="alin"><div class="alic">${w ? '💧' : '⏰'}</div><div class="alt">${esc(ALM.title)}</div><div class="als">${esc(ALM.sub || '')}</div>
+    <div class="alb">${w ? `<button class="btn big" onclick="ALW(1)">Drank a glass ✓ <span class="faint">(${n + 1}/${CFG().water})</span></button><button class="btn quiet big" onclick="ALW(0)">Snooze 5 min</button>` : `<button class="btn big" onclick="ALX()">OK</button>`}</div></div>`;
+}
+function ALX() { ALM = null; clearInterval(ALREP); paintAlert(); }
+function ALW(drank) { if (drank) setMeta({ water: (getDay().meta.water || 0) + 1 }); else { AL.wNext = Date.now() + 5 * 60000; alSave(); } ALX(); }
+function ALTEST(kind) { lunlock(); if (kind === 'water') alertShow('water', 'Drink water', 'Test · every ' + (CFG().waterEvery || 0) + ' min'); else { const P = livePlan(); const b = P && P.B.find(x => x.start >= curMin()) || null; alertShow('tt', b ? blockName(b, P) : 'Dinner', (b ? clock(b.start) + '–' + clock(b.end) : '19:30–20:00') + ' · test'); } }
+function ALPERM() { try { Notification.requestPermission().then(p => { toast(p === 'granted' ? 'Notifications on' : 'Notifications blocked in the browser settings'); render(); }); } catch (e) { toast('This browser has no notifications'); } }
+function alertTick() {
+  if (LIVE_OV || !S) return;
+  const c = CFG(), now = Date.now(), d = dk();
+  if (AL.day !== d) { AL = { day: d, fired: {}, wNext: 0, min: AL.min }; alSave(); }
+  let P; try { P = livePlan(); } catch (e) { return; }
+  if (!P) return;
+  const m = curMin();
+  if (c.tAlarm !== false && !ALM) {
+    const evs = P.B.map(b => ({ k: 'b' + b.kind + b.start, at: b.start, title: blockName(b, P), sub: clock(b.start) + '–' + clock(b.end) }))
+      .concat(P.pins.filter(p => !tick(p.key)).map(p => ({ k: 'p' + p.key, at: p.at, title: p.label, sub: (p.sub ? p.sub + ' · ' : '') + clock(p.at) })))
+      .sort((a, b) => a.at - b.at);
+    for (const e of evs) if (!AL.fired[e.k] && m >= e.at && m < e.at + 2) { AL.fired[e.k] = 1; alSave(); alertShow('tt', e.title, e.sub); break; }
+  }
+  const ev = +c.waterEvery || 0;
+  if (ev > 0 && !ALM && m >= P.s0 && m < c.pmSkin) {
+    if (!AL.wNext) { AL.wNext = now + ev * 60000; alSave(); }
+    else if (now >= AL.wNext) { AL.wNext = now + ev * 60000; alSave(); alertShow('water', 'Drink water', `Glass ${(getDay().meta.water || 0) + 1} of ${c.water}`); }
+  }
+}
+/* floating "Now" box, on every tab */
+let NFW_K = '';
+const NFWT = () => { AL.min = !AL.min; alSave(); NFW_K = ''; nowWidget(); };
+function nowWidget() {
+  let el = document.getElementById('nowfw');
+  if (LIVE_OV || !S || CFG().nowBox === false) { if (el) el.remove(); return; }
+  let P; try { P = livePlan(); } catch (e) { return; }
+  if (!P) return;
+  if (!el) { el = document.createElement('div'); el.id = 'nowfw'; document.body.appendChild(el); }
+  const m = curMin(), cur = P.B.find(b => m >= b.start && m < b.end), nx = P.B.filter(b => b.start > m).sort((a, b) => a.start - b.start)[0];
+  const L = liveNowLec(), lec = L.cur && L.cur.t === 'lec' ? L.cur : L.cur;
+  const col = cur ? (cur.kind === 'study' && cur.items && cur.items[0] && cur.items[0].it.type === 'lec' ? cur.items[0].it.x.s.color : KC[cur.kind] || 'var(--pen)') : 'var(--ink3)';
+  const name = cur ? blockName(cur, P) : nx ? 'Free' : 'Day done · lights out ' + clock(CFG().sleep);
+  const key = [AL.min, cur && cur.start, name, nx && nx.start, lec && (lec.id || lec.title), lec && lec.done].join('|');
+  if (key !== NFW_K) {
+    NFW_K = key;
+    el.className = 'nfw' + (AL.min ? ' min' : '');
+    el.innerHTML = `<div class="nfw-h"><b class="nfw-t" id="nfw-t"></b><span class="nfw-now" style="--c:${col}">${esc(name)}</span><button class="nfw-b" onclick="NFWT()" aria-label="${AL.min ? 'Open' : 'Shrink'}">${AL.min ? '▴' : '▾'}</button></div>
+      ${AL.min ? '' : `${cur ? `<div class="nfw-r"><span class="k">Now</span><span>till ${clock(cur.end)} · <b id="nfw-left"></b> left</span></div>` : ''}
+      ${nx ? `<div class="nfw-r"><span class="k">Next</span><span>${clock(nx.start)} ${esc(blockName(nx, P))}</span></div>` : ''}
+      ${lec ? `<div class="nfw-l" style="--c:${esc(lec.color)}"><span class="k">Lecture</span><span class="nfw-lt"><small>${esc(lec.sub)}</small>${esc(lec.title)}</span>${lec.t === 'lec' ? `<button class="nfw-tk" onclick="TK('${lec.id}')" title="Tick as done">✓</button>` : ''}</div>` : L.n ? `<div class="nfw-r"><span class="k">Lecture</span><span>All ${L.n} done today ✓</span></div>` : ''}`}`;
+  }
+  const d = new Date(), t = el.querySelector('#nfw-t'), lf = el.querySelector('#nfw-left');
+  if (t) t.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  if (lf && cur) lf.textContent = hm(cur.end - m);
+}
+if (!LIVE_OV) {
+  setInterval(() => { try { alertTick(); nowWidget(); } catch (e) { console.error(e); } }, 1000);
+  document.addEventListener('click', lunlock, { capture: true });
+  document.addEventListener('keydown', lunlock, { capture: true });
 }
 
 /* ---------------- shell ---------------- */

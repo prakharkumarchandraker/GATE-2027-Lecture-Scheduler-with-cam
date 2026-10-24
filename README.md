@@ -47,6 +47,13 @@ Ideal day (from Daily_Timetable.docx):
 - "Make today off": no gym, 2h light study.
 All times and durations are editable in Settings (Morning gym start 00:00 = gym before lunch instead).
 
+## Reminders (Settings → Reminders)
+- **Water**: full-screen reminder with sound every N minutes (0 = off), from wake-up to wind-down. "Drank a glass" adds to the water count; "Snooze" asks again in 5 min.
+- **Timetable alarm**: the moment each item starts (study, meals, gym, meds, e.g. 19:30 Dinner) → full-screen alert with a loud sound, repeating every 8 s until you tap OK.
+- **Now box**: floating on every tab — clock, what the timetable says now and how long is left, the next item, and the first unticked lecture with a ✓ button. ▾ shrinks it.
+- Test buttons for both alerts. Optional phone / desktop notifications.
+- Works while Day OS is open in a tab or window. A locked phone can hold sounds back.
+
 ## Live — YouTube study stream (OBS)
 
 Live tab = the remote. OBS overlay = this site with `?live=<sync code>` (Live tab → Connect to OBS → Copy). Browser Source, 1920 × 1080, above the camera.
