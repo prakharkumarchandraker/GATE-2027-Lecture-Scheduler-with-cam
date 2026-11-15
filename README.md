@@ -33,15 +33,14 @@ Ideal day (from Daily_Timetable.docx):
 
 | Time | What |
 |---|---|
-| 5:30 – 6:00 | Wake up · Thyroid tablet · fresh up + AM |
-| 6:00 – 7:50 | Gym (travel 20 · warm-up 7 · exercise 50 · cardio 10 + shake · back 7:50) |
-| 7:50 – 8:30 | Bath + breakfast (morning meds) |
-| 8:30 – 22:00 | Study, with lunch 13:30 (afternoon meds) and dinner 19:30 |
-| 19:15 | Wed & Sat only: buy chicken + curd |
-| 21:00 | Night meds |
-| 22:00 – 22:30 | Wind down · isabgol + milk · pack gym bag |
+| 7:00 – 7:30 | Wake up · Thyroid tablet · fresh up + AM |
+| 7:30 – 9:40 | Gym (travel 20 · warm-up 15 · exercise 50 · cardio 15 + shake · back 30 incl. chicken + curd) |
+| 9:40 – 10:20 | Bath + breakfast · Med2 at 10:30 |
+| 10:20 – 22:30 | Study, with lunch 14:00 (all 300 g chicken) and dinner 20:00 (rice + dal) |
+| 21:30 | Med4 |
+| 22:30 – 23:00 | Wind down · isabgol + milk · pack gym bag · lights out 23:00 |
 
-- Study is one block per gap (no 10-min breaks): 8:30–13:30, 14:00–19:30, 20:00–22:00 = 12h30. Max study per day is in Settings.
+- Study is one block per gap (no 10-min breaks): 10:20–14:00, 14:30–20:00, 20:30–22:30 = 11h10. Max study per day is in Settings.
 - Woke too late for the 6:00 gym? Gym moves to just before lunch, or a 40-min home workout if that doesn't fit either.
 - "I'm up — build my day" re-plans from the time you tap it. "Perfect day" keeps the ideal timetable and fills lectures from right now.
 - "Make today off": no gym, 2h light study.
