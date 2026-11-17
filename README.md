@@ -46,6 +46,9 @@ Ideal day (from Daily_Timetable.docx):
 - "Make today off": no gym, 2h light study.
 All times and durations are editable in Settings (Morning gym start 00:00 = gym before lunch instead).
 
+## Focus mode
+Top bar → **Focus**: full-screen dark screen with a big clock, what the timetable says right now (with time left), the current lecture with a ✓ button, any med or meal due now, and what's next. Screen stays awake. Esc or ✕ Exit to leave.
+
 ## Reminders (Settings → Reminders)
 - **Water**: full-screen reminder with sound every N minutes (0 = off), from wake-up to wind-down. "Drank a glass" adds to the water count; "Snooze" asks again in 5 min.
 - **Timetable alarm**: the moment each item starts (study, meals, gym, meds, e.g. 19:30 Dinner) → full-screen alert with a loud sound, repeating every 8 s until you tap OK.
