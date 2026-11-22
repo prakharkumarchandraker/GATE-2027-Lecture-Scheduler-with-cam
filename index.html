@@ -98,6 +98,27 @@ pre{background:#F3F5EF;border:1px solid var(--edge);border-radius:8px;padding:10
 .blk.now{box-shadow:0 0 0 2px var(--c,var(--pen));opacity:1}
 .blk.done{opacity:.55}
 .pf .blk.past{opacity:.45}.pf .blk.past .nm{text-decoration:line-through}
+/* study vs non-study (Nov 2026) */
+.blk.st{background:#EEF3FB;border-color:#C9D6EA}
+.blk.ns{background:#F6F1E7;border-color:#E3D9C6}
+.blk.fr{background:#F1F2EF;border-style:dashed;border-left-style:solid}
+.bact{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
+.bact button{font:inherit;font-size:12.5px;font-weight:600;border:1px solid var(--edge);background:#fff;color:var(--ink2);border-radius:8px;padding:5px 10px;cursor:pointer}
+.bact button.go{border-color:var(--study);color:var(--study)}
+.bact input{flex:1;min-width:140px;font:inherit;font-size:13.5px;border:1px solid var(--edge);border-radius:8px;padding:5px 8px;background:#fff}
+.swp{color:var(--study)}.swp .tchip{background:#E4EAF3;color:#1F3B66}
+.pskip{margin-left:6px;font-size:12px}
+.viewbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.viewbar .btn{flex:1;min-width:140px;font-size:14px;padding:10px 8px}
+.viewbar .btn.on{background:var(--study);border-color:var(--study);color:#fff}
+.hgrp{margin-top:12px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.swl{display:block;width:100%;text-align:left;font:inherit;background:#fff;border:1px solid var(--edge);border-radius:9px;padding:9px 11px;margin-top:6px;cursor:pointer}
+.swl small{display:block;color:var(--ink3);font-size:12px}
+.swl:hover{border-color:var(--pen)}
+.tag{font-size:11.5px;border-radius:20px;padding:1px 8px;font-weight:600;border:1px solid}
+.tag.hi{color:#2F6B48;border-color:#B9D6C3;background:#EEF6F0}.tag.md{color:#8A6A1B;border-color:#E6D4A6;background:#FBF6E8}.tag.lo{color:#A34328;border-color:#E5CDC3;background:#FBF1EE}
+.tag.ln{color:var(--ink2);border-color:var(--edge);background:#fff}
+.preq{font-size:12.5px;color:var(--ink3);margin-top:4px}.preq.bad{color:var(--clay);font-weight:600}
 .bh{display:flex;align-items:center;gap:10px;padding:11px 12px}
 .bh .nm{flex:1;min-width:0;font-weight:700;font-size:15.5px;color:var(--c,var(--ink))}
 .bh .nm small{display:block;font-weight:500;font-size:12.5px;color:var(--ink3)}
@@ -163,7 +184,7 @@ details.more>summary::-webkit-details-marker{display:none}
 .dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto;display:inline-block;margin-top:6px}
 details summary::-webkit-details-marker{display:none}
 .sub2{padding:13px 0 13px 12px;border-top:1px solid var(--line);border-left:5px solid var(--sc,var(--edge));margin-bottom:2px}
-.s2h{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.s2h{display:flex;align-items:center;gap:7px;margin-bottom:3px;flex-wrap:wrap}
 .s2h b{font-size:16px;font-weight:700;color:var(--sc,var(--ink))}
 .s2m{font-size:13.5px;color:var(--ink2);margin-top:4px;font-weight:500}
 .modh{display:flex;align-items:center;gap:8px;background:#F3F5EF;border:1px solid var(--edge);border-radius:8px;padding:8px 10px;margin:11px 0 4px}
@@ -900,7 +921,7 @@ function planDay(d, ideal) {
   // 7. night skincare + wind down
   let pm = null;
   if (!tk.pmskin) { const t = Math.max(c.pmSkin, s0); pm = add({ kind: 'night', start: t, end: t + c.pmMins }); }
-  const studyEnd = Math.min(c.pmSkin, END);
+  let studyEnd = Math.min(c.pmSkin, END);
   // 8. morning fresh-up / skincare block
   if (amNeeded) {
     const t = firstFree(s0, c.amMins, END);
@@ -919,11 +940,22 @@ function planDay(d, ideal) {
     else notes.push('Home workout did not fit today. Even 15 minutes of it counts — tick it if you do.');
   }
   if (gymMode === 'off') notes.push('Off day: no gym, light study. Meds, food and skincare stay.');
+  // 9b. your own changes for today: a non-study block can be skipped (you decide what goes there) or turned into study
+  const sw = ideal ? {} : (meta.sw || {}), swapped = [];
+  let extraStudy = 0;
+  for (let i = B.length - 1; i >= 0; i--) {
+    const b = B[i], k = bkey(b), o = sw[k]; if (!o || b.kind === 'study') continue;
+    const nm = blockName(b, { d });
+    B.splice(i, 1);
+    (b.meds || []).forEach(g => pins.push({ at: b.start, key: 'meds-' + g, kind: 'med', label: cap(g) + ' meds', sub: (S.core.meds[g] || []).join(' · ') }));
+    if (o.m === 'study') { extraStudy += b.end - b.start; swapped.push({ key: k, name: nm, start: b.start, end: b.end }); if (b.kind === 'night') studyEnd = END; }
+    else B.push({ kind: 'free', key: k, start: b.start, end: b.end, txt: o.txt || '', orig: nm });
+  }
   // 10. study fills every free gap
   B.sort((a, b) => a.start - b.start);
   const gaps = []; let cur = s0;
   B.concat([{ start: studyEnd, end: studyEnd }]).forEach(b => { if (b.start > cur) gaps.push([cur, Math.min(b.start, studyEnd)]); cur = Math.max(cur, b.end); });
-  let budgetLeft = off ? c.offStudy : c.studyMax;
+  let budgetLeft = (off ? c.offStudy : c.studyMax) + extraStudy;
   const study = [], breaks = [];
   gaps.forEach(([a, b]) => {
     let t = a;
@@ -958,7 +990,7 @@ function planDay(d, ideal) {
   const vidBudget = Math.max(0, studyLeft - rev.mins - revDone - keptMins);
   const prac = pracOn ? Math.round(vidBudget * 0.15 / 5) * 5 : 0;
   const emDone = !ideal && Object.keys(S.done).some(id => S.done[id].d === d && (findLect(id) || {}).s && findLect(id).s.track === 'em') || kept.some(k => k.x.s.track === 'em');
-  const asg = assignDay(makePool(), vidBudget - prac, dayIdxOf(d), c.speed, emDone);
+  const asg = assignDay(dayPool(d, ideal), vidBudget - prac, dayIdxOf(d), c.speed, emDone);
   const items = [];
   if (rev.items.length) items.push({ type: 'rev', mins: rev.mins, rev });
   kept.forEach(k => items.push(k));
@@ -979,7 +1011,65 @@ function planDay(d, ideal) {
   const overflow = items.slice(qi);
   study.forEach(s => B.push(s));
   B.sort((a, b) => a.start - b.start || (a.kind === 'study' ? 1 : -1));
-  return { vb: vidBudget - prac, emDone, ideal: !!ideal, d, s0, B, pins: pins.sort((a, b) => a.at - b.at), breaks, notes, gymMode, studyMins, foodOK, rev, items, overflow, off, pf, cut };
+  const pinsOut = pins.filter(p => !sw['p:' + p.key]).sort((a, b) => a.at - b.at);
+  return { vb: vidBudget - prac, emDone, ideal: !!ideal, d, s0, B, pins: pinsOut, breaks, notes, gymMode, studyMins, foodOK, rev, items, overflow, off, pf, cut, swapped, swL: ideal ? {} : (meta.swapL || {}) };
+}
+/* ---- today's own changes (Nov 2026): block skip / make-study, lecture swap ---- */
+const bkey = b => b.kind === 'meal' ? b.meal : b.kind;
+// Pool for a day with today's lecture swaps applied: "watch X instead of Y" puts X in Y's place; Y simply comes back from tomorrow on.
+function dayPool(d, ideal) {
+  const pool = makePool();
+  if (ideal || d !== dk()) return pool;
+  const swL = getDay(d).meta.swapL || {}, lists = () => [pool.A, pool.B, ...pool.em, ...pool.side];
+  const where = id => { for (const a of lists()) { const j = a.findIndex(x => x.l.id === id); if (j >= 0) return [a, j]; } return null; };
+  Object.keys(swL).forEach(from => {
+    const to = swL[from], w = where(from); if (!w) return;
+    let item = null;
+    if (to !== '-' && !S.done[to]) {
+      const f = findLect(to); if (!f || !f.s.on) return;
+      const w2 = where(to);
+      if (w2) { item = w2[0].splice(w2[1], 1)[0]; if (w2[0] === w[0] && w2[1] < w[1]) w[1]--; }
+      else item = { s: f.s, l: f.l, rem: remOf(f.l) };
+    }
+    w[0].splice(w[1], 1);
+    if (item) { item.swapFrom = from; w[0].splice(w[1], 0, item); }
+  });
+  return pool;
+}
+function SWB(k, mode) {
+  const sw = Object.assign({}, getDay().meta.sw || {});
+  if (!mode) delete sw[k];
+  else if (mode === 'skip' && k.startsWith('p:')) sw[k] = { m: 'skip', txt: '' };
+  else if (mode === 'skip') { const t = prompt('Is time me kya karoge? (khali chhodo = free time)', (sw[k] && sw[k].txt) || ''); if (t === null) return; sw[k] = { m: 'skip', txt: t.trim().slice(0, 80) }; }
+  else sw[k] = { m: mode, txt: '' };
+  setMeta({ sw });
+}
+function SWT(k, v) { const sw = Object.assign({}, getDay().meta.sw || {}); if (!sw[k]) return; sw[k] = Object.assign({}, sw[k], { txt: v.trim().slice(0, 80) }); setMeta({ sw }); }
+let SWL = null;
+function SWLO(id) { const f = findLect(id); if (!f) return; SWL = { from: id, sub: f.s.id }; SHEET = 'swapL'; render(); }
+function SWLSET(to) {
+  const swL = Object.assign({}, getDay().meta.swapL || {});
+  // swapping a lecture that is itself a replacement: point the original slot at the new pick
+  const back = Object.keys(swL).find(k => swL[k] === SWL.from);
+  swL[back || SWL.from] = to;
+  SHEET = null; const f = findLect(to); SWL = null; setMeta({ swapL: swL });
+  toast(to === '-' ? 'Moved to a later day' : 'Today: ' + (f ? f.l.t : '') );
+}
+function SWLU(from) { const swL = Object.assign({}, getDay().meta.swapL || {}); delete swL[from]; setMeta({ swapL: swL }); }
+function swapSheetHTML() {
+  if (SHEET !== 'swapL' || !SWL) return '';
+  const f = findLect(SWL.from); if (!f) return '';
+  const su = S.core.subs.find(s => s.id === SWL.sub) || f.s;
+  const list = pend(su).filter(l => l.id !== SWL.from).slice(0, 60);
+  const subs = S.core.subs.filter(s => s.on && pend(s).length);
+  return `<div class="sheet" onclick="if(event.target===this){SHEET=null;SWL=null;render()}"><div class="in">
+   <h2>Iske jagah kya padhoge?</h2>
+   <p class="sm muted" style="margin:0 0 8px">Abhi: <b>${esc(f.l.t)}</b> <span style="color:${f.s.color}">· ${esc(f.s.name)}</span><br>Ye lecture aaj se hat jaayega aur kal se apni jagah wapas schedule hoga.</p>
+   <label class="f">Subject</label><select onchange="SWL.sub=this.value;render()">${subs.map(s => `<option value="${s.id}" ${s.id === su.id ? 'selected' : ''}>${esc(s.name)} — ${pend(s).length} left</option>`).join('')}</select>
+   <div class="hgrp">Next lectures in ${esc(su.name)}</div>
+   ${list.map(l => `<button class="swl" onclick="SWLSET('${l.id}')">${esc(l.t)}<small>${esc(l.mod)} · ${hm(W(l.len))} at ${CFG().speed}x</small></button>`).join('') || '<p class="sm faint">Nothing left here.</p>'}
+   <button class="btn quiet wide" style="margin-top:12px" onclick="SWLSET('-')">Kuch nahi — bas ye lecture aaj se hata do</button>
+   <button class="btn quiet wide" style="margin-top:8px" onclick="SHEET=null;SWL=null;render()">Cancel</button></div></div>`;
 }
 function curMinFor(d) { return d === dk() ? curMin() : 0; }
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
@@ -1012,21 +1102,28 @@ function workList(d) {
 function lecRow(x, mins, cont) {
   const dn = !!S.done[x.l.id], r = S.done[x.l.id];
   let q = '';
-  if (dn) {
+  if (dn && !HID('qa')) {
     const list = (r.qa && r.qa.length) ? r.qa : [['', ''], ['', ''], ['', '']];
     q = `<div class="qa">${list.map((p, i) => `<div class="qarow"><input placeholder="Question ${i + 1}" value="${esc(p[0])}" onchange="QA('${x.l.id}',${i},0,this.value)"><input placeholder="One-line answer" value="${esc(p[1])}" onchange="QA('${x.l.id}',${i},1,this.value)"></div>`).join('')}
       <button class="link xs" onclick="ADDQ('${x.l.id}')">+ one more question</button></div>`;
   }
   const at = posOf(x.l.id);
   return `<div class="task ${dn ? 'done' : ''}">${box(dn, `TK('${x.l.id}')`, x.s.color)}<div class="tx">${esc(x.l.t)}${cont ? '<span class="cont">continued</span>' : ''}
-    <div class="meta"><span class="sub" style="color:${x.s.color}">${esc(x.s.name)}</span><span class="faint">${esc(x.l.mod)}</span>${at && !dn ? `<span class="stage">resume at ${vt(at)}</span>` : ''}</div>${q}</div>${lenTag(dn ? x.l.len : x.l.len - at)}</div>`;
+    <div class="meta"><span class="sub" style="color:${x.s.color}">${esc(x.s.name)}</span><span class="faint">${esc(x.l.mod)}</span>${at && !dn ? `<span class="stage">resume at ${vt(at)}</span>` : ''}${swapTag(x, dn)}</div>${q}</div>${lenTag(dn ? x.l.len : x.l.len - at)}</div>`;
+}
+function swapTag(x, dn) {
+  if (TAB !== 'today' || getDay().meta.start == null) return '';
+  let h = '';
+  if (x.swapFrom) { const o = findLect(x.swapFrom); h += `<span class="stage">instead of ${esc(o ? o.l.t : '?')}</span> <button class="link xs" onclick="SWLU('${x.swapFrom}')">undo</button> `; }
+  if (!dn) h += `<button class="link xs" onclick="SWLO('${x.l.id}')">swap ⇄</button>`;
+  return h;
 }
 const vt = m => Math.floor(m / 60) + ':' + pad(Math.round(m % 60)) + ':00';
 function partRow(x, part, cont) {
   const to = part.from + part.raw, on = posOf(x.l.id) >= to;
   return `<div class="task ${on ? 'done' : ''}">${box(on, `POS('${x.l.id}',${on ? part.from : to},${part.from})`, x.s.color)}<div class="tx">${esc(x.l.t)}${cont ? '<span class="cont">continued</span>' : ''}
     <small>Watch ${vt(part.from)} → ${vt(to)} of ${vt(x.l.len)} · the rest continues tomorrow</small>
-    <div class="meta"><span class="sub" style="color:${x.s.color}">${esc(x.s.name)}</span><span class="faint">${esc(x.l.mod)}</span></div></div>${lenTag(part.raw)}</div>`;
+    <div class="meta"><span class="sub" style="color:${x.s.color}">${esc(x.s.name)}</span><span class="faint">${esc(x.l.mod)}</span>${swapTag(x, on)}</div></div>${lenTag(part.raw)}</div>`;
 }
 function POS(id, to, from) {
   const back = to <= from;   // unticking a watched segment
@@ -1071,6 +1168,8 @@ function blockHTML(b, P, now) {
     const k = nightKey(d), pm = S.core.skin.pm[k] || { label: 'Night', steps: [] };
     name = 'Night skincare — ' + pm.label; sub = 'Then wind down · lights out ' + clock(c.sleep); doneKey = 'pmskin';
     body = pm.steps.map((s, i) => taskRow('skinpm-' + i, s.n, s.d, 'skin', color)).join('');
+  } else if (b.kind === 'free') {
+    name = b.txt || 'Free time — you decide'; sub = 'Skipped: ' + b.orig; color = 'var(--free)';
   } else if (b.kind === 'study') {
     name = 'Study'; color = 'var(--study)';
     const its = b.items || [];
@@ -1089,14 +1188,20 @@ function blockHTML(b, P, now) {
   const done = doneKey && tick(doneKey);
   const isNow = d === dk() && now >= b.start && now < b.end;
   const past = d === dk() && now >= b.end;
-  return `<div class="blk ${isNow ? 'now' : ''} ${done ? 'done' : past ? 'past' : ''}" style="--c:${color}" ${isNow ? 'id="nowblk"' : ''}>
+  const cls = b.kind === 'study' ? 'st' : b.kind === 'free' ? 'fr' : 'ns';
+  if (HID('foods') && b.kind !== 'study') body = '';
+  let act = '';
+  if (!P.ideal && d === dk() && b.kind === 'free') act = `<div class="bact"><input placeholder="Is time me kya karoge?" value="${esc(b.txt)}" onchange="SWT('${b.key}',this.value)"><button class="go" onclick="SWB('${b.key}','study')">Make this study</button><button onclick="SWB('${b.key}')">Undo skip</button></div>`;
+  else if (!P.ideal && d === dk() && b.kind !== 'study' && !done && !HID('blkact')) act = `<div class="bact"><button onclick="SWB('${bkey(b)}','skip')">Skip</button><button class="go" onclick="SWB('${bkey(b)}','study')">Make this study</button></div>`;
+  return `<div class="blk ${cls} ${isNow ? 'now' : ''} ${done ? 'done' : past ? 'past' : ''}" style="--c:${color}" ${isNow ? 'id="nowblk"' : ''}>
     <div class="bh">${tchip(b.start, b.end)}<span class="nm">${esc(name)}${sub ? `<small>${esc(sub)}</small>` : ''}</span>
     ${doneKey ? box(done, `TT('${doneKey}')`, color) : `<span class="dl">${hm(b.end - b.start)}</span>`}</div>
-    ${body ? `<div class="bb">${body}</div>` : ''}</div>`;
+    ${body ? `<div class="bb">${body}</div>` : ''}${act}</div>`;
 }
 function pinHTML(p, now) {
   const on = tick(p.key);
-  return `<div class="blk ${!on && getDay().meta.perfect && p.at < now ? 'past' : ''}" style="--c:${p.kind === 'med' ? 'var(--med)' : 'var(--meal)'}"><div class="bh">${tchip(p.at)}<span class="nm">${esc(p.label)}${p.sub ? `<small>${esc(p.sub)}</small>` : ''}</span>${box(on, `TT('${p.key}')`, p.kind === 'med' ? 'var(--med)' : 'var(--meal)')}</div></div>`;
+  const sk = getDay().meta.start != null && !on && !HID('blkact') ? `<button class="link xs pskip" onclick="SWB('p:${p.key}','skip')">skip</button>` : '';
+  return `<div class="blk ns ${!on && getDay().meta.perfect && p.at < now ? 'past' : ''}" style="--c:${p.kind === 'med' ? 'var(--med)' : 'var(--meal)'}"><div class="bh">${tchip(p.at)}<span class="nm">${esc(p.label)}${p.sub ? `<small>${esc(p.sub)}</small>` : ''}</span>${sk}${box(on, `TT('${p.key}')`, p.kind === 'med' ? 'var(--med)' : 'var(--meal)')}</div></div>`;
 }
 
 /* ---------------- views ---------------- */
@@ -1126,10 +1231,12 @@ function chill() {
 }
 function head() {
   const g = diffD(dk(), CFG().gate), b = diffD(dk(), CFG().bits);
+  const t = TAB === 'today';
+  if (t && HID('clock')) return HID('chill') ? '' : chill();
   return `<div class="topbar"><div class="bigclock" id="bigclock">${clockS()}</div>
    <div class="tb2"><div class="tbd">${fmt(dk())}</div><div class="tbc"><b>${g}</b> days to GATE · <b>${b}</b> to BITS · <span id="syncline">${syncLine()}</span></div></div>
    <button class="fsbtn" onclick="FOCUSON(true)" title="Focus mode"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg><span>Focus</span></button>
-   <button class="fsbtn" id="fsbtn" onclick="FS()" title="Full screen">${fsIcon()}</button></div>${TAB === 'today' ? chill() : ''}`;
+   <button class="fsbtn" id="fsbtn" onclick="FS()" title="Full screen">${fsIcon()}</button></div>${t && !HID('chill') ? chill() : ''}`;
 }
 const HOURS = [6, 7, 8, 9, 10, 11];
 let BANNER_H = null;
@@ -1158,6 +1265,7 @@ function blockName(b, P) {
     its.forEach(p => { const n = p.it.type === 'rev' ? 'Revision' : p.it.type === 'prac' ? 'PYQ practice' : p.it.x.s.name; if (!names.includes(n)) names.push(n); });
     return 'Study' + (names.length ? ' — ' + names[0] + (names.length > 1 ? ' + ' + (names.length - 1) + ' more' : '') : '');
   }
+  if (b.kind === 'free') return b.txt || 'Free time';
   return { gym: 'Gym', home: 'Home workout', bath: 'Bath + AM skincare', skin: b.am ? 'Wake up' : 'Fresh up', night: 'Night skincare — ' + ((S.core.skin.pm[nightKey(P.d)] || {}).label || '') }[b.kind] || b.kind;
 }
 function planRows(P) {
@@ -1183,7 +1291,7 @@ function movedLines(I, P) {
     else L.push(['✕', `Gym ${clock(ig.start)} → no slot today`]);
   }
   ['breakfast', 'lunch', 'dinner'].forEach(m => {
-    const a = fB(I, 'meal', m); if (!a || tk[m]) return;
+    const a = fB(I, 'meal', m); if (!a || tk[m] || (getDay().meta.sw || {})[m]) return;
     const b2 = fB(P, 'meal', m);
     if (!b2) L.push(['✕', `${cap(m)} ${clock(a.start)} → skipped (${m === 'breakfast' ? 'late start' : 'window over'})`]);
     else if (b2.start !== a.start) L.push(['→', `${cap(m)} ${clock(a.start)} → ${clock(b2.start)}`]);
@@ -1228,7 +1336,7 @@ function subjChips(P) {
 function speedLayers(P) {
   const seen = {}, out = []; let cn = 0, cr = 0, cm = 0;
   SPEEDS.forEach(sp => {
-    const r = assignDay(makePool(), P.vb, dayIdxOf(P.d), sp, P.emDone);
+    const r = assignDay(dayPool(P.d, P.ideal), P.vb, dayIdxOf(P.d), sp, P.emDone);
     const its = [...r.em, ...r.A, ...r.B, ...r.side].map(x => ({ x, raw: x.rem }));
     if (r.partial) its.push({ x: r.partial.it, raw: r.partial.raw, part: r.partial });
     const add = its.filter(i => !seen[i.x.l.id]); its.forEach(i => seen[i.x.l.id] = 1);
@@ -1248,33 +1356,75 @@ function layersCard(P) {
      <div class="laycum">running total ${o.cn} lectures · ${o.cr === o.cm ? `<b class="gr">${hm(o.cr)}</b>` : `<s class="st2">${hm(o.cr)}</s> <b class="gr">${hm(o.cm)}</b>`}</div></summary>
      ${o.add.map(a => `<div class="layitem" style="--sc:${a.x.s.color}"><div class="li-main"><span class="lt2">${esc(a.x.l.t)}${a.part ? ' <span class="cont">part</span>' : ''}</span><span class="ls2">${esc(a.x.s.name)}</span></div><span class="durline">${pairT(a.raw, o.sp)}</span></div>`).join('')}</details>`).join('')}</div>`;
 }
+/* ---- hide anything on Today + "Study only" view (Nov 2026) ---- */
+const HIDE_ITEMS = [
+  ['Top', [['clock', 'Big clock + days-to-GATE bar'], ['chill', 'Chill — you have time']]],
+  ['Side cards', [['nowcard', 'Right now card'], ['summary', 'Today summary (study, gym, lecture chips)'], ['water', 'Water glasses'], ['notes', 'Notes / warnings'], ['changes', "Today's changes (skips, swaps)"], ['layers', 'How far you can get today'], ['moved', 'Vs your ideal day'], ['banner', 'Keep calm card']]],
+  ['Timeline', [['k_meal', 'Meals (breakfast, lunch, dinner)'], ['k_gym', 'Gym / home workout'], ['k_bath', 'Bath + AM skincare'], ['k_skin', 'Wake up / fresh up'], ['k_night', 'Night skincare + wind down'], ['k_free', 'Skipped / free slots'], ['k_swap', '"→ study" markers'], ['p_med', 'Meds reminders'], ['p_meal', 'Snack + shopping reminders'], ['breaks', 'Breaks'], ['nowline', 'Now line'], ['lights', 'Lights out'], ['foods', 'Food / skincare lists inside blocks'], ['blkact', 'Skip / Make this study buttons'], ['ctrl', 'Re-plan / Perfect day / Off day buttons'], ['donebox', 'Done today list'], ['qa', 'Question boxes under ticked lectures']]],
+  ['Before the day starts', [['skinnote', 'Skincare note'], ['ideal', 'Your ideal day card'], ['yesterday', 'Yesterday card']]],
+  ['Everywhere', [['nowbox', 'Floating Now box']]]];
+const SO_DEF = { chill: 1, nowcard: 1, water: 1, notes: 1, layers: 1, moved: 1, banner: 1, k_meal: 1, k_gym: 1, k_bath: 1, k_skin: 1, k_night: 1, k_free: 1, k_swap: 1, p_med: 1, p_meal: 1, breaks: 1, lights: 1, foods: 1, blkact: 1, skinnote: 1, ideal: 1, yesterday: 1 };
+const hideSet = so => so ? (CFG().hideSO || SO_DEF) : (CFG().hide || {});
+const HID = k => !!hideSet(!!CFG().studyOnly)[k];
+let HEDIT = null;   // which list the hide sheet edits: true = study-only, false = normal
+function STUDYONLY() { S.core.cfg.studyOnly = !CFG().studyOnly; setCore(); }
+function HTOG(k, on) { const so = !!HEDIT, key = so ? 'hideSO' : 'hide', h = Object.assign({}, hideSet(so)); if (on) h[k] = 1; else delete h[k]; S.core.cfg[key] = h; setCore(); }
+function HRESET(all) { const so = !!HEDIT; S.core.cfg[so ? 'hideSO' : 'hide'] = all ? {} : (so ? Object.assign({}, SO_DEF) : {}); setCore(); }
+function hideSheetHTML() {
+  if (SHEET !== 'hide') return '';
+  const so = !!HEDIT, h = hideSet(so);
+  return `<div class="sheet" onclick="if(event.target===this){SHEET=null;render()}"><div class="in">
+   <h2>Today tab — kya kya chhupana hai?</h2>
+   <div class="seg">${[[false, 'Normal view'], [true, 'Study-only view']].map(([v, l]) => `<button class="${so === v ? 'on' : ''}" onclick="HEDIT=${v};render()">${l}</button>`).join('')}</div>
+   <p class="sm muted" style="margin:6px 0 0">Ticked = hidden in the ${so ? 'Study-only' : 'normal'} view. ${so ? 'Study blocks always stay.' : ''}</p>
+   ${HIDE_ITEMS.map(([g, its]) => `<div class="hgrp">${g}</div>${its.map(([k, l]) => `<label class="ck"><input type="checkbox" ${h[k] ? 'checked' : ''} onchange="HTOG('${k}',this.checked)"><span>${esc(l)}</span></label>`).join('')}`).join('')}
+   <div class="row2b" style="margin-top:12px"><button class="btn quiet" onclick="HRESET(1)">Show everything</button><button class="btn quiet" onclick="HRESET(0)">Default</button></div>
+   <button class="btn big" style="margin-top:10px" onclick="SHEET=null;render()">Done</button></div></div>`;
+}
+function viewBar() {
+  const so = !!CFG().studyOnly;
+  return `<div class="viewbar"><button class="btn ${so ? 'on' : 'quiet'}" onclick="STUDYONLY()">📚 Study only${so ? ' · ON' : ''}</button><button class="btn quiet" onclick="HEDIT=${so};SHEET='hide';render()">👁 Hide…</button></div>`;
+}
+function changesCard(P) {
+  if (HID('changes')) return '';
+  const meta = getDay().meta, sw = meta.sw || {}, swL = meta.swapL || {}, L = [];
+  P.swapped.forEach(x => L.push(`${clock(x.start)} ${esc(x.name)} → study <button class="link xs" onclick="SWB('${x.key}')">undo</button>`));
+  P.B.filter(b => b.kind === 'free').forEach(b => L.push(`${clock(b.start)} ${esc(b.orig)} → ${esc(b.txt || 'free time')} <button class="link xs" onclick="SWB('${b.key}')">undo</button>`));
+  Object.keys(sw).filter(k => k.startsWith('p:')).forEach(k => L.push(`Skipped reminder: ${esc(k.slice(2))} <button class="link xs" onclick="SWB('${k}')">undo</button>`));
+  Object.keys(swL).forEach(f => { const a = findLect(f), b = swL[f] === '-' ? null : findLect(swL[f]); L.push(`${esc(a ? a.l.t : '?')} → ${b ? esc(b.l.t) + ` <span class="faint">(${esc(b.s.name)})</span>` : 'later day'} <button class="link xs" onclick="SWLU('${f}')">undo</button>`); });
+  if (!L.length) return '';
+  return `<div class="card"><h2>Today's changes</h2>${L.map(x => `<div class="mv"><span class="mvi">⇄</span><span>${x}</span></div>`).join('')}</div>`;
+}
+const rowKind = b => ({ meal: 'k_meal', gym: 'k_gym', home: 'k_gym', bath: 'k_bath', skin: 'k_skin', night: 'k_night', free: 'k_free' })[b.kind];
+function RESETDAY() { if (!confirm('Start today over? Ticks stay; you pick "I\'m up" or "Perfect day" again.')) return; setMeta({ start: null, perfect: false }); }
 function viewToday() {
   const d = dk(), day = getDay(d), now = curMin(), I = planDay(d, true);
   if (day.meta.start == null) {
     const skinNow = now < 640 ? 'AM skincare after gym + bath (' + clock(CFG().gymAt ? CFG().gymAt + CFG().gymMins : 580) + ')' : now >= 1200 ? 'Tonight: ' + ((S.core.skin.pm[nightKey(d)] || {}).label || '') + ' night skincare' : 'If you head out: reapply SPF';
-    return `<div class="grid"><div class="side">
+    return `${viewBar()}<div class="grid"><div class="side">
      <div class="card nowcard"><h2>Right now · ${clock(now)}</h2><p class="sm muted" style="margin:0 0 12px">Tap when you're up. It asks what's already done, then builds the day from right now up to lights out at ${clock(CFG().sleep)}.</p>
      <button class="btn big" onclick="openCheckin()">I'm up — build my day</button>
      <button class="btn quiet big" style="margin-top:8px" onclick="PERFECT()">Perfect day — run my timetable as it is</button>
      <p class="xs faint" style="margin:6px 0 0">Starts the day at ${clock(CFG().idealWake)} like the ideal timetable. Everything before now is crossed off and Right now shows what the timetable says.</p>
-     <div class="note" style="background:#F7EEF4;border-color:#E6CFE0;color:#6B2F57">Skincare: ${esc(skinNow)}</div></div>
-     ${banner()}${layersCard(I)}</div><div class="main">
-     <div class="card"><div class="sec"><h2>Your ideal day</h2><span class="mono muted sm">wake ${clock(CFG().idealWake)}</span></div>
-     <p class="sm muted" style="margin:0 0 8px">This is the original timetable. Wake later and the app moves things for you.</p>${idealHTML(I)}</div>
-     ${yesterdayCard()}</div></div>`;
+     ${HID('skinnote') ? '' : `<div class="note" style="background:#F7EEF4;border-color:#E6CFE0;color:#6B2F57">Skincare: ${esc(skinNow)}</div>`}</div>
+     ${HID('banner') ? '' : banner()}${HID('layers') ? '' : layersCard(I)}</div><div class="main">
+     ${HID('ideal') ? '' : `<div class="card"><div class="sec"><h2>Your ideal day</h2><span class="mono muted sm">wake ${clock(CFG().idealWake)}</span></div>
+     <p class="sm muted" style="margin:0 0 8px">This is the original timetable. Wake later and the app moves things for you.</p>${idealHTML(I)}</div>`}
+     ${HID('yesterday') ? '' : yesterdayCard()}</div></div>`;
   }
   const P = planDay(d);
   const rows = [];
-  P.B.forEach(b => rows.push({ t: b.start, o: 1, h: blockHTML(b, P, now), b }));
-  P.pins.forEach(p => rows.push({ t: p.at, o: 0, h: pinHTML(p, now) }));
-  P.breaks.forEach(br => rows.push({ t: br.start, o: 2, h: `<div class="brk">${tchip(br.start, br.end)}<span>Break · ${br.end - br.start} min</span></div>` }));
+  P.B.forEach(b => { if (b.kind !== 'study' && HID(rowKind(b))) return; rows.push({ t: b.start, o: 1, h: blockHTML(b, P, now), b }); });
+  P.pins.forEach(p => { if (HID(p.kind === 'med' ? 'p_med' : 'p_meal')) return; rows.push({ t: p.at, o: 0, h: pinHTML(p, now) }); });
+  if (!HID('breaks')) P.breaks.forEach(br => rows.push({ t: br.start, o: 2, h: `<div class="brk">${tchip(br.start, br.end)}<span>Break · ${br.end - br.start} min</span></div>` }));
+  if (!HID('k_swap')) P.swapped.forEach(x => rows.push({ t: x.start, o: 0, h: `<div class="brk swp">${tchip(x.start, x.end)}<span>${esc(x.name)} → study</span><button class="link xs" onclick="SWB('${x.key}')">undo</button></div>` }));
   rows.sort((a, b) => a.t - b.t || a.o - b.o);
-  let tl = '', nowPut = d !== dk() || P.B.some(b => now >= b.start && now < b.end);
+  let tl = '', nowPut = d !== dk() || HID('nowline') || P.B.some(b => now >= b.start && now < b.end);
   rows.forEach(r => {
     if (!nowPut && r.t > now && now >= P.s0) { tl += `<div class="nowline">Now ${clock(now)}</div>`; nowPut = true; }
     tl += r.h;
   });
-  tl += `<div class="brk">${tchip(CFG().sleep)}<span>Lights out</span></div>`;
+  if (!HID('lights')) tl += `<div class="brk">${tchip(CFG().sleep)}<span>Lights out</span></div>`;
   const doneToday = Object.keys(S.done).filter(id => S.done[id].d === d && (P.pf || (S.done[id].at ?? -1) < P.s0)).map(findLect).filter(Boolean);
   const doneMins = doneToday.reduce((a, x) => a + W(x.l.len), 0);
   const vidPlanned = P.items.filter(i => i.type === 'lec').reduce((a, i) => a + i.mins, 0);
@@ -1287,17 +1437,20 @@ function viewToday() {
     <span class="chip" style="--c:var(--rev)">Revision <b>${hm(P.rev.mins)}</b></span>
     </div><div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">${subjChips(P)}</div>
     ${P.studyMins + doneMins < CFG().studyMin && !P.off ? `<div class="note">Short day: ${hm(P.studyMins)} of study fits before lights out (your minimum is ${hm(CFG().studyMin)}). Still beats zero — keep the chain.</div>` : ''}
-    ${P.notes.map(n => `<div class="note">${esc(n)}</div>`).join('')}
+    ${HID('notes') ? '' : P.notes.map(n => `<div class="note">${esc(n)}</div>`).join('')}
     ${P.overflow.length ? `<div class="sm faint" style="margin-top:8px">${P.overflow.filter(i => i.type === 'lec').length} planned lecture(s) didn't fit — they move to tomorrow on their own.</div>` : ''}
-    <div class="water"><span class="sm muted" style="margin-right:4px">Water ${water}/${wg}</span>${Array.from({ length: wg }, (_, i) => `<button class="wg ${i < water ? 'on' : ''}" aria-label="glass ${i + 1}" onclick="WATER(${i + 1})"></button>`).join('')}</div></div>`;
+    ${HID('water') ? '' : `<div class="water"><span class="sm muted" style="margin-right:4px">Water ${water}/${wg}</span>${Array.from({ length: wg }, (_, i) => `<button class="wg ${i < water ? 'on' : ''}" aria-label="glass ${i + 1}" onclick="WATER(${i + 1})"></button>`).join('')}</div>`}</div>`;
   const ml = movedLines(I, P);
   const moved = `<div class="card"><div class="sec"><h2>Vs your ideal day</h2><span class="mono muted sm">ideal wake ${clock(CFG().idealWake)}</span></div>
     ${ml.length ? ml.map(([i, t]) => `<div class="mv"><span class="mvi">${i}</span><span>${esc(t)}</span></div>`).join('') : '<div class="sm muted">Running exactly like the ideal day.</div>'}
     <details class="more"><summary>See the full ideal timetable ▾</summary>${idealHTML(I)}</details></div>`;
-  const ctrl = `<div class="dayhead"><button class="btn" onclick="openCheckin()">Running late? Re-plan from now</button>
-    <button class="btn ${P.off ? '' : 'off'}" onclick="OFFDAY()">${P.off ? 'Off day ON' : 'Make today off'}</button></div>`;
+  const pfOn = !!day.meta.perfect;
+  const ctrl = HID('ctrl') ? '' : `<div class="dayhead" style="flex-wrap:wrap"><button class="btn ${pfOn ? 'quiet' : ''}" onclick="openCheckin()">${pfOn ? "Switch to I'm up — re-plan from now" : 'Running late? Re-plan from now'}</button>
+    <button class="btn ${pfOn ? '' : 'quiet'}" onclick="PERFECT()">${pfOn ? 'Perfect day ON' : 'Switch to Perfect day'}</button>
+    <button class="btn ${P.off ? '' : 'off'}" onclick="OFFDAY()">${P.off ? 'Off day ON' : 'Make today off'}</button>
+    <button class="btn quiet" onclick="RESETDAY()">Start over</button></div>`;
   const doneBox = doneToday.length ? `<details class="card donebox"><summary>${P.pf ? 'Done today' : 'Done before this plan'} — ${doneToday.length} lecture(s) ✓</summary>${doneToday.map(x => lecRow(x, 0, false)).join('')}</details>` : '';
-  return `<div class="grid"><div class="side">${nowCard(P, now)}${summary}${layersCard(P)}${moved}${banner()}</div><div class="main">${ctrl}<h2 style="margin:4px 0 10px">Full day${day.meta.perfect ? ' <span class="faint sm">· perfect day</span>' : ''}</h2><div class="tl${day.meta.perfect ? ' pf' : ''}">${tl}</div>${doneBox}</div></div>`;
+  return `${viewBar()}<div class="grid"><div class="side">${HID('nowcard') ? '' : nowCard(P, now)}${HID('summary') ? '' : summary}${changesCard(P)}${HID('layers') ? '' : layersCard(P)}${HID('moved') ? '' : moved}${HID('banner') ? '' : banner()}</div><div class="main">${ctrl}<h2 style="margin:4px 0 10px">${CFG().studyOnly ? 'Study timetable' : 'Full day'}${day.meta.perfect ? ' <span class="faint sm">· perfect day</span>' : ''}</h2><div class="tl${day.meta.perfect ? ' pf' : ''}">${tl}</div>${HID('donebox') ? '' : doneBox}</div></div>`;
 }
 function yesterdayCard() {
   const y = addD(dk(), -1), yd = S.days[y]; if (!yd || !yd.meta || yd.meta.start == null) return '';
@@ -1345,7 +1498,7 @@ function sheetHTML() {
 function closeSheet() { SHEET = null; CK = null; render(); }
 function submitCheckin() {
   const d = dk(), now = curMin(), day = getDay(d), m = {};
-  const meta = Object.assign({}, day.meta, { start: now, off: CK.off });
+  const meta = Object.assign({}, day.meta, { start: now, off: CK.off, perfect: false });
   if (CK.thy === 'no') { m['days/' + d + '/ticks/thyroid'] = null; meta.thyAt = null; }
   else { meta.thyAt = CK.thy === 'now' ? now : now - 60; m['days/' + d + '/ticks/thyroid'] = day.ticks.thyroid || meta.thyAt; }
   for (const k in CK.ticks) {
@@ -1376,9 +1529,38 @@ function viewRev() {
 }
 
 /* ---------------- courses tab ---------------- */
+/* ---- recommended GATE order + prerequisites + value tags (research 22 Nov 2026) ---- */
+// [track, order]. A: C → DS → Algo → OS → DBMS → TOC → CD · B: DLD → CO → CN · side: DMS + Aptitude (alternate) · maths: LA, Prob, Calculus (rotate)
+const REC_ORD = { odbp12s: ['A', 1], z0qut2d: ['A', 2], '5ophzvr': ['A', 3], my3s2qr: ['A', 4], aewcv1n: ['A', 5], ltaqp8d: ['A', 6], zzq53b4: ['A', 7],
+  mdgr4us: ['B', 1], knofuq3: ['B', 2], kvxpzp8: ['B', 3], cq2wngq: ['side', 1], o2z43sh: ['side', 2], e23cspq: ['em', 1], el5f948: ['em', 2], y0q678r: ['em', 3] };
+const REC_DMS = ['Set Theory', 'Relations', 'Function', 'Mathematical Logic', 'Graph Theory', 'Combinatorics', 'Group Theory', 'Lattice', 'Mathematical Logic (repeat)'];
+// [needs, hard?, why]
+const PREQ = { z0qut2d: [['odbp12s', 1, 'pointers, structs, recursion']], '5ophzvr': [['z0qut2d', 1, 'heaps, trees, recurrences, asymptotics']], knofuq3: [['mdgr4us', 1, 'gates, number systems, circuits']],
+  zzq53b4: [['ltaqp8d', 1, 'regex, DFA, CFG = lexer + parser']], ltaqp8d: [['cq2wngq', 0, 'sets, relations, functions, logic (first DMS modules)']],
+  my3s2qr: [['z0qut2d', 0, 'queues, linked lists'], ['knofuq3', 0, 'memory/cache basics help in paging']], aewcv1n: [['z0qut2d', 0, 'B/B+ trees for indexing']], kvxpzp8: [['mdgr4us', 0, 'binary, bits for IP/CRC']] };
+function valTag(s) {
+  const hrs = s.lects.filter(l => !l.skip).reduce((a, l) => a + l.len, 0) / 60, r = (+s.marks || 0) / Math.max(1, hrs);
+  const v = r >= 0.1 ? ['hi', '⭐ high marks / hour'] : r >= 0.07 ? ['md', 'medium marks / hour'] : ['lo', 'slow marks'];
+  const L = hrs < 50 ? 'short' : hrs <= 90 ? 'medium length' : 'long';
+  return `<span class="tag ${v[0]}">${v[1]}</span><span class="tag ln">${Math.round(hrs)}h · ${L}</span>`;
+}
+function preqHTML(s, sim) {
+  const P = PREQ[s.id]; if (!P) return '';
+  return P.map(([id, hard, why]) => {
+    const q = S.core.subs.find(x => x.id === id); if (!q) return '';
+    const bad = hard && q.on && !subjDone(q) && s.on && sim.fin[s.id] && (!sim.fin[id] || sim.fin[id] > sim.fin[s.id]);
+    return `<div class="preq ${bad ? 'bad' : ''}">${bad ? '⚠ ' : ''}Needs ${esc(q.name.split(' 20')[0])} first${hard ? '' : ' (helps)'} — ${esc(why)}${bad ? ' · it finishes after this one, move it up' : ''}</div>`;
+  }).join('');
+}
+function RECORD() {
+  if (!confirm('Apply the recommended GATE order?\nA: C → DS → Algo → OS → DBMS → TOC → CD\nB: DLD → CO → CN\nSide: DMS (sets/logic first) + Aptitude\nMaths: LA, Prob, Calculus\n\nTicks and progress stay.')) return;
+  S.core.subs.forEach(s => { const r = REC_ORD[s.id]; if (r) { s.track = r[0]; s.ord = r[1]; } if (s.id === 'cq2wngq') { const have = new Set(s.lects.map(l => l.mod)); s.modOrd = REC_DMS.filter(m => have.has(m)).concat([...have].filter(m => !REC_DMS.includes(m))); } });
+  setCore(); toast('Recommended order applied');
+}
 function viewCourses() {
   const sim = simulate(CFG().speed);
-  let h = `<div class="card"><h2>Paste a lecture list</h2><pre># Module name
+  let h = `<div class="card"><h2>Subject order</h2><p class="sm muted" style="margin:0 0 8px">Recommended for GATE (Feb 2027): prerequisites first, high marks-per-hour subjects never last. Tags on every subject below.</p>
+  <button class="btn wide" onclick="RECORD()">Apply recommended GATE order</button></div><div class="card"><h2>Paste a lecture list</h2><pre># Module name
 L01 Lecture title|1:32:10</pre>
   <label class="f">Subject</label><select id="psub">${S.core.subs.map(s => `<option value="${s.id}">${esc(s.name)} — ${s.lects.length}</option>`).join('')}</select>
   <label class="f">List</label><textarea id="ptext"></textarea>
@@ -1390,11 +1572,11 @@ L01 Lecture title|1:32:10</pre>
     L.forEach((s, i) => {
       const act = s.lects.filter(l => !l.skip), dn = act.filter(l => S.done[l.id]), raw = act.reduce((a, b) => a + b.len, 0);
       const p = act.length ? Math.round(dn.length / act.length * 100) : 0, f = sim.fin[s.id];
-      h += `<div class="sub2" style="opacity:${s.on ? 1 : .5};--sc:${s.color}"><div class="s2h"><b>${esc(s.name)}</b><span class="pill">${s.marks} marks</span><span class="grow"></span>
+      h += `<div class="sub2" style="opacity:${s.on ? 1 : .5};--sc:${s.color}"><div class="s2h"><b>${esc(s.name)}</b><span class="pill">${s.marks} marks</span>${valTag(s)}<span class="grow"></span>
        <button class="btn quiet mini" onclick="MV('${s.id}',-1)" ${i === 0 ? 'disabled' : ''}>↑</button><button class="btn quiet mini" onclick="MV('${s.id}',1)" ${i === L.length - 1 ? 'disabled' : ''}>↓</button>
        <button class="btn quiet mini" onclick="TG('${s.id}')">${s.on ? 'on' : 'off'}</button></div>
        <div class="bar"><i style="width:${p}%;background:${s.color}"></i></div>
-       <div class="s2m"><b>${dn.length}/${act.length}</b> lectures · ${p}% · ${hm(raw)} → ${hm(W(raw))} at ${CFG().speed}x${f ? ' · finishes ' + fmt2(f) : ''}</div>`;
+       <div class="s2m"><b>${dn.length}/${act.length}</b> lectures · ${p}% · ${hm(raw)} → ${hm(W(raw))} at ${CFG().speed}x${f ? ' · finishes ' + fmt2(f) : ''}</div>${preqHTML(s, sim)}`;
       const mods = (s.modOrd && s.modOrd.length) ? s.modOrd : [...new Set(s.lects.map(l => l.mod))];
       h += `<details><summary class="link" style="display:inline-block;margin-top:6px">Full list — ${s.lects.length} lectures</summary>`;
       mods.forEach((m, j) => {
@@ -2112,9 +2294,10 @@ function paintAlert() {
   const w = ALM.kind === 'water', n = getDay().meta.water || 0;
   el.className = 'alfs ' + (w ? 'w' : 't');
   el.innerHTML = `<div class="alin"><div class="alic">${w ? '💧' : '⏰'}</div><div class="alt">${esc(ALM.title)}</div><div class="als">${esc(ALM.sub || '')}</div>
-    <div class="alb">${w ? `<button class="btn big" onclick="ALW(1)">Drank a glass ✓ <span class="faint">(${n + 1}/${CFG().water})</span></button><button class="btn quiet big" onclick="ALW(0)">Snooze 5 min</button>` : `<button class="btn big" onclick="ALX()">OK</button>`}</div></div>`;
+    <div class="alb">${w ? `<button class="btn big" onclick="ALW(1)">Drank a glass ✓ <span class="faint">(${n + 1}/${CFG().water})</span></button><button class="btn quiet big" onclick="ALW(0)">Snooze 5 min</button><button class="btn quiet big" onclick="ALX()">Skip this one</button><button class="btn quiet big" onclick="ALWOFF()">No water reminders today</button>` : `<button class="btn big" onclick="ALX()">OK</button>`}</div></div>`;
 }
 function ALX() { ALM = null; clearInterval(ALREP); paintAlert(); }
+function ALWOFF() { AL.wOff = 1; alSave(); ALX(); toast('Water reminders off till tomorrow'); }
 function ALW(drank) { if (drank) setMeta({ water: (getDay().meta.water || 0) + 1 }); else { AL.wNext = Date.now() + 5 * 60000; alSave(); } ALX(); }
 function ALTEST(kind) { lunlock(); if (kind === 'water') alertShow('water', 'Drink water', 'Test · every ' + (CFG().waterEvery || 0) + ' min'); else { const P = livePlan(); const b = P && P.B.find(x => x.start >= curMin()) || null; alertShow('tt', b ? blockName(b, P) : 'Dinner', (b ? clock(b.start) + '–' + clock(b.end) : '19:30–20:00') + ' · test'); } }
 function ALPERM() { try { Notification.requestPermission().then(p => { toast(p === 'granted' ? 'Notifications on' : 'Notifications blocked in the browser settings'); render(); }); } catch (e) { toast('This browser has no notifications'); } }
@@ -2132,7 +2315,7 @@ function alertTick() {
     for (const e of evs) if (!AL.fired[e.k] && m >= e.at && m < e.at + 2) { AL.fired[e.k] = 1; alSave(); alertShow('tt', e.title, e.sub); break; }
   }
   const ev = +c.waterEvery || 0;
-  if (ev > 0 && !ALM && m >= P.s0 && m < c.pmSkin) {
+  if (ev > 0 && !ALM && !AL.wOff && m >= P.s0 && m < c.pmSkin) {
     if (!AL.wNext) { AL.wNext = now + ev * 60000; alSave(); }
     else if (now >= AL.wNext) { AL.wNext = now + ev * 60000; alSave(); alertShow('water', 'Drink water', `Glass ${(getDay().meta.water || 0) + 1} of ${c.water}`); }
   }
@@ -2189,9 +2372,10 @@ function focusPaint() {
 /* floating "Now" box, on every tab */
 let NFW_K = '';
 const NFWT = () => { AL.min = !AL.min; alSave(); NFW_K = ''; nowWidget(); };
+function NFWX() { S.core.cfg.nowBox = false; setCore(); toast('Now box hidden · wapas: Settings → Reminders'); }
 function nowWidget() {
   let el = document.getElementById('nowfw');
-  if (LIVE_OV || !S || CFG().nowBox === false) { if (el) el.remove(); return; }
+  if (LIVE_OV || !S || CFG().nowBox === false || HID('nowbox')) { if (el) el.remove(); return; }
   let P; try { P = livePlan(); } catch (e) { return; }
   if (!P) return;
   if (!el) { el = document.createElement('div'); el.id = 'nowfw'; document.body.appendChild(el); }
@@ -2203,7 +2387,7 @@ function nowWidget() {
   if (key !== NFW_K) {
     NFW_K = key;
     el.className = 'nfw' + (AL.min ? ' min' : '');
-    el.innerHTML = `<div class="nfw-h"><b class="nfw-t" id="nfw-t"></b><span class="nfw-now" style="--c:${col}">${esc(name)}</span><button class="nfw-b" onclick="NFWT()" aria-label="${AL.min ? 'Open' : 'Shrink'}">${AL.min ? '▴' : '▾'}</button></div>
+    el.innerHTML = `<div class="nfw-h"><b class="nfw-t" id="nfw-t"></b><span class="nfw-now" style="--c:${col}">${esc(name)}</span><button class="nfw-b" onclick="NFWT()" aria-label="${AL.min ? 'Open' : 'Shrink'}">${AL.min ? '▴' : '▾'}</button><button class="nfw-b" onclick="NFWX()" aria-label="Hide" title="Hide this box">✕</button></div>
       ${AL.min ? '' : `${cur ? `<div class="nfw-r"><span class="k">Now</span><span>till ${clock(cur.end)} · <b id="nfw-left"></b> left</span></div>` : ''}
       ${nx ? `<div class="nfw-r"><span class="k">Next</span><span>${clock(nx.start)} ${esc(blockName(nx, P))}</span></div>` : ''}
       ${lec ? `<div class="nfw-l" style="--c:${esc(lec.color)}"><span class="k">Lecture</span><span class="nfw-lt"><small>${esc(lec.sub)}</small>${esc(lec.title)}</span>${lec.t === 'lec' ? `<button class="nfw-tk" onclick="TK('${lec.id}')" title="Tick as done">✓</button>` : ''}</div>` : L.n ? `<div class="nfw-r"><span class="k">Lecture</span><span>All ${L.n} done today ✓</span></div>` : ''}`}`;
@@ -2233,7 +2417,7 @@ function render() {
   const y = window.scrollY;
   applyScale();
   document.getElementById('app').innerHTML = body;
-  document.getElementById('sheet').innerHTML = sheetHTML() + joinHTML();
+  document.getElementById('sheet').innerHTML = sheetHTML() + joinHTML() + hideSheetHTML() + swapSheetHTML();
   paintTimer();
   const rc = dueRev(dk(), 1e9).all.length;
   document.getElementById('nav').innerHTML = [['today', 'Today'], ['study', 'Study'], ['body', 'Body'], ['progress', 'Progress'], ['live', 'Live'], ['set', 'Settings']]

@@ -46,6 +46,15 @@ Ideal day (from Daily_Timetable.docx):
 - "Make today off": no gym, 2h light study.
 All times and durations are editable in Settings (Morning gym start 00:00 = gym before lunch instead).
 
+## Changes 22 Nov 2026
+- **Perfect day ⇄ I'm up**: after picking one, the Today tab has *Switch to Perfect day* / *Switch to I'm up — re-plan from now* and *Start over* (pick again). Ticks stay.
+- **Study vs non-study colours**: study blocks blue, everything else beige, skipped slots grey.
+- Every non-study block: **Skip** (asks what you'll do there instead, editable) or **Make this study** (that time is added to today's study). Reminders (meds, snack, shopping) have a small *skip*. All undoable from the timeline or the *Today's changes* card.
+- **Lecture swap**: *swap ⇄* on any lecture → pick any other lecture (any subject) to watch today instead, or just move it to a later day. The swapped-out lecture comes back from tomorrow in its normal place.
+- **Study only** button: shows only the study timetable. **Hide…** lets you hide any part of the Today tab (separate lists for normal and Study-only view), incl. the floating Now box.
+- Floating Now box has an ✕ (bring back: Settings → Reminders). Water reminder: *Skip this one* and *No water reminders today*.
+- Courses tab: **Apply recommended GATE order** (A: C → DS → Algo → OS → DBMS → TOC → CD · B: DLD → CO → CN · side: DMS sets/logic first + Aptitude · maths: LA, Prob, Calculus), plus tags per subject (marks/hour, length) and prerequisite warnings.
+
 ## Focus mode
 Top bar → **Focus**: full-screen dark screen with a big clock, what the timetable says right now (with time left), the current lecture with a ✓ button, any med or meal due now, and what's next. Screen stays awake. Esc or ✕ Exit to leave.
 
